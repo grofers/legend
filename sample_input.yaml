@@ -1,0 +1,17 @@
+#TODO: people should be able to add custom metrics within their panels 
+#TODO: Write a spec for metrtics library and input file and additional custom metrics 
+
+Title: LokiFromCode
+Environment: Stage
+Description: Loki metrics
+Tags: 
+  - stage
+  - infra
+Components:
+  S3:
+    BucketName: grofers-loki-stage 
+    FilterId: EntireBucket
+  Promtail:
+    PodName: promtail
+  SystemCore-ec2:
+    Host: bind

@@ -1,0 +1,17 @@
+Datasource: cloudwatch 
+IdentifierKeys:
+  - BucketName
+  - FilterId
+Panels:
+  - Title: (S) Throttles
+    Type: Graph
+    Description: Number of events which exceeded your provisioned read throughput in the selected time period (sum) 
+    Targets: 
+    - dimensions: {"BucketName": {{ IdentifierKeys.BucketName }} ,"FilterId": {{ IdentifierKeys.FilterId }}}
+      metric: ReadThrottleEvents
+      namespace: AWS/DynamoDB
+      statistic: Sum
+    - dimensions: {"BucketName": {{ IdentifierKeys.BucketName }} ,"FilterId": {{ IdentifierKeys.FilterId }}}
+      metric: WriteThrottleEvents
+      namespace: AWS/DynamoDB
+      statistic: Sum

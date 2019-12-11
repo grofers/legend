@@ -1,0 +1,10 @@
+Datasource: influxdb 
+IdentifierKeys: 
+  - Host
+Panels:
+  - Title: (U) Memory utilisation
+    Type: Graph
+    Description: Memory utilisation
+    Targets: 
+    - query: SELECT mean('value') FROM 'memory_value' WHERE ('type_instance' = 'used' AND 'host' =~ /^{{ IdentifierKeys.Host }}/ AND 'type' = 'percent') AND $timeFilter GROUP BY time($interval), 'host' fill(null)
+      alias_by: $tag_host
