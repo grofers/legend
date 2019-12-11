@@ -2,6 +2,16 @@
 
 ############
 #
+#Constants
+#
+############
+
+SERVICE_DESC_INDIVIDUAL_COMPONENTS = '[{component}]({component_ref}): {component_desc}'
+
+SERVICE_DESC = '# {{ service }} {% raw %}\\<placeHolder>n  {% endraw %} #### Components {% raw %} \\<placeHolder>n  {% endraw %} {% for item in SERVICE_DESC_INDIVIDUAL_COMPONENTS -%} {{ item }} {% raw %}  \\<placeHolder>n{% endraw %}{% endfor -%}{% raw %} \\<placeHolder>n \\<placeHolder>n {% endraw %}#### References{% raw %} \\<placeHolder>n  {% endraw %}{% for dict_item in references -%} {% for k,v in dict_item.items() -%} [{{ k }}]({{ v }}){% raw %} \\<placeHolder>n {% endraw %}{% endfor -%}{% endfor -%}'
+
+############
+#
 #Dashboards
 #
 ############
@@ -12,6 +22,7 @@ IMPORTS = """
 local grafana = import 'grafonnet/grafana.libsonnet';
 local dashboard = grafana.dashboard;
 local template = grafana.template;
+local text = grafana.text; 
 local row = grafana.row;
 local singlestat = grafana.singlestat;
 local graphPanel = grafana.graphPanel;
@@ -23,7 +34,6 @@ local influxdb = grafana.influxdb;
 DASHBOARD_HEAD = '''
 dashboard.new(
 '{title}',
-description="{desc}",
 tags={tags},
 schemaVersion=18,
 editable='true',
@@ -34,30 +44,30 @@ refresh='1m',
 template.datasource(
     'PROMETHEUS_DS',
     'prometheus', 
-    'Prometheus ({Env})',
+    'Prometheus ({env})',
     hide='variable',
     label=null,
-    regex="/^Prometheus.*{Env}/i"
+    regex="/^Prometheus.*{env}/i"
     )
 )
 .addTemplate(
 template.datasource(
     'CLOUDWATCH_DS',
     'cloudwatch', 
-    'Cloudwatch ({Env})',
+    'Cloudwatch ({env})',
     hide='variable',
     label=null,
-    regex="/.{Env}/i"
+    regex="/.{env}/i"
     )
 )
 .addTemplate(
 template.datasource(
     'INFLUXDB_DS',
     'influxDB', 
-    'InfluxDB ({Env})',
+    'InfluxDB ({env})',
     hide='variable',
     label=null,
-    regex="/^InfluxDB .{Env}/i"
+    regex="/^InfluxDB .{env}/i"
     )
 )
 '''
@@ -85,7 +95,22 @@ GRAPH_PANEL = '''
         legend_alignAsTable='true',
     )
 '''
+
+#Text
+TEXT_PANEL = '''
+    text.new(
+        title='{title}',
+        span=null,
+        mode='markdown',
+        content='{content}',
+        transparent=null,
+        description=null,
+        datasource=null,
+    )
+'''
+
 #SingleStat
+
 
 
 ############
@@ -123,7 +148,7 @@ PROMETHEUS_TARGET = '''
 '''
 
 #influx
-INFLUX_TARGET = '''
+INFLUXDB_TARGET = '''
 .addTarget(
     influxdb.target(
     "{query}",

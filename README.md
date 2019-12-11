@@ -1,3 +1,7 @@
+# Legend
+
+Tool to generate grafana dashboard with pre filled metrics 
+
 ## Structure 
 
 * The input file should represent a "Service"
@@ -5,7 +9,6 @@
 * The component needs to have a matching file in `metrics_library`. The spec is defined <>
 
 Refer to docs in <docs>
-
 
 ## Dependencies
 
@@ -17,7 +20,7 @@ Refer to docs in <docs>
 
 ### Python requirements
 `pip3 install -r requirements.txt`
-
+ 
 
 ## Generate dashboards
 

@@ -1,4 +1,6 @@
 Datasource: cloudwatch 
+Reference: https://aws.amazon.com/s3/
+Description: Provide a reliable solution for object level storage 
 IdentifierKeys:
   - BucketName
   - FilterId

@@ -12,8 +12,6 @@ def INPUT_YAML_TO_JSON(input_file):
             raise Exception(exc)
 
 def ASSEMBLE_PANELS(panels_list):
-
-    #ASSEMBLE_PANELS
     assemble_panels = '''
     .addPanels(
   [
@@ -34,6 +32,6 @@ def ASSEMBLE_PANELS(panels_list):
   ]
 )
 '''
-    assemble= assemble_panels + assemble_panels_close
+    assemble = assemble_panels + assemble_panels_close
 
     return (assemble)

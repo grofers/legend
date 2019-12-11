@@ -2,6 +2,7 @@
 local grafana = import 'grafonnet/grafana.libsonnet';
 local dashboard = grafana.dashboard;
 local template = grafana.template;
+local text = grafana.text; 
 local row = grafana.row;
 local singlestat = grafana.singlestat;
 local graphPanel = grafana.graphPanel;
@@ -87,7 +88,7 @@ local SystemCoreec2 =
 local UMemoryutilisation = 
     graphPanel.new(
         title='(U) Memory utilisation',
-        datasource='$INFLUX_DS',
+        datasource='$INFLUXDB_DS',
         legend_values='true',
         legend_min='true',
         legend_max='true',
@@ -104,10 +105,20 @@ local UMemoryutilisation =
     )
 )
 ; 
+local sdp = 
+    text.new(
+        title='Service Description',
+        span=null,
+        mode='markdown',
+        content='# LokiFromCode \n \n  #### Components  \n \n  [S3](https://aws.amazon.com/s3/): Provide a reliable solution for object level storage  \n \n[Promtail](https://github.com/grafana/loki/tree/master/docs/clients/promtail): Scrapes logs from pods and pushes them to loki, deployed as daemonset across all nodes  \n \n[SystemCore-ec2](https://www.slideshare.net/OpsStack/how-to-monitoring-the-sre-golden-signals-ebook/): System core metrics  \n \n \n \n #### References \n \n [Deployment](https://github.com/grofers/kube-infra/tree/master/manifests/loki) \n \n[Documentation](https://github.com/grafana/loki/tree/master/docs) \n \n[Metrics definition](https://github.com/grofers/kube-infra/tree/master/manifests/loki) \n \n',
+        transparent=null,
+        description=null,
+        datasource=null,
+    )
+; 
 
 dashboard.new(
 'LokiFromCode',
-description="Loki metrics",
 tags=['stage', 'infra'],
 schemaVersion=18,
 editable='true',
@@ -145,6 +156,7 @@ template.datasource(
     )
 )
 
+.addPanels([ sdp  { gridPos: { h: 10, w: 15, x: 0, y: 0 }, }, ])
 
     .addPanels(
   [

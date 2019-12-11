@@ -7,8 +7,6 @@ import yaml
 import helpers
 from jinja2 import Template
 
-#TODO: Add promethus and influx DB metrics as samples at least
-#TODO: Add Description of serice at the top 
 #TODO: seperate the head and the templates
 
 def dashboard_builder(input):
@@ -22,21 +20,33 @@ def dashboard_builder(input):
     #Build individual panels for each component
     panels_constants = {}
     panels_list = {}
+    component_ref = {}
     for component in input['Components']:
-        InputIdentifierKeys = input['Components'][component]
-        panels_constants[component],panels_list[component] = helpers.generators.ADD_COMPONENT(component,InputIdentifierKeys)
-        
+        ComponentIdentifiers = input['Components'][component]
+        panels_constants[component],panels_list[component],component_ref[component] = helpers.generators.ADD_COMPONENT(component,ComponentIdentifiers)
+    
     #Write constants to the output file
     for data in panels_constants.values():
         for k,v in data.items():
             f.write("local "+k+" = "+v+"; \n")
 
+    #Build service description panel
+    service_template = Template(helpers.constants.SERVICE_DESC)
+    msg = service_template.render(SERVICE_DESC_INDIVIDUAL_COMPONENTS=component_ref.values(),service= input["Title"],references=input["References"])
+    sdp = helpers.constants.TEXT_PANEL.format(title="Service Description",content=msg)
+    #Placehoplder to avoid \n by python, if we add additional \ then JSONNET would throuw an error step
+    sdp = sdp.replace("<placeHolder>","")
+    f.write("local sdp = "+sdp+"; \n")
+    
     #Write data to the sheet
-    head = helpers.generators.DASHBOARD_HEAD(input['Title'],input['Tags'],input['Description'],input["Environment"])
+    head = helpers.constants.DASHBOARD_HEAD.format(title=input['Title'],tags=input['Tags'],env=input["Environment"])
     f.write(head+"\n")
 
-    #Assemble the panels and write to sheet
-    assembled_panels = helpers.subtasks.ASSEMBLE_PANELS(panels_list)
+    #Write the service desc panel gridPos
+    f.write(".addPanels([ sdp  { gridPos: { h: 10, w: 15, x: 0, y: 0 }, }, ])"+"\n")
+
+    #Assemble the panels and write to sheet (the gridPOS panels )
+    assembled_panels = helpers.utilities.ASSEMBLE_PANELS(panels_list)
     f.write(assembled_panels+"\n")
 
     f.close()
@@ -52,5 +62,5 @@ if __name__ == '__main__':
     if not os.path.exists(input_file):
         raise Exception ("Unable to find the file")
 
-    input = helpers.subtasks.INPUT_YAML_TO_JSON(input_file)
+    input = helpers.utilities.INPUT_YAML_TO_JSON(input_file)
     dashboard_builder(input)

@@ -4,10 +4,6 @@ import helpers.constants
 from jinja2 import Template, Environment, FileSystemLoader
 import yaml
 
-def DASHBOARD_HEAD(title,tags,desc,env):
-    head = helpers.constants.DASHBOARD_HEAD.format(title=title,desc=desc,tags=str(tags),Env=env)
-    return (head)
-
 def ADD_GRAPH(data_source,panel_data):
     if data_source == "cloudwatch" :
         panel = helpers.constants.GRAPH_PANEL.format(title=panel_data["Title"],datasource='$CLOUDWATCH_DS')
@@ -26,7 +22,9 @@ def ADD_GRAPH(data_source,panel_data):
     elif data_source == "influxdb":
         panel = helpers.constants.GRAPH_PANEL.format(title=panel_data["Title"],datasource='$INFLUXDB_DS')
         for target in panel_data["Targets"]:
-            target = helpers.constants.INFLUX_TARGET.format(query=target["query"],alias_by=target["alias_by"])
+            #Converting double quotes to single to avoid misconfig
+            target["query"] = target["query"].replace("\"","\'")
+            target = helpers.constants.INFLUXDB_TARGET.format(query=target["query"],alias_by=target["alias_by"])
             panel = panel+target
         return (panel)
 
@@ -78,8 +76,10 @@ def ADD_COMPONENT(component,InputIdentifierKeys):
     #Generate panels along with metrics
     panels_list[componentIdentification] = []
 
+    #Generate component ref for decs text box in dashbaord
+    component_ref = helpers.constants.SERVICE_DESC_INDIVIDUAL_COMPONENTS.format(component_desc=component_metrics["Description"],component_ref=component_metrics["Reference"],component=component)
     for panel in component_metrics["Panels"]:
         panelIdentification = ''.join(e for e in panel["Title"] if e.isalnum())
         panels_constants[panelIdentification] = ADD_PANEL(data_source,panel)
         panels_list[componentIdentification].append(panelIdentification)
-    return (panels_constants,panels_list)
+    return (panels_constants,panels_list,component_ref)
