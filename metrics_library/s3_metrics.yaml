@@ -13,7 +13,9 @@ Panels:
       metric: ReadThrottleEvents
       namespace: AWS/DynamoDB
       statistic: Sum
+      refId: A
     - dimensions: {"BucketName": {{ IdentifierKeys.BucketName }} ,"FilterId": {{ IdentifierKeys.FilterId }}}
       metric: WriteThrottleEvents
       namespace: AWS/DynamoDB
       statistic: Sum
+      refId: B

@@ -9,6 +9,7 @@ local graphPanel = grafana.graphPanel;
 local prometheus = grafana.prometheus;
 local cloudwatch = grafana.cloudwatch;
 local influxdb = grafana.influxdb;
+local alertCondition = grafana.alertCondition;
 
 local S3 = 
     row.new(title='S3')
@@ -16,7 +17,8 @@ local S3 =
 local SThrottles = 
     graphPanel.new(
         title='(S) Throttles',
-        datasource='$CLOUDWATCH_DS',
+        datasource='Cloudwatch (Stage)',
+        shared_tooltip='true',
         legend_values='true',
         legend_min='true',
         legend_max='true',
@@ -24,6 +26,7 @@ local SThrottles =
         legend_total='false',
         legend_avg='true',
         legend_alignAsTable='true',
+        nullPointMode='connected',
     )
 
 .addTarget(
@@ -60,7 +63,8 @@ local Promtail =
 local EMissingpods = 
     graphPanel.new(
         title='(E) Missing pods',
-        datasource='$PROMETHEUS_DS',
+        datasource='Prometheus (Stage)',
+        shared_tooltip='true',
         legend_values='true',
         legend_min='true',
         legend_max='true',
@@ -68,17 +72,36 @@ local EMissingpods =
         legend_total='false',
         legend_avg='true',
         legend_alignAsTable='true',
+        nullPointMode='connected',
     )
 
 .addTarget(
     prometheus.target(
-    '(count(kube_node_info) - count(kube_pod_info{pod=~".*.*"}))',
+    '(count(kube_node_info) - count(kube_pod_info{pod=~".*promtail.*"}))',
     )
 )
 
-.addTarget(
-    prometheus.target(
-    '(count(kube_node_info) - count(kube_pod_info{pod=~".*.*"}))',
+.addAlert(
+      '(E) Missing pods',
+      executionErrorState='alerting',
+      forDuration='5m',
+      frequency='10s',
+      handler=1,
+      message='Severity: SEV-2',
+      noDataState='no_data',
+      notifications=[{'uid': 'SVPe4gfZk'}],
+    )
+
+.addCondition(
+    alertCondition.new(
+        evaluatorParams=[4],
+        evaluatorType='gt',
+        operatorType='and',
+        queryRefId='A',
+        queryTimeEnd='now',
+        queryTimeStart='5m',
+        reducerParams=[],
+        reducerType='avg',
     )
 )
 ; 
@@ -88,7 +111,8 @@ local SystemCoreec2 =
 local UMemoryutilisation = 
     graphPanel.new(
         title='(U) Memory utilisation',
-        datasource='$INFLUXDB_DS',
+        datasource='InfluxDB (Stage)',
+        shared_tooltip='true',
         legend_values='true',
         legend_min='true',
         legend_max='true',
@@ -96,11 +120,12 @@ local UMemoryutilisation =
         legend_total='false',
         legend_avg='true',
         legend_alignAsTable='true',
+        nullPointMode='connected',
     )
 
 .addTarget(
     influxdb.target(
-    "SELECT mean('value') FROM 'memory_value' WHERE ('type_instance' = 'used' AND 'host' =~ /^bind/ AND 'type' = 'percent') AND $timeFilter GROUP BY time($interval), 'host' fill(null)",
+    "SELECT mean(\'value\') FROM \'memory_value\' WHERE (\'type_instance\' = 'used' AND \'host\' =~ /^bind/ AND \'type\' = 'percent') AND $timeFilter GROUP BY time($interval), \'host\' fill(null)",
     '$tag_host',
     )
 )
@@ -110,7 +135,7 @@ local sdp =
         title='Service Description',
         span=null,
         mode='markdown',
-        content='# LokiFromCode \n \n  #### Components  \n \n  [S3](https://aws.amazon.com/s3/): Provide a reliable solution for object level storage  \n \n[Promtail](https://github.com/grafana/loki/tree/master/docs/clients/promtail): Scrapes logs from pods and pushes them to loki, deployed as daemonset across all nodes  \n \n[SystemCore-ec2](https://www.slideshare.net/OpsStack/how-to-monitoring-the-sre-golden-signals-ebook/): System core metrics  \n \n \n \n #### References \n \n [Deployment](https://github.com/grofers/kube-infra/tree/master/manifests/loki) \n \n[Documentation](https://github.com/grafana/loki/tree/master/docs) \n \n[Metrics definition](https://github.com/grofers/kube-infra/tree/master/manifests/loki) \n \n',
+        content='# LokiFromCode \n   #### Components  \n   [S3](https://aws.amazon.com/s3/): Provide a reliable solution for object level storage   \n[Promtail](https://github.com/grafana/loki/tree/master/docs/clients/promtail): Scrapes logs from pods and pushes them to loki, deployed as daemonset across all nodes   \n[SystemCore-ec2](https://www.slideshare.net/OpsStack/how-to-monitoring-the-sre-golden-signals-ebook/): System core metrics   \n \n \n #### References \n  [Deployment](https://github.com/grofers/kube-infra/tree/master/manifests/loki) \n [Documentation](https://github.com/grafana/loki/tree/master/docs) \n [Metrics definition](https://github.com/grofers/kube-infra/tree/master/manifests/loki) \n ',
         transparent=null,
         description=null,
         datasource=null,
@@ -118,45 +143,15 @@ local sdp =
 ; 
 
 dashboard.new(
-'LokiFromCode',
+'LokiFromCode - Stage',
 tags=['stage', 'infra'],
 schemaVersion=18,
 editable='true',
 time_from='now-1h',
 refresh='1m',
 )
-.addTemplate(
-template.datasource(
-    'PROMETHEUS_DS',
-    'prometheus', 
-    'Prometheus (Stage)',
-    hide='variable',
-    label=null,
-    regex="/^Prometheus.*Stage/i"
-    )
-)
-.addTemplate(
-template.datasource(
-    'CLOUDWATCH_DS',
-    'cloudwatch', 
-    'Cloudwatch (Stage)',
-    hide='variable',
-    label=null,
-    regex="/.Stage/i"
-    )
-)
-.addTemplate(
-template.datasource(
-    'INFLUXDB_DS',
-    'influxDB', 
-    'InfluxDB (Stage)',
-    hide='variable',
-    label=null,
-    regex="/^InfluxDB .Stage/i"
-    )
-)
 
-.addPanels([ sdp  { gridPos: { h: 10, w: 15, x: 0, y: 0 }, }, ])
+.addPanels([ sdp { gridPos: { h: 10, w: 15, x: 0, y: 0 },},])
 
     .addPanels(
   [
