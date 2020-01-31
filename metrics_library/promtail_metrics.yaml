@@ -1,4 +1,4 @@
-Datasource: prometheus
+Datasource: Prometheus
 Reference: https://github.com/grafana/loki/tree/master/docs/clients/promtail
 Description: Scrapes logs from pods and pushes them to loki, deployed as daemonset across all nodes
 IdentifierKeys: 

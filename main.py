@@ -4,7 +4,7 @@ import argparse
 import os
 import re
 
-from helpers.utilities import ASSEMBLE_PANELS, JINJA2_TO_RENDER, STR_YAML_TO_JSON, INPUT_YAML_TO_JSON
+from helpers.utilities import assemble_panels, jinja2_to_render, str_yaml_to_json, input_yaml_to_json
 
 
 def convert_to_alnum(str):
@@ -20,23 +20,23 @@ def template_builder(input):
 
         panel_dict[component] = []
 
-        template_str = JINJA2_TO_RENDER('metrics_library', '{}_metrics.yaml'.format(component.lower()), data=values)
-        template = STR_YAML_TO_JSON(template_str)
+        template_str = jinja2_to_render('metrics_library', '{}_metrics.yaml'.format(component.lower()), data=values)
+        template = str_yaml_to_json(template_str)
 
         for panel in template['Panels']:
             panel['title_var'] = convert_to_alnum(panel['Title'])
             panel_dict[component].append(panel['title_var'])
             for target in panel['Targets']:
                 datasource_str = template['Datasource'].lower()
-                render = JINJA2_TO_RENDER('templates/datasource', '{}.j2'.format(datasource_str),
+                render = jinja2_to_render('templates/datasource', '{}.j2'.format(datasource_str),
                                           data=target)
                 target['render'] = render
 
         values['metric'] = template
 
-    input['assemble_panels'] = ASSEMBLE_PANELS(panel_dict)
+    input['assemble_panels'] = assemble_panels(panel_dict)
 
-    output = JINJA2_TO_RENDER('templates', 'output.j2', data=input)
+    output = jinja2_to_render('templates', 'output.j2', data=input)
     f.write(output)
 
     f.close()
@@ -55,5 +55,5 @@ if __name__ == '__main__':
     if not os.path.exists(input_file):
         raise Exception("Unable to find the file")
 
-    input = INPUT_YAML_TO_JSON(input_file)
+    input = input_yaml_to_json(input_file)
     template_builder(input)

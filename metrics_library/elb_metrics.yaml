@@ -8,7 +8,7 @@ Panels:
     Type: Graph
     Description: ELB Requests TODO
     Targets: 
-    - dimensions: {"LoadBalancerName": {{ IdentifierKeys.LoadBalancerName }} }
+    - dimensions: {"LoadBalancerName": {{ data.LoadBalancerName }} }
       metric: RequestCount
       namespace: AWS/ELB
       statistic: Sum
@@ -18,13 +18,13 @@ Panels:
     Type: Graph
     Description: ELB Healthy/Unhealthy Host Count TODO
     Targets:
-    - dimensions: {"LoadBalancerName": {{ IdentifierKeys.LoadBalancerName }} }
+    - dimensions: {"LoadBalancerName": {{ data.LoadBalancerName }} }
       metric: HealthyHostCount
       namespace: AWS/ELB
       statistic: Maximum
       alias: healthy
       refId: A
-    - dimensions: {"LoadBalancerName": {{ IdentifierKeys.LoadBalancerName }} }
+    - dimensions: {"LoadBalancerName": {{ data.LoadBalancerName }} }
       metric: UnhealthyHostCount
       namespace: AWS/ELB
       statistic: Maximum

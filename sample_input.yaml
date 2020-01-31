@@ -1,6 +1,6 @@
 ---
 
-Title: Loki
+Title: PO-Testing
 AlertChannels: ["Loki-PagerDuty"]
 Environment: Prod
 Description: Logging tool for everything deployed on kubernetes
@@ -15,3 +15,7 @@ Components:
   S3:
     BucketName: grofers-loki-prod
     FilterId: EntireBucket
+  systemCore_EC2:
+    Host: purchaseorder
+  promtail:
+    PodName: promtail
