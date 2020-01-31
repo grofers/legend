@@ -1,21 +1,34 @@
-Datasource: cloudwatch 
+Datasource: Cloudwatch
 Reference: https://aws.amazon.com/s3/
-Description: Provide a reliable solution for object level storage 
-IdentifierKeys:
+Description: Provide a reliable solution for object level storage
+data:
   - BucketName
   - FilterId
 Panels:
-  - Title: (S) Throttles
+  - Title: (R) Request Count - Write
     Type: Graph
-    Description: Number of events which exceeded your provisioned read throughput in the selected time period (sum) 
+    Description: TODO
     Targets: 
-    - dimensions: {"BucketName": {{ IdentifierKeys.BucketName }} ,"FilterId": {{ IdentifierKeys.FilterId }}}
-      metric: ReadThrottleEvents
-      namespace: AWS/DynamoDB
+    - dimensions: {"BucketName": {{ data.BucketName }} ,"FilterId": {{ data.FilterId }}}
+      metric: PutRequests
+      namespace: AWS/S3
       statistic: Sum
+      alias: '{{ '{{metric}}' }}'
       refId: A
-    - dimensions: {"BucketName": {{ IdentifierKeys.BucketName }} ,"FilterId": {{ IdentifierKeys.FilterId }}}
-      metric: WriteThrottleEvents
-      namespace: AWS/DynamoDB
+    - dimensions: {"BucketName": {{ data.BucketName }} ,"FilterId": {{ data.FilterId }}}
+      metric: PostRequests
+      namespace: AWS/S3
       statistic: Sum
+      alias: '{{ '{{metric}}' }}'
       refId: B
+
+  - Title: (R) Request Count - Read
+    Type: Graph
+    Description: TODO
+    Targets:
+    - dimensions: {"BucketName": {{ data.BucketName }} ,"FilterId": {{ data.FilterId }}}
+      metric: GetRequests
+      namespace: AWS/S3
+      statistic: Sum
+      alias: '{{ '{{metric}}' }}'
+      refId: A

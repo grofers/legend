@@ -1,64 +1,43 @@
 #!/usr/bin/env python
 
-import sys
 import argparse
 import os
-import yaml
-from jinja2 import Template
-import helpers
+import re
+
+from helpers.utilities import ASSEMBLE_PANELS, JINJA2_TO_RENDER, STR_YAML_TO_JSON, INPUT_YAML_TO_JSON
 
 
-def dashboard_builder(input):
+def convert_to_alnum(str):
+    return re.sub(r'\W+', '', str)
 
-    # Create an ouput file to write the jsonnet config
+
+def template_builder(input):
     f = open("output.jsonnet", "w+")
 
-    # Imports
-    imports = helpers.constants.IMPORTS
-    f.write(imports+"\n")
+    panel_dict = {}
 
-    # Build individual panels for each component
-    panels_constants = {}
-    panels_list = {}
-    component_ref = {}
-    for component in input['Components']:
-        ComponentIdentifiers = input['Components'][component]
-        ServiceEnvironment = input["Environment"]
-        AlertChannels = input["AlertChannels"]
-        panels_constants[component], panels_list[component], component_ref[component] = helpers.generators.add_component(
-            component, ComponentIdentifiers,
-            ServiceEnvironment,  AlertChannels)
+    for component, values in input['Components'].items():
 
-    # Write constants to the output file
-    for data in panels_constants.values():
-        for k, v in data.items():
-            f.write("local "+k+" = "+v+"; \n")
+        panel_dict[component] = []
 
-    # Build service description panel
-    service_template = Template(helpers.constants.SERVICE_DESC)
-    msg = service_template.render(SERVICE_DESC_INDIVIDUAL_COMPONENTS=component_ref.values(),
-                                  service=input["Title"], references=input["References"])
-    sdp = helpers.constants.TEXT_PANEL.format(
-        title="Service Description", content=msg)
+        template_str = JINJA2_TO_RENDER('metrics_library', '{}_metrics.yaml'.format(component.lower()), data=values)
+        template = STR_YAML_TO_JSON(template_str)
 
-    # Placehoplder to avoid \n by python,
-    # if we add additional \ then JSONNET would throuw an error step
-    sdp = sdp.replace("<placeHolder>", "")
-    f.write("local sdp = "+sdp+"; \n")
+        for panel in template['Panels']:
+            panel['title_var'] = convert_to_alnum(panel['Title'])
+            panel_dict[component].append(panel['title_var'])
+            for target in panel['Targets']:
+                datasource_str = template['Datasource'].lower()
+                render = JINJA2_TO_RENDER('templates/datasource', '{}.j2'.format(datasource_str),
+                                          data=target)
+                target['render'] = render
 
-    # Write data to the sheet
-    head = helpers.constants.DASHBOARD_HEAD.format(
-        title=str(input['Title'] + " - " + input["Environment"]),
-        tags=input['Tags'])
-    f.write(head+"\n")
+        values['metric'] = template
 
-    # Write the service desc panel gridPos
-    f.write(
-        ".addPanels([ sdp { gridPos: { h: 10, w: 15, x: 0, y: 0 },},])"+"\n")
+    input['assemble_panels'] = ASSEMBLE_PANELS(panel_dict)
 
-    # Assemble the panels and write to sheet (the gridPOS panels )
-    assembled_panels = helpers.utilities.ASSEMBLE_PANELS(panels_list)
-    f.write(assembled_panels+"\n")
+    output = JINJA2_TO_RENDER('templates', 'output.j2', data=input)
+    f.write(output)
 
     f.close()
 
@@ -76,5 +55,5 @@ if __name__ == '__main__':
     if not os.path.exists(input_file):
         raise Exception("Unable to find the file")
 
-    input = helpers.utilities.INPUT_YAML_TO_JSON(input_file)
-    dashboard_builder(input)
+    input = INPUT_YAML_TO_JSON(input_file)
+    template_builder(input)

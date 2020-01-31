@@ -49,7 +49,7 @@ def add_alert(panel_data, ServiceEnvironment, AlertChannels):
 
 
 def add_graph(data_source, panel_data, ServiceEnvironment):
-    if data_source == "cloudwatch":
+    if data_source == "Cloudwatch":
         ds = 'Cloudwatch ({Env})'.format(Env=ServiceEnvironment)
         panel = helpers.constants.GRAPH_PANEL.format(
             title=panel_data["Title"], datasource=ds)
@@ -58,7 +58,9 @@ def add_graph(data_source, panel_data, ServiceEnvironment):
                 namespace=target["namespace"],
                 metric=target["metric"],
                 statistic=target["statistic"],
-                dimensions=target["dimensions"])
+                dimensions=target["dimensions"],
+                alias=target.get("alias", "null"),
+            )
             panel = panel+target
         return (panel)
 

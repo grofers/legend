@@ -1,1 +1,11 @@
 *.pyc
+
+.idea/
+
+.DS_Store
+
+local_constants.py
+
+ve/
+
+output.jsonnet

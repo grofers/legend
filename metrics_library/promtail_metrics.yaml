@@ -8,7 +8,7 @@ Panels:
     Type: Graph
     Description: Number of missing promtail pods in the cluster
     Targets: 
-    - metric: (count(kube_node_info) - count(kube_pod_info{pod=~".*{{ IdentifierKeys.PodName }}.*"}))
+    - metric: (count(kube_node_info) - count(kube_pod_info{pod=~".*{{ data.PodName }}.*"}))
       refId: A
     AlertsConfig:
       Prod: 

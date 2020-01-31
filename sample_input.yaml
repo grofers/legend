@@ -1,8 +1,8 @@
 ---
 
-Title: LokiFromCode
+Title: Loki
 AlertChannels: ["Loki-PagerDuty"]
-Environment: Stage
+Environment: Prod
 Description: Logging tool for everything deployed on kubernetes
 References: 
   - Deployment: https://github.com/grofers/kube-infra/tree/master/manifests/loki 
@@ -11,11 +11,7 @@ References:
 Tags: 
   - stage
   - infra
-Components: #The components' name should match with the respective component in metrics_library folder
-  S3: #The identifiers are required which can be reffered from .IdentifierKeys in metrics file for each component
-    BucketName: grofers-loki-stage 
+Components:
+  S3:
+    BucketName: grofers-loki-prod
     FilterId: EntireBucket
-  Promtail:
-    PodName: promtail
-  SystemCore-ec2:
-    Host: bind

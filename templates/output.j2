@@ -1,0 +1,77 @@
+
+local grafana = import 'grafonnet/grafana.libsonnet';
+local dashboard = grafana.dashboard;
+local template = grafana.template;
+local text = grafana.text;
+local row = grafana.row;
+local singlestat = grafana.singlestat;
+local graphPanel = grafana.graphPanel;
+local prometheus = grafana.prometheus;
+local cloudwatch = grafana.cloudwatch;
+local influxdb = grafana.influxdb;
+local alertCondition = grafana.alertCondition;
+
+{% for component, values in data.Components.items() %}
+
+local {{ component }} =
+    row.new(title='{{ component }}')
+    ;
+    {% for panel_value in values.metric.Panels %}
+
+local {{ panel_value.title_var }} =
+    graphPanel.new(
+        title='{{ panel_value.Title }}',
+        datasource='{{ values.metric.Datasource }} ({{ data.Environment }})',
+        shared_tooltip='true',
+        legend_values='true',
+        legend_min='true',
+        legend_max='true',
+        legend_current='true',
+        legend_total='false',
+        legend_avg='true',
+        legend_alignAsTable='true',
+        nullPointMode='connected',
+    )
+
+        {% for target in panel_value.Targets %}
+{{ target.render }}
+        {% endfor %}
+;
+    {% endfor %}
+
+
+{% endfor %}
+
+
+
+
+local sdp =
+    text.new(
+        title='Service Description',
+        span=null,
+        mode='markdown',
+        content='# {{ data.Title }} \n #### Components {% for component, component_values in data.Components.items() -%} \n[{{ component }}]({{component_values.metric.Reference}}): {{component_values.metric.Description}} {% endfor -%} \n\n\n #### References {% for reference in data.References -%} \n {% for k,v in reference.items() -%} \n[{{ k }}]({{ v }}) {% endfor -%} {% endfor -%}',
+        transparent=null,
+        description=null,
+        datasource=null,
+    )
+;
+
+
+dashboard.new(
+'{{ data.Title }} - {{ data.Environment }}',
+tags={{ data.Tags }},
+schemaVersion=18,
+editable='true',
+time_from='now-1h',
+refresh='1m',
+)
+
+.addPanels([ sdp { gridPos: { h: 10, w: 15, x: 0, y: 0 },},])
+
+.addPanels(
+  [
+    {{ data.assemble_panels }}
+  ]
+)
+

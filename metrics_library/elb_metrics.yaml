@@ -1,0 +1,32 @@
+Datasource: Cloudwatch
+Reference: https://aws.amazon.com/elasticloadbalancing/
+Description: Provide a reliable solution for AWS ELB
+IdentifierKeys:
+  - LoadBalancerName
+Panels:
+  - Title: (R) ELB Requests
+    Type: Graph
+    Description: ELB Requests TODO
+    Targets: 
+    - dimensions: {"LoadBalancerName": {{ IdentifierKeys.LoadBalancerName }} }
+      metric: RequestCount
+      namespace: AWS/ELB
+      statistic: Sum
+      refId: A
+
+  - Title: (R) ELB Healthy/Unhealthy Host Count
+    Type: Graph
+    Description: ELB Healthy/Unhealthy Host Count TODO
+    Targets:
+    - dimensions: {"LoadBalancerName": {{ IdentifierKeys.LoadBalancerName }} }
+      metric: HealthyHostCount
+      namespace: AWS/ELB
+      statistic: Maximum
+      alias: healthy
+      refId: A
+    - dimensions: {"LoadBalancerName": {{ IdentifierKeys.LoadBalancerName }} }
+      metric: UnhealthyHostCount
+      namespace: AWS/ELB
+      statistic: Maximum
+      alias: unhealthy
+      refId: B

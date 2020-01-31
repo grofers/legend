@@ -8,7 +8,7 @@
 
 # Grafana DB
 # Grafana API readonly key, hence plain text
-GRAFANA_API_KEY = "***REMOVED***"
+GRAFANA_API_KEY = ""
 GRAFANA_URL = "https://grafana.grofers.com/api"
 
 # Service description components
@@ -23,20 +23,6 @@ SERVICE_DESC = '# {{ service }} {% raw %}\\<placeHolder>n  {% endraw %} #### Com
 ############
 
 # Dashboard
-
-IMPORTS = """
-local grafana = import 'grafonnet/grafana.libsonnet';
-local dashboard = grafana.dashboard;
-local template = grafana.template;
-local text = grafana.text; 
-local row = grafana.row;
-local singlestat = grafana.singlestat;
-local graphPanel = grafana.graphPanel;
-local prometheus = grafana.prometheus;
-local cloudwatch = grafana.cloudwatch;
-local influxdb = grafana.influxdb;
-local alertCondition = grafana.alertCondition;
-"""
 
 DASHBOARD_HEAD = '''
 dashboard.new(
@@ -107,7 +93,7 @@ CLOUDWATCH_TARGET = '''
     '{metric}',
     datasource=null,
     statistic='{statistic}',
-    alias=null,
+    alias='{alias}',
     highResolution='false',
     period='1m',
     dimensions={dimensions}
@@ -167,3 +153,5 @@ ADD_ALERT_CONDITION = '''
     )
 )
 '''
+
+from helpers.local_constants import *
