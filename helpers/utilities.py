@@ -1,5 +1,7 @@
 import yaml
 from jinja2 import Environment, FileSystemLoader
+import helpers.constants
+import requests
 
 
 def input_yaml_to_json(input_file):
@@ -48,3 +50,38 @@ def assemble_panels(panels_dict):
             n += 1
 
     return assembled_panels
+
+def get_alert_id(AlertChannels):
+    grafana_notification_channel_uid = []
+    grafana_api_key = helpers.constants.GRAFANA_API_KEY
+    grafana_url = helpers.constants.GRAFANA_URL
+    api_url = grafana_url + "/alert-notifications/lookup"
+    headers = {'Authorization': 'Bearer ' + grafana_api_key,
+               'Content-Type': 'application/json',
+               'Accept': 'application/json'}
+    r = requests.get(api_url, headers=headers)
+    for g_data in r.json():
+        if g_data["name"] in AlertChannels:
+            grafana_notification_channel_uid.append({"uid": g_data["uid"]})
+
+    return (grafana_notification_channel_uid)
+
+def parse_condition_query(condition_queries):
+    conditions = []
+    for condition_query in condition_queries:
+        parts = condition_query.split(',')
+        if len(parts) != 7:
+            raise Exception('Condition query parameters not complete')
+    
+        conditions.append({'operatorType': parts[0],
+                'reducerType': parts[1], 
+                'queryRefId': parts[2],
+                'queryTimeEnd': parts[3],
+                'queryTimeStart': parts[4],
+                'evaluatorType': parts[5],
+                'evaluatorParams': parts[6],
+                'reducerParams': [],
+                })
+    return conditions
+    
+    
