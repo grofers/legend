@@ -1,0 +1,43 @@
+data_source: Prometheus
+reference: https://www.haproxy.com/blog/haproxy-exposes-a-prometheus-metrics-endpoint
+description: High Availability Load Balancer and Proxy Server
+panels:
+  - title: (S) Pending Requests
+    type: Graph
+    description: Number of Requests unassigned in Queue
+    targets:
+      {% for dimension in data %}
+      - metric: rate(haproxy_backend_current_queue{backend="{{ dimension.backend }}"}[5m])
+        legend: '{{ '{{backend}}' }}'
+      {% endfor %}
+    alert_config:
+
+  - title: (R) Request Count
+    type: Graph
+    description: Total number of Requests on the backend in an interval
+    targets:
+      {% for dimension in data %}
+    - metric: sum(rate(haproxy_backend_http_responses_total{backend="{{ dimension.backend }}"}[5m])) by (backend)
+      legend: '{{ '{{backend}}' }}'
+      {% endfor %}
+    alert_config:
+
+  - title: (E) Errors
+    type: Graph
+    description: Responses with 4xx or 5xx
+    targets:
+      {% for dimension in data %}
+    - metric: rate(haproxy_backend_http_responses_total{backend="{{ dimension.backend }}",code=~"4xx|5xx"}[5m])
+      legend: '{{ '{{code}}-{{backend}}' }}'
+      {% endfor %}
+    alert_config:
+
+  - title: (D) Request Latency
+    type: Graph
+    description: Average Latency per Request
+    targets:
+      {% for dimension in data %}
+    - metric: rate(haproxy_backend_http_response_time_average_seconds{backend="{{ dimension.backend }}"}[5m])
+      legend: '{{ '{{backend}}' }}'
+      {% endfor %}
+    alert_config:
