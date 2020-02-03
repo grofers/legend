@@ -6,7 +6,7 @@
 
 Tool to generate grafana dashboard with pre filled metrics 
 
-### Structure 
+### Directory Structure
 
 * The input file should represent a "Service"
 * Every service has multiple "Components"
@@ -14,26 +14,45 @@ Tool to generate grafana dashboard with pre filled metrics
 
 Refer to docs in <docs>
 
-### Dependencies
+### Install Dependencies
 
-Install JSONNET 
+This project is built with python3. Make sure you have python3 installed on your system.
+
+Install Jsonnet with brew
 ```
 brew install jsonnet
 ```
 
-Python requirements
+Clone grafonnet-lib repository to your local
 ```
-virtualenv legend
-source legend/bin/activate
+git clone git@github.com:grafana/grafonnet-lib.git
+```
+
+### Generate Dashboards
+
+Clone this repository to your local
+```
+git clone git@github.com:grofers/legend.git
+```
+
+Create a python3 virtualenv
+```
+mkvirtualenv -p /usr/local/bin/python3 legend
+```
+
+Install requirements from requirements.txt
+```
 pip3 install -r requirements.txt
 ```
  
-### Generate dashboards
-
-Generate the JSON
+Generate a jsonnet output file
 ```
 python main.py -f sample_input.yaml 
-jsonnet output.jsonnet > x.txt
 ```
 
-Copy paste the output from the above commands into grafana
+Generate dashboard json by passing last command's output file as an argument to jsonnet command
+```
+jsonnet -J grafonnet-lib output.jsonnet
+```
+
+Import the json generated from the above comamnd into Grafana
