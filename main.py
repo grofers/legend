@@ -16,10 +16,10 @@ def template_builder(input):
 
     panel_dict = {}
     
-    if input.get('AlertChannels'):
-        alertIds = get_alert_id(input['AlertChannels'])
+    if input.get('alert_channels'):
+        alert_ids = get_alert_id(input['alert_channels'])
 
-    for component, values in input['Components'].items():
+    for component, values in input['components'].items():
 
         panel_dict[component] = []
 
@@ -27,38 +27,43 @@ def template_builder(input):
         template = str_yaml_to_json(template_str)
         
         # Adding custom panels and adding custom alerts
-        tpanel_map = {x['Title']: x for x in template['Panels']}
-        for panel in values.get('Panels', []):
-            if panel['Title'] in tpanel_map.keys():
+        tpanel_map = {x['title']: x for x in template['panels']}
+        for panel in values.get('panels', []):
+            if panel['title'] in tpanel_map.keys():
                 for k in panel.keys():
-                    if k == 'AlertConfig':
+                    if k == 'alert_config':
                         for ak in panel[k].keys():
-                            tpanel_map[panel['Title']][k][ak] = panel[k][ak]
+                            tpanel_map[panel['title']][k][ak] = panel[k][ak]
                     else:
-                        tpanel_map[panel['Title']][k] = panel[k]
+                        tpanel_map[panel['title']][k] = panel[k]
             else:
-                template['Panels'].append(panel)
+                template['panels'].append(panel)
 
-        for panel in template['Panels']:
-            panel['title_var'] = convert_to_alnum(panel['Title'])
+        for panel in template['panels']:
+            panel['title_var'] = convert_to_alnum(panel['title'])
             panel_dict[component].append(panel['title_var'])
-            for target in panel['Targets']:
-                datasource_str = template['Datasource'].lower()
+            for target in panel['targets']:
+                datasource_str = template['data_source'].lower()
                 render = jinja2_to_render('templates/datasource', '{}.j2'.format(datasource_str),
                                           data=target)
                 target['render'] = render
             panel['alertrender'] = ''
             # if alert is present then render it
             # import pdb; pdb.set_trace()
-            if panel.get('AlertConfig') :
-                panel['AlertConfig']['Rule']['name'] = panel['Title']
-                panel['AlertConfig']['alertIds'] = alertIds
-                alertrender = jinja2_to_render('templates/alert', 'alert.j2',
-                                        data=panel['AlertConfig'])
-                if panel['AlertConfig'].get('ConditionQuery'):
-                    panel['AlertConfig']['Conditions'] = parse_condition_query(panel['AlertConfig']['ConditionQuery'])
-                    
-                for condition in panel['AlertConfig']['Conditions']:
+            if panel.get('alert_config') :
+                panel['alert_config']['rule']['name'] = panel['title']
+                panel['alert_config']['alert_ids'] = alert_ids
+                alertrender = jinja2_to_render(
+                        'templates/alert',
+                        'alert.j2',
+                        data=panel['alert_config']
+                )
+                if panel['alert_config'].get('condition_query'):
+                    panel['alert_config']['conditions'] = parse_condition_query(
+                            panel['alert_config']['condition_query']
+                    )
+
+                for condition in panel['alert_config']['conditions']:
                     conditionrender = jinja2_to_render('templates/alert', 'alert_condition.j2',
                                         data=condition)
                     alertrender += conditionrender

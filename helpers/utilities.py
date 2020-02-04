@@ -51,7 +51,7 @@ def assemble_panels(panels_dict):
 
     return assembled_panels
 
-def get_alert_id(AlertChannels):
+def get_alert_id(alert_channels):
     grafana_notification_channel_uid = []
     grafana_api_key = helpers.constants.GRAFANA_API_KEY
     grafana_url = helpers.constants.GRAFANA_URL
@@ -61,7 +61,7 @@ def get_alert_id(AlertChannels):
                'Accept': 'application/json'}
     r = requests.get(api_url, headers=headers)
     for g_data in r.json():
-        if g_data["name"] in AlertChannels:
+        if g_data["name"] in alert_channels:
             grafana_notification_channel_uid.append({"uid": g_data["uid"]})
 
     return (grafana_notification_channel_uid)
@@ -72,16 +72,18 @@ def parse_condition_query(condition_queries):
         parts = condition_query.split(',')
         if len(parts) != 7:
             raise Exception('Condition query parameters not complete')
-    
-        conditions.append({'operatorType': parts[0],
-                'reducerType': parts[1], 
-                'queryRefId': parts[2],
-                'queryTimeEnd': parts[3],
-                'queryTimeStart': parts[4],
-                'evaluatorType': parts[5],
-                'evaluatorParams': parts[6],
-                'reducerParams': [],
-                })
+
+        conditions.append({
+            'operator_type': parts[0],
+            'reducer_type': parts[1],
+            'query_ref_id': parts[2],
+            'query_time_end': parts[3],
+            'query_time_start': parts[4],
+            'evaluator_type': parts[5],
+            'evaluator_params': parts[6],
+            'reducer_params': [],
+        })
+
     return conditions
     
     

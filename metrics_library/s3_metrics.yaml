@@ -1,14 +1,14 @@
-Datasource: Cloudwatch
-Reference: https://aws.amazon.com/s3/
-Description: Provide a reliable solution for object level storage
+data_source: Cloudwatch
+reference: https://aws.amazon.com/s3/
+description: Provide a reliable solution for object level storage
 data:
-  - BucketName
-  - FilterId
-Panels:
-  - Title: (R) Request Count - Write
-    Type: Graph
-    Description: TODO
-    Targets: 
+  - bucket_name
+  - filter_id
+panels:
+  - title: (R) Request Count - Write
+    type: Graph
+    description: TODO
+    targets: 
     - dimensions: {"BucketName": {{ data.BucketName }} ,"FilterId": {{ data.FilterId }}}
       metric: PutRequests
       namespace: AWS/S3
@@ -19,37 +19,37 @@ Panels:
       namespace: AWS/S3
       statistic: Sum
       alias: '{{ '{{metric}}' }}'
-    AlertConfig:
-      Priority: P1
-      Message: 'Request Count - Write take actions like this 1. 2.'
-      Rule:
-        forDuration: 2m
-        evaluateEvery: 10s
-      Conditions:
-        - evaluatorParams: 2
-          evaluatorType: gt
-          operatorType: and
-          queryRefId: A # it is according to sequence
-          queryTimeEnd: now
-          queryTimeStart: 5m
-          reducerParams: []
-          reducerType: avg
-        - evaluatorParams: 2
-          evaluatorType: gt
-          operatorType: and
-          queryRefId: B # it is according to sequence
-          queryTimeEnd: now
-          queryTimeStart: 5m
-          reducerParams: []
-          reducerType: avg
+    alert_config:
+      priority: P1
+      message: 'Request Count - Write take actions like this 1. 2.'
+      rule:
+        for_duration: 2m
+        evaluate_every: 10s
+      conditions:
+        - evaluator_params: 2
+          evaluator_type: gt
+          operator_type: and
+          query_ref_id: A # it is according to sequence
+          query_time_end: now
+          query_time_start: 5m
+          reducer_params: []
+          reducer_type: avg
+        - evaluator_params: 2
+          evaluator_type: gt
+          operator_type: and
+          query_ref_id: B # it is according to sequence
+          query_time_end: now
+          query_time_start: 5m
+          reducer_params: []
+          reducer_type: avg
 
-  - Title: (R) Request Count - Read
-    Type: Graph
-    Description: TODO
-    Targets:
-    - dimensions: {"BucketName": {{ data.BucketName }} ,"FilterId": {{ data.FilterId }}}
+  - title: (R) Request Count - Read
+    type: Graph
+    description: TODO
+    targets:
+    - dimensions: {"BucketName": {{ data.bucket_name }} ,"FilterId": {{ data.filter_id }}}
       metric: GetRequests
       namespace: AWS/S3
       statistic: Sum
       alias: '{{ '{{metric}}' }}'
-      refId: A
+      ref_id: A

@@ -1,12 +1,12 @@
-Datasource: InfluxDB
-Reference: https://www.slideshare.net/OpsStack/how-to-monitoring-the-sre-golden-signals-ebook/
-Description: System core metrics 
-IdentifierKeys: 
-  - Host
-Panels:
-  - Title: (U) Memory utilisation
-    Type: Graph
-    Description: Memory utilisation
-    Targets: 
+data_source: InfluxDB
+reference: https://www.slideshare.net/OpsStack/how-to-monitoring-the-sre-golden-signals-ebook/
+description: System core metrics 
+identifier_keys: 
+  - host
+panels:
+  - title: (U) Memory utilisation
+    type: Graph
+    description: Memory utilisation
+    targets: 
     - query: SELECT mean(\"value\") FROM \"memory_value\" WHERE (\"type_instance\" = \'used\' AND \"host\" =~ /^{{ data.Host }}/ AND \"type\" = \'percent\') AND $timeFilter GROUP BY time($interval), \"host\" fill(null)
       alias_by: $tag_host

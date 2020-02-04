@@ -1,34 +1,34 @@
-Datasource: Prometheus
-Reference: https://github.com/grafana/loki/tree/master/docs/clients/promtail
-Description: Scrapes logs from pods and pushes them to loki, deployed as daemonset across all nodes
-IdentifierKeys: 
-  - PodName
-Panels:
-  - Title: (E) Missing pods
-    Type: Graph
-    Description: Number of missing promtail pods in the cluster
-    Targets: 
+data_source: Prometheus
+reference: https://github.com/grafana/loki/tree/master/docs/clients/promtail
+description: Scrapes logs from pods and pushes them to loki, deployed as daemonset across all nodes
+identifier_keys: 
+  - pod_name
+panels:
+  - title: (E) Missing pods
+    type: Graph
+    description: Number of missing promtail pods in the cluster
+    targets: 
     - metric: (count(kube_node_info) - count(kube_pod_info{pod=~".*{{ data.PodName }}.*"}))
-    AlertConfig:
-      Priority: P1
-      Message: 'Missing pods take actions like this 1. 2.'
-      Rule:
-        forDuration: 2m
-        evaluateEvery: 10s
-      Conditions:
-        - evaluatorParams: 2
-          evaluatorType: gt
-          operatorType: and
-          queryRefId: A # it is according to sequence
-          queryTimeEnd: now
-          queryTimeStart: 5m
-          reducerParams: []
-          reducerType: avg
-        - evaluatorParams: 2
-          evaluatorType: gt
-          operatorType: and
-          queryRefId: A # it is according to sequence
-          queryTimeEnd: now
-          queryTimeStart: 5m
-          reducerParams: []
-          reducerType: avg
+    alert_config:
+      priority: P1
+      message: 'Missing pods take actions like this 1. 2.'
+      rule:
+        for_duration: 2m
+        evaluate_every: 10s
+      conditions:
+        - evaluator_params: 2
+          evaluator_type: gt
+          operator_type: and
+          query_ref_id: A # it is according to sequence
+          query_time_end: now
+          query_time_start: 5m
+          reducer_params: []
+          reducer_type: avg
+        - evaluator_params: 2
+          evaluator_type: gt
+          operator_type: and
+          query_ref_id: A # it is according to sequence
+          query_time_end: now
+          query_time_start: 5m
+          reducer_params: []
+          reducer_type: avg
