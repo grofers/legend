@@ -55,7 +55,7 @@ components:
             - WHEN,avg,A,now,5m,gt,20 
             - AND,avg,B,now,5m,gt,30 
           
-  ec2:
+  systemcore_ec2:
     host: purchaseorder
   promtail:
     pod_name: promtail

@@ -64,7 +64,9 @@ def get_alert_id(alert_channels):
         'Content-Type': 'application/json',
         'Accept': 'application/json'
     }
+
     r = requests.get(api_url, headers=headers)
+    r.raise_for_status()
     for g_data in r.json():
         if g_data["name"] in alert_channels:
             grafana_notification_channel_uid.append({"uid": g_data["uid"]})
