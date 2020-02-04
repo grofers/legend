@@ -3,59 +3,64 @@ title: PO-Testing
 alert_channels: ["Pager Duty OMS1"]
 environment: Prod
 description: Logging tool for everything deployed on kubernetes
-references: 
-  - deployment: https://github.com/grofers/kube-infra/tree/master/manifests/loki 
-  - documentation: https://github.com/grafana/loki/tree/master/docs 
-  - metrics_definition: https://github.com/grofers/kube-infra/tree/master/manifests/loki  
-tags: 
-  - stage
-  - infra
+references:
+- deployment: https://github.com/grofers/kube-infra/tree/master/manifests/loki
+- documentation: https://github.com/grafana/loki/tree/master/docs
+- metrics_definition: https://github.com/grofers/kube-infra/tree/master/manifests/loki
+tags:
+- stage
+- infra
 components:
   s3:
-    bucket_name: grofers-loki-prod
-    filter_id: EntireBucket
+    dimensions:
+    - bucket_name: grofers-loki-prod
+      filter_id: EntireBucket
+    - bucket_name: retail-bulk-upload
+      filter_id: EntireBucket
     panels:
-      - title: (R) Request Count - WriteMY
-        type: Graph
-        description: TODO
-        targets: 
-        - dimensions: {"BucketName": "grofers-loki-prod" ,"FilterId": "EntireBucket"}
-          metric: PutRequests
-          namespace: AWS/S3
-          statistic: Sum
-          alias: '{{ metric }}'
-        - dimensions: {"BucketName": "grofers-loki-prod" ,"FilterId": "EntireBucket"}
-          metric: PostRequests
-          namespace: AWS/S3
-          statistic: Sum
-          alias: '{{ metric }}'
-        alert_config:
-          priority: P1
-          message: 'Request Count - Write take actions like this 1. 2.'
-          rule:
-            for_duration: 1m
-            evaluate_every: 10s
-          conditions:
-            - evaluator_params: 2
-              evaluator_type: gt
-              operator_type: when
-              query_ref_id: A # it is according to sequence
-              query_time_end: now
-              query_time_start: 5m
-              reducer_params: []
-              reducer_type: avg
-      - title: (R) Request Count - Write
-        alert_config:
-          priority: P2
-          message: 'Request Count - Write take actions like this 1. 2.'
-          rule:
-            for_duration: 5m
-            evaluate_every: 10s
-          condition_query:
-            - WHEN,avg,A,now,5m,gt,20 
-            - AND,avg,B,now,5m,gt,30 
-          
+    - title: (R) Request Count - WriteMY
+      type: Graph
+      description: TODO
+      targets:
+      - dimensions: {"BucketName": "grofers-loki-prod" ,"FilterId": "EntireBucket"}
+        metric: PutRequests
+        namespace: AWS/S3
+        statistic: Sum
+        alias: '{{ metric }}'
+      - dimensions: {"BucketName": "grofers-loki-prod" ,"FilterId": "EntireBucket"}
+        metric: PostRequests
+        namespace: AWS/S3
+        statistic: Sum
+        alias: '{{ metric }}'
+      alert_config:
+        priority: P1
+        message: 'Request Count - Write take actions like this 1. 2.'
+        rule:
+          for_duration: 1m
+          evaluate_every: 10s
+        conditions:
+        - evaluator_params: 2
+          evaluator_type: gt
+          operator_type: when
+          query_ref_id: A # it is according to sequence
+          query_time_end: now
+          query_time_start: 5m
+          reducer_params: []
+          reducer_type: avg
+    - title: (R) Request Count - Write
+      alert_config:
+        priority: P2
+        message: 'Request Count - Write take actions like this 1. 2.'
+        rule:
+          for_duration: 5m
+          evaluate_every: 10s
+        condition_query:
+        - WHEN,avg,A,now,5m,gt,20
+        - AND,avg,B,now,5m,gt,30
+
   systemcore_ec2:
-    host: purchaseorder
+    dimensions:
+    - host: purchaseorder
   promtail:
-    pod_name: promtail
+    dimensions:
+    - pod_name: promtail

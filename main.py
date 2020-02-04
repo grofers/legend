@@ -33,7 +33,7 @@ def template_builder(input):
         template_str = jinja2_to_render(
                 'metrics_library',
                 '{}_metrics.yaml'.format(component.lower()),
-                data=values
+                data=values.get('dimensions',[])
         )
         template = str_yaml_to_json(template_str)
 

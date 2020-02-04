@@ -7,6 +7,8 @@ panels:
   - title: (U) Memory utilisation
     type: Graph
     description: Memory utilisation
-    targets: 
-    - query: SELECT mean(\"value\") FROM \"memory_value\" WHERE (\"type_instance\" = \'used\' AND \"host\" =~ /^{{ data.Host }}/ AND \"type\" = \'percent\') AND $timeFilter GROUP BY time($interval), \"host\" fill(null)
+    targets:
+      {% for dimension in data %}
+    - query: SELECT mean(\"value\") FROM \"memory_value\" WHERE (\"type_instance\" = \'used\' AND \"host\" =~ /^{{ dimension.host }}/ AND \"type\" = \'percent\') AND $timeFilter GROUP BY time($interval), \"host\" fill(null)
       alias_by: $tag_host
+      {% endfor %}

@@ -8,17 +8,19 @@ panels:
   - title: (R) Request Count - Write
     type: Graph
     description: TODO
-    targets: 
-    - dimensions: {"BucketName": {{ data.BucketName }} ,"FilterId": {{ data.FilterId }}}
+    targets:
+      {% for dimension in data %}
+    - dimensions: {"BucketName": {{ dimension.bucket_name }} ,"FilterId": {{ dimension.filter_id }}}
       metric: PutRequests
       namespace: AWS/S3
       statistic: Sum
-      alias: '{{ '{{metric}}' }}'
-    - dimensions: {"BucketName": {{ data.BucketName }} ,"FilterId": {{ data.FilterId }}}
+      alias: '{{ '{{BucketName}}_{{metric}}_{{stat}}' }}'
+    - dimensions: {"BucketName": {{ dimension.bucket_name }} ,"FilterId": {{ dimension.filter_id }}}
       metric: PostRequests
       namespace: AWS/S3
       statistic: Sum
-      alias: '{{ '{{metric}}' }}'
+      alias: '{{ '{{BucketName}}_{{metric}}_{{stat}}' }}'
+      {% endfor %}
     alert_config:
       priority: P1
       message: 'Request Count - Write take actions like this 1. 2.'
@@ -47,9 +49,11 @@ panels:
     type: Graph
     description: TODO
     targets:
-    - dimensions: {"BucketName": {{ data.bucket_name }} ,"FilterId": {{ data.filter_id }}}
+      {% for dimension in data %}
+    - dimensions: {"BucketName": {{ dimension.bucket_name }} ,"FilterId": {{ dimension.filter_id }}}
       metric: GetRequests
       namespace: AWS/S3
       statistic: Sum
       alias: '{{ '{{metric}}' }}'
       ref_id: A
+      {% endfor %}

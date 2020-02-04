@@ -7,12 +7,14 @@ panels:
   - title: (R) ELB Requests
     type: Graph
     description: ELB Requests TODO
-    targets: 
-    - dimensions: {"LoadBalancerName": {{ data.load_balancer_name }} }
+    targets:
+      {% for dimension in data %}
+    - dimensions: {"LoadBalancerName": {{ dimension.load_balancer_name }} }
       metric: RequestCount
       namespace: AWS/ELB
       statistic: Sum
       refId: A
+      {% endfor %}
 
   - title: (R) ELB Healthy/Unhealthy Host Count
     type: Graph

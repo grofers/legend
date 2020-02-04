@@ -7,8 +7,10 @@ panels:
   - title: (E) Missing pods
     type: Graph
     description: Number of missing promtail pods in the cluster
-    targets: 
-    - metric: (count(kube_node_info) - count(kube_pod_info{pod=~".*{{ data.PodName }}.*"}))
+    targets:
+      {% for dimension in data %}
+    - metric: (count(kube_node_info) - count(kube_pod_info{pod=~".*{{ dimension.pod_name }}.*"}))
+      {% endfor %}
     alert_config:
       priority: P1
       message: 'Missing pods take actions like this 1. 2.'
