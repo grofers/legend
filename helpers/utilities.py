@@ -1,7 +1,9 @@
-import yaml
-from jinja2 import Environment, FileSystemLoader
-import helpers.constants
 import requests
+import yaml
+
+from jinja2 import Environment, FileSystemLoader
+
+import helpers.constants
 
 
 def input_yaml_to_json(input_file):
@@ -33,7 +35,7 @@ def assemble_panels(panels_dict):
     n = 1
     for k, v in panels_dict.items():
         assembled_panels += k + \
-                           "  { gridPos: { h: 4, w: 24, x: 0, y: " + str(n) + " }, }, \n"
+                           " { gridPos: { h: 4, w: 24, x: 0, y: " + str(n) + " }, }, \n"
         n += 1
         for i in range(0, len(v), 2):
             try:
@@ -51,20 +53,24 @@ def assemble_panels(panels_dict):
 
     return assembled_panels
 
+
 def get_alert_id(alert_channels):
     grafana_notification_channel_uid = []
     grafana_api_key = helpers.constants.GRAFANA_API_KEY
     grafana_url = helpers.constants.GRAFANA_URL
     api_url = grafana_url + "/alert-notifications/lookup"
-    headers = {'Authorization': 'Bearer ' + grafana_api_key,
-               'Content-Type': 'application/json',
-               'Accept': 'application/json'}
+    headers = {
+        'Authorization': 'Bearer ' + grafana_api_key,
+        'Content-Type': 'application/json',
+        'Accept': 'application/json'
+    }
     r = requests.get(api_url, headers=headers)
     for g_data in r.json():
         if g_data["name"] in alert_channels:
             grafana_notification_channel_uid.append({"uid": g_data["uid"]})
 
     return (grafana_notification_channel_uid)
+
 
 def parse_condition_query(condition_queries):
     conditions = []
@@ -85,5 +91,3 @@ def parse_condition_query(condition_queries):
         })
 
     return conditions
-    
-    
