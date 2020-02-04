@@ -9,33 +9,26 @@ Panels:
     Description: Number of missing promtail pods in the cluster
     Targets: 
     - metric: (count(kube_node_info) - count(kube_pod_info{pod=~".*{{ data.PodName }}.*"}))
-      refId: A
-    AlertsConfig:
-      Prod: 
-        Severity: SEV-1
-        Rule:
-          forDuration: 2m
-          evaluate_every: 10s
-        Conditions:
-          - evaluatorParams: 2
-            evaluatorType: gt
-            operatorType: and
-            queryRefId: A
-            queryTimeEnd: now
-            queryTimeStart: 5m
-            reducerParams: []
-            reducerType: avg
-      Stage:
-        Severity: SEV-2
-        Rule:
-          forDuration: 5m
-          evaluate_every: 10s
-        Conditions:
-          - evaluatorParams: 4
-            evaluatorType: gt
-            operatorType: and
-            queryRefId: A
-            queryTimeEnd: now
-            queryTimeStart: 5m
-            reducerParams: []
-            reducerType: avg
+    AlertConfig:
+      Priority: P1
+      Message: 'Missing pods take actions like this 1. 2.'
+      Rule:
+        forDuration: 2m
+        evaluateEvery: 10s
+      Conditions:
+        - evaluatorParams: 2
+          evaluatorType: gt
+          operatorType: and
+          queryRefId: A # it is according to sequence
+          queryTimeEnd: now
+          queryTimeStart: 5m
+          reducerParams: []
+          reducerType: avg
+        - evaluatorParams: 2
+          evaluatorType: gt
+          operatorType: and
+          queryRefId: A # it is according to sequence
+          queryTimeEnd: now
+          queryTimeStart: 5m
+          reducerParams: []
+          reducerType: avg

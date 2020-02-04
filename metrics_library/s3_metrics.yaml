@@ -14,13 +14,34 @@ Panels:
       namespace: AWS/S3
       statistic: Sum
       alias: '{{ '{{metric}}' }}'
-      refId: A
     - dimensions: {"BucketName": {{ data.BucketName }} ,"FilterId": {{ data.FilterId }}}
       metric: PostRequests
       namespace: AWS/S3
       statistic: Sum
       alias: '{{ '{{metric}}' }}'
-      refId: B
+    AlertConfig:
+      Priority: P1
+      Message: 'Request Count - Write take actions like this 1. 2.'
+      Rule:
+        forDuration: 2m
+        evaluateEvery: 10s
+      Conditions:
+        - evaluatorParams: 2
+          evaluatorType: gt
+          operatorType: and
+          queryRefId: A # it is according to sequence
+          queryTimeEnd: now
+          queryTimeStart: 5m
+          reducerParams: []
+          reducerType: avg
+        - evaluatorParams: 2
+          evaluatorType: gt
+          operatorType: and
+          queryRefId: B # it is according to sequence
+          queryTimeEnd: now
+          queryTimeStart: 5m
+          reducerParams: []
+          reducerType: avg
 
   - Title: (R) Request Count - Read
     Type: Graph

@@ -36,6 +36,8 @@ local {{ panel_value.title_var }} =
         {% for target in panel_value.Targets %}
 {{ target.render }}
         {% endfor %}
+    {{ panel_value.alertrender }}
+
 ;
     {% endfor %}
 

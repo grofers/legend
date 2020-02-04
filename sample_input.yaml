@@ -1,7 +1,7 @@
 ---
 
 Title: PO-Testing
-AlertChannels: ["Loki-PagerDuty"]
+AlertChannels: ["Pager Duty OMS1"]
 Environment: Prod
 Description: Logging tool for everything deployed on kubernetes
 References: 
@@ -15,6 +15,48 @@ Components:
   S3:
     BucketName: grofers-loki-prod
     FilterId: EntireBucket
+    Panels:
+      - Title: (R) Request Count - WriteMY
+        Type: Graph
+        Description: TODO
+        Targets: 
+        - dimensions: {"BucketName": "grofers-loki-prod" ,"FilterId": "EntireBucket"}
+          metric: PutRequests
+          namespace: AWS/S3
+          statistic: Sum
+          alias: '{{ metric }}'
+        - dimensions: {"BucketName": "grofers-loki-prod" ,"FilterId": "EntireBucket"}
+          metric: PostRequests
+          namespace: AWS/S3
+          statistic: Sum
+          alias: '{{ metric }}'
+        AlertConfig:
+          Priority: P1
+          Message: 'Request Count - Write take actions like this 1. 2.'
+          Rule:
+            forDuration: 1m
+            evaluateEvery: 10s
+          Conditions:
+            - evaluatorParams: 2
+              evaluatorType: gt
+              operatorType: when
+              queryRefId: A # it is according to sequence
+              queryTimeEnd: now
+              queryTimeStart: 5m
+              reducerParams: []
+              reducerType: avg
+      - Title: (R) Request Count - Write
+        AlertConfig:
+          Priority: P2
+          Message: 'Request Count - Write take actions like this 1. 2.'
+          Rule:
+            forDuration: 5m
+            evaluateEvery: 10s
+          ConditionQuery: 
+            - WHEN,avg,A,now,5m,gt,20 
+            - AND,avg,B,now,5m,gt,30 
+          
+
   systemCore_EC2:
     Host: purchaseorder
   promtail:

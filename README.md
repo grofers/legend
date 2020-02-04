@@ -21,13 +21,10 @@ Install JSONNET
 brew install jsonnet
 ```
 
-Download the grafonned-lib
-```
-git clone https://github.com/grafana/grafonnet-lib.git
-```
-
 Python requirements
 ```
+virtualenv legend
+source legend/bin/activate
 pip3 install -r requirements.txt
 ```
  
@@ -36,7 +33,7 @@ pip3 install -r requirements.txt
 Generate the JSON
 ```
 python main.py -f sample_input.yaml 
-jsonnet -J grafonnet-lib output.jsonnet
+jsonnet output.jsonnet > x.txt
 ```
 
 Copy paste the output from the above commands into grafana

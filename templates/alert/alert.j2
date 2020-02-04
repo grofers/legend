@@ -1,0 +1,10 @@
+.addAlert(
+      '{{data.Rule.name}}',
+      executionErrorState='alerting',
+      forDuration='{{data.Rule.forDuration}}',
+      frequency='{{data.Rule.evaluateEvery}}',
+      handler=1,
+      message='Priority: {{data.Priority}}\n Message: {{data.Message}}',
+      noDataState='no_data',
+      notifications={{data.alertIds}},
+    )
