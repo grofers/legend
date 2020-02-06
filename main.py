@@ -3,6 +3,8 @@
 import argparse
 import os
 import re
+import subprocess
+
 
 from helpers.utilities import (
         assemble_panels,
@@ -19,8 +21,6 @@ def convert_to_alnum(str):
 
 
 def template_builder(input):
-    f = open("output.jsonnet", "w+")
-
     panel_dict = {}
 
     if input.get('alert_channels'):
@@ -92,13 +92,20 @@ def template_builder(input):
     input['assemble_panels'] = assemble_panels(panel_dict)
 
     output = jinja2_to_render('templates', 'output.j2', data=input)
-    f.write(output)
+    return output
 
-    f.close()
+
+def generate_dashboard_from_jsonnet(path):
+    cmd_env_vars = dict(os.environ)
+    exec_command = 'jsonnet -J grafonnet-lib %s' % path
+    output = subprocess.check_output(
+        exec_command.split(' '), env=cmd_env_vars
+    )
+
+    return output
 
 
 if __name__ == '__main__':
-
     parser = argparse.ArgumentParser(
         description='Generate dashboard with pre filled metrics'
     )
@@ -112,4 +119,12 @@ if __name__ == '__main__':
         raise Exception("Unable to find the file")
 
     input = input_yaml_to_json(input_file)
-    template_builder(input)
+    jsonnet = template_builder(input)
+
+    jsonnet_path = 'output.jsonnet'
+    with open('output.jsonnet', 'w') as f:
+        f.write(jsonnet)
+
+    dashboard_json = generate_dashboard_from_jsonnet(jsonnet_path)
+    with open('dashboard.json', 'w') as f:
+        f.write(dashboard_json.decode('utf-8'))

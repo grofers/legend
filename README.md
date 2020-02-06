@@ -45,14 +45,10 @@ Install requirements from requirements.txt
 pip3 install -r requirements.txt
 ```
  
-Generate a jsonnet output file
+Run the following command with a dashboard template to generate the dashboard JSON -
+
 ```
 python main.py -f sample_input.yaml 
 ```
 
-Generate dashboard json by passing last command's output file as an argument to jsonnet command
-```
-jsonnet -J grafonnet-lib output.jsonnet
-```
-
-Import the json generated from the above comamnd into Grafana
+This output of the above command will be saved to `output.json`. This JSON file can be imported the into Grafana to create your dashboard.
