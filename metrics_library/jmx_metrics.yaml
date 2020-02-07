@@ -1,0 +1,94 @@
+data_source: Prometheus
+reference: https://github.com/prometheus/jmx_exporter
+description: JMX metrics
+identifierKeys:
+  - job
+panels:
+  - title: (U) Heap Utilized
+    type: Graph
+    description: Heap utilized percentage for each instance
+    targets:
+      {% for dimension in data %}
+      - metric: sum by (instance) ((jvm_memory_bytes_used{job=~"{{ dimension.job }}",area="heap"})*100)/(sum by (instance) (jvm_memory_bytes_max{job=~"{{ dimension.job }}",area="heap"}))
+        legend:
+      {% endfor %}
+    alert_config:
+      priority: P1
+      message: 'Heap Memory is High'
+      rule:
+        for_duration: 10m
+        evaluate_every: 1m
+      conditions:
+        - evaluator_params: 90
+          evaluator_type: gt
+          operator_type: and
+          query_ref_id: A # it is according to sequence
+          query_time_end: now
+          query_time_start: 5m
+          reducer_params: []
+          reducer_type: avg
+
+  - title: (U) Non Heap Utilized
+    type: Graph
+    description: Non Heap Utilized percentage for each instance
+    targets:
+      {% for dimension in data %}
+      - metric: sum by (instance) ((jvm_memory_bytes_used{job=~"{{ dimension.job }}",area="nonheap"})*100)/(sum by (instance) (jvm_memory_bytes_max{job=~"{{ dimension.job }}",area="nonheap"}))
+        legend:
+      {% endfor %}
+    alert_config:
+      priority: P1
+      message: 'Non Heap Memory is High'
+      rule:
+        for_duration: 10m
+        evaluate_every: 1m
+      conditions:
+        - evaluator_params: 90
+          evaluator_type: gt
+          operator_type: and
+          query_ref_id: A # it is according to sequence
+          query_time_end: now
+          query_time_start: 5m
+          reducer_params: []
+          reducer_type: avg
+
+  - title: (U) User Threads Count
+    type: Graph
+    description: (live - daemon) = user threads, MAX(peak count of active threads in the system from JVM start)
+    targets:
+      {% for dimension in data %}
+      - metric: max(jvm_threads_peak_threads{job="{{ dimension.job }}"}
+        legend: MAX_PEAK
+      - metric: jvm_threads_live_threads{job="{{ dimension.job }}"} - jvm_threads_daemon_threads{job="{{ dimension.job }}"}
+        legend: '{{ '{{instance}}' }}'
+      {% endfor %}
+
+  - title: (U) Daemon Threads Count
+    type: Graph
+    description: Threads that are running in the background like GC etc..
+    targets:
+      {% for dimension in data %}
+      - metric: jvm_threads_daemon_threads{job="{{ dimension.job }}"}
+        legend: '{{ '{{instance}}' }}'
+      {% endfor %}
+
+  - title: (S) File Descriptors Count
+    type: Graph
+    description: Maximum number of open file descriptors and Number of open file descriptors. https://docs.gigaspaces.com/latest/production/production-file-descriptors.html https://github.com/netdata/netdata/issues/1272
+    targets:
+      {% for dimension in data %}
+      - metric: min(process_max_fds{job="{{ dimension.job }}"})
+        legend: Max_File_descriptors
+      - metric: process_open_fds{job="{{ dimension.job }}"}
+        legend: '{{ '{{instance}}' }}'
+      {% endfor %}
+
+  - title: (E) DeadLock Threads Count
+    type: Graph
+    description:
+    targets:
+      {% for dimension in data %}
+      - metric: jvm_threads_deadlocked{job="{{ dimension.job }}"}
+        legend: '{{ '{{instance}}' }}'
+      {% endfor %}
+

@@ -1,0 +1,150 @@
+data_source: Cloudwatch
+reference: https://aws.amazon.com/rds/mysql/
+description: Provide a reliable solution for mysql rds
+panels:
+  - title: (U) CPU Utilization Percentage
+    type: Graph
+    description:
+    targets:
+      {% for dimension in data %}
+    - dimensions: {"DBInstanceIdentifier": {{ dimension.db_instance_identifier }}}
+      metric: CPUUtilization
+      namespace: AWS/RDS
+      statistic: Maximum
+      alias: '{{ '{{DBInstanceIdentifier}}_{{metric}}_{{stat}}' }}'
+      {% endfor %}
+
+  - title: (U) Database Connection Count
+    type: Graph
+    description:
+    targets:
+      {% for dimension in data %}
+    - dimensions: {"DBInstanceIdentifier": {{ dimension.db_instance_identifier }}}
+      metric: DatabaseConnections
+      namespace: AWS/RDS
+      statistic: Maximum
+      alias: '{{ '{{DBInstanceIdentifier}}_{{metric}}_{{stat}}' }}'
+      {% endfor %}
+
+  - title: (U) Freeable Memory
+    type: Graph
+    description:
+    targets:
+      {% for dimension in data %}
+      - dimensions: {"DBInstanceIdentifier": {{ dimension.db_instance_identifier }}}
+        metric: FreeableMemory
+        namespace: AWS/RDS
+        statistic: Average
+        alias: '{{ '{{DBInstanceIdentifier}}_{{metric}}_{{stat}}' }}'
+        {% endfor %}
+
+  - title: (U) Network Throughput (Bytes)
+    type: Graph
+    description:
+    targets:
+      {% for dimension in data %}
+    - dimensions: {"DBInstanceIdentifier": {{ dimension.db_instance_identifier }}}
+      metric: NetworkReceiveThroughput
+      namespace: AWS/RDS
+      statistic: Maximum
+      alias: '{{ '{{DBInstanceIdentifier}}_{{metric}}_{{stat}}' }}'
+    - dimensions: {"DBInstanceIdentifier": {{ dimension.db_instance_identifier }}}
+      metric: NetworkTransmitThroughput
+      namespace: AWS/RDS
+      statistic: Maximum
+      alias: '{{ '{{DBInstanceIdentifier}}_{{metric}}_{{stat}}' }}'
+      {% endfor %}
+
+  - title: (U) Read/Write IOPS utilisation
+    type: Graph
+    description: Read and Write IOPS utilisation
+    targets:
+      {% for dimension in data %}
+      - dimensions: {"DBInstanceIdentifier": {{ dimension.db_instance_identifier }}}
+        metric: ReadIOPS
+        namespace: AWS/RDS
+        statistic: Maximum
+        alias: '{{ '{{DBInstanceIdentifier}}_{{metric}}_{{stat}}' }}'
+      - dimensions: {"DBInstanceIdentifier": {{ dimension.db_instance_identifier }}}
+        metric: WriteIOPS
+        namespace: AWS/RDS
+        statistic: Maximum
+        alias: '{{ '{{DBInstanceIdentifier}}_{{metric}}_{{stat}}' }}'
+      {% endfor %}
+
+  - title: (U) Free Storage Space
+    type: Graph
+    description:
+    targets:
+      {% for dimension in data %}
+      - dimensions: {"DBInstanceIdentifier": {{ dimension.db_instance_identifier }}}
+        metric: FreeStorageSpace
+        namespace: AWS/RDS
+        statistic: Minimum
+        alias: '{{ '{{DBInstanceIdentifier}}_{{metric}}_{{stat}}' }}'
+        {% endfor %}
+
+  - title: (S) Disk Queue Depth
+    type: Graph
+    description:
+    targets:
+      {% for dimension in data %}
+      - dimensions: {"DBInstanceIdentifier": {{ dimension.db_instance_identifier }}}
+        metric: DiskQueueDepth
+        namespace: AWS/RDS
+        statistic: Average
+        alias: '{{ '{{DBInstanceIdentifier}}_{{metric}}_{{stat}}' }}'
+        {% endfor %}
+
+  - title: (D) Read/Write latency
+    type: Graph
+    description: Read and Write latency
+    targets:
+      {% for dimension in data %}
+      - dimensions: {"DBInstanceIdentifier": {{ dimension.db_instance_identifier }}}
+        metric: ReadLatency
+        namespace: AWS/RDS
+        statistic: Maximum
+        alias: '{{ '{{DBInstanceIdentifier}}_{{metric}}_{{stat}}' }}'
+      - dimensions: {"DBInstanceIdentifier": {{ dimension.db_instance_identifier }}}
+        metric: WriteLatency
+        namespace: AWS/RDS
+        statistic: Maximum
+        alias: '{{ '{{DBInstanceIdentifier}}_{{metric}}_{{stat}}' }}'
+      {% endfor %}
+
+  - title: (D) Replication Lag (Only for read replicas)
+    type: Graph
+    description:
+    targets:
+      {% for dimension in data %}
+      - dimensions: {"DBInstanceIdentifier": {{ dimension.db_instance_identifier }}}
+        metric: ReplicaLag
+        namespace: AWS/RDS
+        statistic: Maximum
+        alias: '{{ '{{DBInstanceIdentifier}}_{{metric}}_{{stat}}' }}'
+        {% endfor %}
+
+  - title: (D) Slow Query Count
+    type: Graph
+    description:
+    targets:
+      {% for dimension in data %}
+      - dimensions: {}
+        metric: SlowQueryCount-{{ dimension.db_instance_identifier }}
+        namespace: RDSCustomMetric
+        statistic: Maximum
+        {% endfor %}
+
+  - title: (E) Replication error count (Only for read replica)
+    type: Graph
+    description:
+    targets:
+      {% for dimension in data %}
+      - dimensions: {}
+        metric: ReplicationErrorCount-{{ dimension.db_instance_identifier }}
+        namespace: RDSCustomMetric
+        statistic: Maximum
+        {% endfor %}
+
+

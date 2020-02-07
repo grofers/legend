@@ -1,0 +1,86 @@
+data_source: Prometheus
+reference: https://github.com/deadtrickster/prometheus_rabbitmq_exporter/blob/master/README.md#overview
+description: RabbitMQ is an open-source message-broker
+identifierKeys:
+  - job
+panels:
+  - title: (R) Rate of requests (qps) - aggregated over all methods
+    type: Graph
+    description: qps
+    targets:
+    {% for dimension in data %}
+      - metric: sum(rate(http_server_requests_seconds_count{job=~"{{ dimension.job }}"}[5m]))
+        legend: Aggregate
+      - metric: sum(rate(http_server_requests_seconds_count{job=~"{{ dimension.job }}"}[5m])) by (instance)
+        legend: '{{ '{{instance}}' }}'
+    {% endfor %}
+
+  - title: (R) Rate of requests per API
+    type: Graph
+    description: qps per API
+    targets:
+    {% for dimension in data %}
+      - metric: sum(rate(http_server_requests_seconds_count{job=~"lastmile/ec2-obelix-jvm"}[5m])) by (uri,method)
+        legend: '{{ '{{method}} - {{uri}}' }}'
+    {% endfor %}
+
+  - title: (E) Error rate - aggregated over all methods (4xx)
+    type: Graph
+    description: 4xx Error rate at service level. Client side errors
+    targets:
+    {% for dimension in data %}
+      - metric: sum(rate(http_server_requests_seconds_count{job=~"{{ dimension.job }}",status =~ "4.."}[5m]))
+        legend: Aggregate
+      - metric: sum(rate(http_server_requests_seconds_count{job=~"{{ dimension.job }}", status =~ "4.."}[5m])) by (instance)
+        legend: '{{ '{{instance}}' }}'
+    {% endfor %}
+
+  - title: (E) Error rate - per API (4xx)
+    type: Graph
+    description: error per API. Client side errors
+    targets:
+    {% for dimension in data %}
+      - metric: sum(rate(http_server_requests_seconds_count{job=~"{{ dimension.job }}", status =~ "4.."}[5m])) by (uri,method)
+        legend: '{{ '{{method}} - {{view}}' }}'
+    {% endfor %}
+
+  - title: (E) Error rate - aggregated over all methods (5xx)
+    type: Graph
+    description: 5xx Error rate at service level. Server side errors
+    targets:
+    {% for dimension in data %}
+      - metric: sum(rate(http_server_requests_seconds_count{job=~"{{ dimension.job }}",status =~ "5.."}[5m]))
+        legend: Aggregate
+      - metric: sum(rate(http_server_requests_seconds_count{job=~"{{ dimension.job }}", status =~ "5.."}[5m])) by (instance)
+        legend: '{{ '{{instance}}' }}'
+    {% endfor %}
+
+  - title: (E) Error rate - per API (5xx)
+    type: Graph
+    description: error per API. Server side errors
+    targets:
+    {% for dimension in data %}
+      - metric: sum(rate(http_server_requests_seconds_count{job=~"{{ dimension.job }}", status =~ "5.."}[5m])) by (uri,method)
+        legend: '{{ '{{method}} - {{uri}}' }}'
+    {% endfor %}
+
+  - title: (D) Avg Latency  - aggregated over all methods
+    type: Graph
+    description: overall latency
+    targets:
+    {% for dimension in data %}
+      - metric: sum(rate(http_server_requests_seconds_count{job=~"{{ dimension.job }}"}[5m]))
+        legend: Aggregate
+      - metric: sum(rate(http_server_requests_seconds_count{job=~"{{ dimension.job }}"}[5m])) by (instance)
+        legend: '{{ '{{instance}}' }}'
+    {% endfor %}
+
+  - title: (D) Avg Latency  - per API
+    type: Graph
+    description: API level latency
+    targets:
+    {% for dimension in data %}
+      - metric: sum(rate(http_server_requests_seconds_count{job=~"{{ dimension.job }}"}[5m])) by (uri,method)
+        legend: '{{ '{{method}} - {{uri}}' }}'
+    {% endfor %}
+
