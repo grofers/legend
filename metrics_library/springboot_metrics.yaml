@@ -20,7 +20,7 @@ panels:
     description: qps per API
     targets:
     {% for dimension in data %}
-      - metric: sum(rate(http_server_requests_seconds_count{job=~"lastmile/ec2-obelix-jvm"}[5m])) by (uri,method)
+      - metric: sum(rate(http_server_requests_seconds_count{job=~"{{ dimension.job }}"}[5m])) by (uri,method)
         legend: '{{ '{{method}} - {{uri}}' }}'
     {% endfor %}
 

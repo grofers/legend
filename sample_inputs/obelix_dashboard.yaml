@@ -9,27 +9,21 @@ references:
   - metrics_definition:
 tags:
   - prod
-
 components:
-  elb:
-    dimensions:
-      -
-
-
   s3:
     dimensions:
-      - bucket_name: grofers-prod-lastmile-obelix
-        filter_id: EntireBucket
-      - bucket_name: grofers-prod-lastmile-obelixconsumer
-        filter_id: EntireBucket
-      - bucket_name: grofers-prod-lastmile-obelix-logs
-        filter_id: EntireBucket
+    - bucket_name: grofers-prod-lastmile-obelix
+      filter_id: EntireBucket
+    - bucket_name: grofers-prod-lastmile-obelixconsumer
+      filter_id: EntireBucket
+    - bucket_name: grofers-prod-lastmile-obelix-logs
+      filter_id: EntireBucket
   springboot:
     dimensions:
     - job: lastmile/ec2-obelix-springboot
   jmx:
     dimensions:
-      - job: lastmile/ec2-obelix-springboot
+    - job: lastmile/ec2-obelix-jmx
   mysql_rds:
     dimensions:
     - db_instance_identifier: prod-lastmile-db
