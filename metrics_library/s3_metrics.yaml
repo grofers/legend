@@ -1,13 +1,10 @@
 data_source: Cloudwatch
 reference: https://aws.amazon.com/s3/
-description: Provide a reliable solution for object level storage
-data:
-  - bucket_name
-  - filter_id
+description: Provide a reliable solution for object level storage. 
 panels:
-  - title: (R) Request Count - Write
+  - title: (R) Request Count - Read/Write
     type: Graph
-    description: TODO
+    description: The number of HTTP GET requests made for objects in an Amazon S3 bucket. This doesn't include list operations. The number of HTTP PUT requests made for objects in an Amazon S3 bucket. 
     targets:
       {% for dimension in data %}
     - dimensions: {"BucketName": {{ dimension.bucket_name }} ,"FilterId": {{ dimension.filter_id }}}
@@ -20,40 +17,55 @@ panels:
       namespace: AWS/S3
       statistic: Sum
       alias: '{{ '{{BucketName}}_{{metric}}_{{stat}}' }}'
-      {% endfor %}
-    alert_config:
-      priority: P1
-      message: 'Request Count - Write take actions like this 1. 2.'
-      rule:
-        for_duration: 2m
-        evaluate_every: 10s
-      conditions:
-        - evaluator_params: 2
-          evaluator_type: gt
-          operator_type: and
-          query_ref_id: A # it is according to sequence
-          query_time_end: now
-          query_time_start: 5m
-          reducer_params: []
-          reducer_type: avg
-        - evaluator_params: 2
-          evaluator_type: gt
-          operator_type: and
-          query_ref_id: B # it is according to sequence
-          query_time_end: now
-          query_time_start: 5m
-          reducer_params: []
-          reducer_type: avg
-
-  - title: (R) Request Count - Read
-    type: Graph
-    description: TODO
-    targets:
-      {% for dimension in data %}
     - dimensions: {"BucketName": {{ dimension.bucket_name }} ,"FilterId": {{ dimension.filter_id }}}
       metric: GetRequests
       namespace: AWS/S3
       statistic: Sum
-      alias: '{{ '{{metric}}' }}'
-      ref_id: A
+      alias: '{{ '{{BucketName}}_{{metric}}_{{stat}}' }}'
+    - dimensions: {"BucketName": {{ dimension.bucket_name }} ,"FilterId": {{ dimension.filter_id }}}
+      metric: AllRequests
+      namespace: AWS/S3
+      statistic: Sum
+      alias: '{{ '{{BucketName}}_{{metric}}_{{stat}}' }}'
+      {% endfor %}
+    
+  - title: (E) Client Errors - 4xx
+    type: Graph
+    description: The number of HTTP 4xx client error status code requests made to an Amazon S3 bucket 
+    targets:
+      {% for dimension in data %}
+    - dimensions: {"BucketName": {{ dimension.bucket_name }} ,"FilterId": {{ dimension.filter_id }}}
+      metric: 4xxErrors
+      namespace: AWS/S3
+      statistic: Sum
+      alias: '{{ '{{BucketName}}_{{metric}}_{{stat}}' }}'
+      {% endfor %}
+
+  - title: (E) Server Errors - 5xx
+    type: Graph
+    description: The number of HTTP 5xx server error status code requests made to an Amazon S3 bucket
+    targets:
+      {% for dimension in data %}
+    - dimensions: {"BucketName": {{ dimension.bucket_name }} ,"FilterId": {{ dimension.filter_id }}}
+      metric: 5xxErrors
+      namespace: AWS/S3
+      statistic: Sum
+      alias: '{{ '{{BucketName}}_{{metric}}_{{stat}}' }}'
+      {% endfor %}
+
+  - title: (D) Request Latency - 99th percentile
+    type: Graph
+    description: The elapsed per-request time from the first byte received to the last byte sent to an Amazon S3 bucket. This includes the time taken to receive the request body and send the response body, which is not included in FirstByteLatency. 
+    targets:
+      {% for dimension in data %}
+    - dimensions: {"BucketName": {{ dimension.bucket_name }} ,"FilterId": {{ dimension.filter_id }}}
+      metric: TotalRequestLatency
+      namespace: AWS/S3
+      statistic: p99
+      alias: '{{ '{{BucketName}}_{{metric}}_{{stat}}' }}'
+    - dimensions: {"BucketName": {{ dimension.bucket_name }} ,"FilterId": {{ dimension.filter_id }}}
+      metric: FirstByteLatency
+      namespace: AWS/S3
+      statistic: p99
+      alias: '{{ '{{BucketName}}_{{metric}}_{{stat}}' }}'
       {% endfor %}
