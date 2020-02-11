@@ -64,3 +64,9 @@ components:
   promtail:
     dimensions:
     - pod_name: promtail
+  redis:
+    dimensions:
+      - job_name: po-redis-metrics
+  celery:
+    dimensions:
+      - job_name: po-celery-metrics

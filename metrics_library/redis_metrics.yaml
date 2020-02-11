@@ -1,0 +1,45 @@
+data_source: Prometheus
+reference: https://redis.io/documentation
+description: Redis is an in-memory data structure project implementing a distributed, in-memory key-value database with optional durability
+
+panels:
+  - title: (S) Total blocked clients
+    type: Graph
+    description: "Number of clients pending on a blocking calls (BLPOP, BRPOP, BRPOPLPUSH) Ref: https://redis.io/topics/modules-blocking-ops"
+    targets:
+      {% for dimension in data %}
+      - metric: redis_blocked_clients{job=~\"{{ dimension.job_name }}\"}
+        legend: Blocked Clients Count
+      {% endfor %}
+
+  - title: (E) Keyspace hits/misses
+    type: Graph
+    description: Hits, misses, Percentage of miss
+    targets:
+      {% for dimension in data %}
+      - metric: rate(redis_keyspace_hits_total{job=~"{{ dimension.job_name }}"}[5m])
+        legend: Hits
+      - metric: rate(redis_keyspace_misses_total{job=~"{{ dimension.job_name }}"}[5m])
+        legend: Misses
+      - metric: rate(redis_keyspace_misses_total{job=~"{{ dimension.job_name }}"}[5m])*100 / (rate(redis_keyspace_hits_total{job=~"{{ dimension.job_name }}"}[5m]) + rate(redis_keyspace_misses_total{job=~"{{ dimension.job_name }}"}[5m]) )
+        legend: Percent of misses
+      {% endfor %}
+
+  - title: (R) Rate of Commands executed
+    type: Graph
+    description: Number of commands executed, processed
+    targets:
+      {% for dimension in data %}
+      - metric: rate(redis_commands_processed_total{job="{{ dimension.job_name }}"}[5m])
+        legend: Processed
+      - metric: sum(rate(redis_commands_total{job="{{ dimension.job_name }}"}[5m])) by (instance)
+        legend: Total
+      {% endfor %}
+
+  - title: (E) Total rejected connections
+    type: Graph
+    description: Number of rejected connections
+    targets:
+      {% for dimension in data %}
+      - metric: redis_rejected_connections_total{job=~"{{ dimension.job_name }}"}
+      {% endfor %}
