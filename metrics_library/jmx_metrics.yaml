@@ -54,12 +54,12 @@ panels:
 
   - title: (U) User Threads Count
     type: Graph
-    description: (live - daemon) = user threads, MAX(peak count of active threads in the system from JVM start)
+    description: (current - daemon) = user threads, MAX(peak count of active threads in the system from JVM start)
     targets:
       {% for dimension in data %}
-      - metric: max(jvm_threads_peak_threads{job="{{ dimension.job }}"}
+      - metric: max(jvm_threads_peak{job="{{ dimension.job }}"})
         legend: MAX_PEAK
-      - metric: jvm_threads_live_threads{job="{{ dimension.job }}"} - jvm_threads_daemon_threads{job="{{ dimension.job }}"}
+      - metric: jvm_threads_current{job="{{ dimension.job }}"} - jvm_threads_daemon{job="{{ dimension.job }}"}
         legend: '{{ '{{instance}}' }}'
       {% endfor %}
 
@@ -68,7 +68,7 @@ panels:
     description: Threads that are running in the background like GC etc..
     targets:
       {% for dimension in data %}
-      - metric: jvm_threads_daemon_threads{job="{{ dimension.job }}"}
+      - metric: jvm_threads_daemon{job="{{ dimension.job }}"}
         legend: '{{ '{{instance}}' }}'
       {% endfor %}
 
