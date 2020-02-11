@@ -1,0 +1,63 @@
+data_source: Prometheus
+reference: https://github.com/deadtrickster/prometheus_rabbitmq_exporter/blob/master/README.md#overview
+description: RabbitMQ is an open-source message-broker
+panels:
+  - title: (U) No of consumers
+    type: Graph
+    description: No of consumers per queue
+    targets:
+      {% for dimension in data %}
+      - metric: rabbitmq_queue_consumers{queue=~"{{ dimension.queue }}",job =~"{{dimension.job}}"}
+        legend: '{{ '{{queue}}' }}'
+      {% endfor %}
+
+  - title: (S) File Descriptors Count
+    type: Graph
+    description: Maximum number of open file descriptors and Number of open file descriptors. https://docs.gigaspaces.com/latest/production/production-file-descriptors.html https://github.com/netdata/netdata/issues/1272
+    targets:
+      {% for dimension in data %}
+      - metric: min(process_max_fds{job="{{ dimension.job }}"})
+        legend: Max_File_descriptors
+      - metric: process_open_fds{job="{{ dimension.job }}"}
+        legend: '{{ '{{instance}}' }}'
+      {% endfor %}
+
+  - title: (S) Queue depth(Total messages)
+    type: Graph
+    description: Sum of ready and unacknowledged messages. https://stackoverflow.com/questions/31915773/rabbitmq-what-are-ready-and-unacked-types-of-messages
+    targets:
+      {% for dimension in data %}
+      - metric: rabbitmq_queue_messages{queue=~"{{ dimension.queue }}",job =~"{{dimension.job}}"}
+        legend: '{{ '{{queue}}' 'Queue_depth' }}'
+      - metric: rabbitmq_queue_messages_ready{queue=~"{{ dimension.queue }}",job =~"{{dimension.job}}"}
+        legend: '{{ '{{queue}}' 'Ready_messages' }}'
+      - metric: rabbitmq_queue_messages_unacknowledged{queue=~"{{ dimension.queue }}",job =~"{{dimension.job}}"}
+        legend: '{{ '{{queue}}' 'Unacknowledged_messages' }}'
+      {% endfor %}
+
+  - title: (R) Rate of messages published
+    type: Graph
+    description: Rate of messages published in a queue.
+    targets:
+      {% for dimension in data %}
+      - metric: rate(rabbitmq_queue_messages_published_total{queue=~"{{ dimension.queue }}",job =~"{{dimension.job}}"}[5m])
+        legend: '{{ '{{queue}}' }}'
+      {% endfor %}
+
+  - title: (R) Rate of messages Delivered
+    type: Graph
+    description: Delivered messages = Sum of messages_delivered_total, messages_delivered_no_ack_total, messages_get_total and messages_get_no_ack_total.
+    targets:
+      {% for dimension in data %}
+      - metric: rate(rabbitmq_queue_messages_deliver_get_total{queue=~"{{ dimension.queue }}", job =~"{{dimension.job}}"}[5m])
+        legend: '{{ '{{queue}}' }}'
+      {% endfor %}
+
+  - title: (E) Error rate of messages returned to publisher as unroutable
+    type: Graph
+    description: Error rate of messages returned to publisher as unroutable
+    targets:
+      {% for dimension in data %}
+      - metric: rate(rabbitmq_queue_messages_returned_total{queue=~"{{ dimension.queue }}", job =~"{{dimension.job}}"}[5m])
+        legend: '{{ '{{queue}}' }}'
+      {% endfor %}
