@@ -1,14 +1,68 @@
 data_source: InfluxDB
 reference: https://www.slideshare.net/OpsStack/how-to-monitoring-the-sre-golden-signals-ebook/
 description: System core metrics 
-identifier_keys: 
-  - host
 panels:
-  - title: (U) Memory utilisation
+  - title: (U) CPU Utilisation
     type: Graph
-    description: Memory utilisation
+    description: CPU utilisation. Utilisation: % time that the resource was busy
     targets:
-      {% for dimension in data %}
+    {% for dimension in data %}
+    - query: SELECT 100 - mean(\"value\") FROM \"cpu_value\" WHERE (\"type\" = \'percent\' AND \"type_instance\" = \'idle\' AND \"host\" =~ /^{{ dimension.host }}/ AND \"type\" = \'percent\') AND $timeFilter GROUP BY time($interval), \"host\" fill(null)
+      alias_by: $tag_host
+    {% endfor %}
+
+  - title: (U) Memory Utilisation
+    type: Graph
+    description: Memory utilisation. Utilisation: % time that the resource was busy
+    targets:
+    {% for dimension in data %}
     - query: SELECT mean(\"value\") FROM \"memory_value\" WHERE (\"type_instance\" = \'used\' AND \"host\" =~ /^{{ dimension.host }}/ AND \"type\" = \'percent\') AND $timeFilter GROUP BY time($interval), \"host\" fill(null)
       alias_by: $tag_host
-      {% endfor %}
+    {% endfor %}
+
+  - title: (U) Disk Utilisation
+    type: Graph
+    description: Disk utilisation. Utilisation: % time that the resource was busy
+    targets:
+    {% for dimension in data %}
+    - query: SELECT mean(\"value\") FROM \"df_value\" WHERE (\"type_instance\" = \'used\' AND \"host\" =~ /^{{ dimension.host }}/ AND \"type\" = \'percent_bytes\') AND $timeFilter GROUP BY time($interval), \"host\" fill(null)
+      alias_by: $tag_host
+    {% endfor %}
+
+  - title: (U) Disk Read IOPS
+    type: Graph
+    description: Disk IO Read/Write Operations
+    targets:
+    {% for dimension in data %}
+    - query: SELECT non_negative_derivative(mean(\"value\"), 1m) FROM \"disk_read\" WHERE (\"type\" = \'disk_ops\' AND \"host\" =~ /^{{ dimension.host }}/) AND $timeFilter GROUP BY time($interval), \"host\" fill(null)
+      alias_by: $tag_host
+
+  - title: (U) Disk Write IOPS
+    type: Graph
+    description: Disk IO Read/Write Operations
+    targets:
+    - query: SELECT non_negative_derivative(mean(\"value\"), 1m) FROM \"disk_write\" WHERE (\"type\" = \'disk_ops\' AND \"host\" =~ /^{{ dimension.host }}/) AND $timeFilter GROUP BY time($interval), \"host\" fill(null)
+      alias_by: $tag_host
+
+  - title: (U) Network In Bytes
+    type: Graph
+    description: Network In Bytes
+    targets:
+    - query: SELECT non_negative_derivative(mean(\"value\"), 1s) FROM \"interface_rx\" WHERE (\"type\" = \'if_octets\' AND \"host\" =~ /^{{ dimension.host }}/) AND $timeFilter GROUP BY time($interval), \"host\" fill(null)
+      alias_by: $tag_host
+
+  - title: (U) Network Out Bytes
+    type: Graph
+    description: Network Out Bytes
+    targets:
+    - query: SELECT non_negative_derivative(mean(\"value\"), 1s) FROM \"interface_tx\" WHERE (\"type\" = \'if_octets\' AND \"host\" =~ /^{{ dimension.host }}/) AND $timeFilter GROUP BY time($interval), \"host\" fill(null)
+      alias_by: $tag_host
+
+  - title: (S) CPU Load
+    type: Graph
+    description: CPU saturation. https://scoutapm.com/blog/understanding-load-averages
+    targets:
+    {% for dimension in data %}
+    - query: SELECT mean("value") FROM "load_longterm" WHERE ("type" = 'load' AND "host" =~ /^{{ dimension.host }}) AND $timeFilter GROUP BY time($interval), "host" fill(null)
+      alias_by: $tag_host
+    {% endfor %}
