@@ -14,8 +14,11 @@ local alertCondition = grafana.alertCondition;
 {% for component, values in data.components.items() %}
 
 local {{ component }} =
-    row.new(title='{{ component }}')
-    ;
+    row.new(title='{{ component }}',
+    {% if values.metric.get('hide') is not none %}
+        collapse=true,
+    {%endif%}
+    );
     {% for panel_value in values.metric.panels %}
 
 local {{ panel_value.title_var }} =

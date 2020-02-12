@@ -1,5 +1,9 @@
 .addTarget(
     prometheus.target(
     '{{data.metric}}',
+    legendFormat='{{ data.legend if data.legend != None else data.metric }}',
+    {% if data.get('hide') is not none %}
+    hide='hide',
+    {%endif%}
     )
 )

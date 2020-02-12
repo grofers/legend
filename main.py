@@ -87,6 +87,8 @@ def template_builder(input):
 
                 panel['alertrender'] = alertrender
 
+        if (values.get('hide') is not None):
+            template['hide'] = values.get('hide', None)
         values['metric'] = template
 
     input['assemble_panels'] = assemble_panels(panel_dict)
