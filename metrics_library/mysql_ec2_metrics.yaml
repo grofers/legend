@@ -1,0 +1,38 @@
+data_source: Prometheus
+reference: https://www.percona.com/doc/percona-monitoring-and-management/index.metrics-monitor.dashboard.html#pmm-dashboard-mysql-list
+description: Percona Monitored MySQL EC2 Instances
+hide: true
+panels:
+  - title: (U) Database Connections (Counts)
+    type: Graph
+    description: Number of database connections
+    targets:
+      {% for dimension in data %}
+      - metric: max(max_over_time(mysql_global_status_threads_connected{job=~"{{ dimension.master }}"}[5m]) or mysql_global_status_threads_connected{job=~"{{ dimension.master }}"} ) by (job,instance)
+        legend: '{{ 'CONNECTIONS_{{job}}_{{instance}}' }}'
+      - metric: mysql_global_status_max_used_connections{job=~"{{ dimension.master }}"}
+        legend: '{{ 'MAX_USED_CONNECTIONS_{{job}}_{{instance}}' }}'
+      - metric: mysql_global_variables_max_connections{job=~"{{ dimension.master }}"}
+        legend: '{{ 'MAX_GLOBAL_CONNECTIONS_{{job}}_{{instance}}' }}'
+        {% for slave in dimension.slaves %}
+      - metric: max(max_over_time(mysql_global_status_threads_connected{job=~"{{ slave }}"}[5m]) or mysql_global_status_threads_connected{job=~"{{ slave }}"} ) by (job,instance)
+        legend: '{{ 'CONNECTIONS_{{job}}_{{instance}}' }}'
+        hide: true
+      - metric: mysql_global_status_max_used_connections{job=~"{{ slave }}"}
+        legend: '{{ 'MAX_USED_CONNECTIONS_{{job}}_{{instance}}' }}'
+      - metric: mysql_global_variables_max_connections{job=~"{{ slave }}"}
+        legend: '{{ 'MAX_GLOBAL_CONNECTIONS_{{job}}_{{instance}}' }}'
+        {% endfor %}
+      {% endfor %}
+  - title: (U) Database Connection Utilization (%)
+    type: Graph
+    description: Percentage of DB connection utilization
+    targets:
+      {% for dimension in data %}
+      - metric: (max((max_over_time(mysql_global_status_threads_connected{job=~"{{ dimension.master }}"}[5m]) or mysql_global_status_threads_connected{job=~"{{ dimension.master }}"})*100/mysql_global_variables_max_connections{job=~"{{ dimension.master }}"} ) by (job,instance))
+        legend: '{{ '{{job}}_{{instance}}' }}'
+        {% for slave in dimension.slaves %}
+      - metric: (max((max_over_time(mysql_global_status_threads_connected{job=~"{{ slave }}"}[5m]) or mysql_global_status_threads_connected{job=~"{{ slave }}"})*100/mysql_global_variables_max_connections{job=~"{{ slave }}"} ) by (job,instance))
+        legend: '{{ '{{job}}_{{instance}}' }}'
+        {% endfor %}
+      {% endfor %}

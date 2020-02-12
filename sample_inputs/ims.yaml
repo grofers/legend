@@ -14,6 +14,12 @@ tags:
   - retail
 
 components:
+  elb:
+    dimensions:
+      - load_balancer_name: ims-retail-https
+  django:
+    dimensions:
+    - job: ims-django-metrics
   sqs:
     dimensions:
       - queue_name: pos_upstream_data_log
@@ -23,7 +29,21 @@ components:
       - queue_name: ims_task
         job: pos-rabbitmq-metrics
         dead_queue_name:
-
-  django:
+  redis:
     dimensions:
-      - job: ims-django-metrics
+      - job_name: ims-redis-metrics
+  celery:
+    dimensions:
+      - job_name: pos-celery-metrics
+  mysql_ec2:
+    dimensions:
+      - master: perconamaster4-mysql-metrics
+        slaves: [perconamaster1-mysql-metrics,perconamaster5-mysql-metrics]
+  systemcore_ec2:
+    dimensions:
+      - host: .*ims.*
+  s3:
+    dimensions:
+    - bucket_name: retail-bulk-upload
+      filter_id: EntireBucket
+
