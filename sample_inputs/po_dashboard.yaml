@@ -1,0 +1,31 @@
+---
+title: PO-Dashboard
+alert_channels: ["PO-opsgenie"]
+environment: Prod
+description: Purchase order management system
+references:
+- deployment: https://github.com/grofers/ansible-retail/tree/master/roles/purchase_order
+- documentation: https://github.com/grofers/retail_purchase_order
+
+tags:
+- prod
+components:
+  s3:
+    dimensions:
+    - bucket_name: retail-bulk-upload
+      filter_id: EntireBucket
+  systemcore_ec2:
+    dimensions:
+    - host: purchaseorder
+  promtail:
+    dimensions:
+    - pod_name: promtail
+  redis:
+    dimensions:
+      - job_name: po-redis-metrics
+  celery:
+    dimensions:
+      - job_name: po-celery-metrics
+  couchdb:
+    dimensions:
+      - job_name: po-couchdb-metrics

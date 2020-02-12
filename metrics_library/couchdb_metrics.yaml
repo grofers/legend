@@ -1,0 +1,47 @@
+data_source: Prometheus
+reference: https://couchdb.apache.org/
+description: A CouchDB server hosts named databases, which store documents. Each document is uniquely named in the database, and CouchDB provides a RESTful HTTP API for reading and updating (add, edit, delete) database documents.
+
+panels:
+  - title: (U) Memory consumed by documents
+    type: Graph
+    description: Displays the total memory used by documents
+    targets:
+      {% for dimension in data %}
+      - metric: couchdb_database_data_size{job="{{ dimension.job_name }}"}
+        legend: documents size
+      - metric: couch_database_disk_size{job="{{ dimension.job_name }}"}
+        legend: database size
+      {% endfor %}
+
+  - title: (U) Total documents on server
+    type: Graph
+    description: Total number of documents currently residing on server
+    targets:
+      {% for dimension in data %}
+      - metric: couchdb_database_doc_count{job="{{ dimension.job_name }}"}
+      {% endfor %}
+
+  - title: (U) Database overhead
+    type: Graph
+    description: The number of allocated but unused bytes
+    targets:
+      {% for dimension in data %}
+      - metric: couchdb_database_overhead{job="{{ dimension.job_name }}"}
+      {% endfor %}
+
+  - title: (R) Database reads
+    type: Graph
+    description: The number of database reads
+    targets:
+      {% for dimension in data %}
+      - metric: couchdb_httpd_database_reads{job="{{ dimension.job_name }}"}
+      {% endfor %}
+
+  - title: (R) Database wrties
+    type: Graph
+    description: The number of database reads
+    targets:
+      {% for dimension in data %}
+      - metric: couchdb_httpd_database_writes{job="{{ dimension.job_name }}"}
+      {% endfor %}

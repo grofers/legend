@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 
 import argparse
+import json
 import os
 import re
 import subprocess
@@ -65,7 +66,7 @@ def template_builder(input):
 
             if panel.get('alert_config'):
                 panel['alert_config']['rule']['name'] = panel['title']
-                panel['alert_config']['alert_ids'] = alert_ids
+                panel['alert_config']['alert_ids'] = json.dumps(alert_ids)
                 alertrender = jinja2_to_render(
                         'templates/alert',
                         'alert.j2',
