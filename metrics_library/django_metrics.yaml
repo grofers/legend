@@ -1,0 +1,83 @@
+data_source: Prometheus
+reference: https://docs.djangoproject.com/en/3.0/
+description: Django is a high-level Python Web framework that encourages rapid development and clean, pragmatic design.
+panels:
+  - title: (R) Rate of requests (qps) - aggregated over all methods
+    type: Graph
+    description: qps
+    targets:
+    {% for dimension in data %}
+      - metric: sum(rate(django_http_requests_total_by_method_total{job=~"{{ dimension.job }}"}[5m]))
+        legend: Aggregate
+      - metric: sum(rate(django_http_requests_total_by_method_total{job=~"{{ dimension.job }}"}[5m])) by (instance)
+        legend: '{{ '{{instance}}' }}'
+    {% endfor %}
+
+  - title: (R) Rate of requests per API
+    type: Graph
+    description: qps per API
+    targets:
+    {% for dimension in data %}
+    - metric: sum(rate(django_http_requests_total_by_view_transport_method_total{job=~"{{ dimension.job }}"}[5m])) by (view,method)
+      legend: '{{ '{{method}} - {{view}}' }}'
+    {% endfor %}
+
+  - title: (E) Error rate - aggregated over all methods (4xx)
+    type: Graph
+    description: 4xx Error rate at service level. Client side errors
+    targets:
+    {% for dimension in data %}
+      - metric: sum(rate(django_http_responses_total_by_status_total{job=~"{{ dimension.job }}",status =~ "4.."}[5m]))
+        legend: Aggregate
+      - metric: sum(rate(django_http_responses_total_by_status_total{job=~"{{ dimension.job }}", status =~ "4.."}[5m])) by (instance)
+        legend: '{{ '{{instance}}' }}'
+    {% endfor %}
+
+  - title: (E) Error rate - per API (4xx)
+    type: Graph
+    description: error per API. Client side errors
+    targets:
+    {% for dimension in data %}
+    - metric: sum(rate(django_http_responses_total_by_status_view_method_total{job=~"{{ dimension.job }}", status =~ "4.."}[5m])) by (view,method)
+      legend: '{{ '{{method}} - {{view}}' }}'
+    {% endfor %}
+
+  - title: (E) Error rate - aggregated over all methods (5xx)
+    type: Graph
+    description: 5xx Error rate at service level. Server side errors
+    targets:
+    {% for dimension in data %}
+      - metric: sum(rate(django_http_responses_total_by_status_total{job=~"{{ dimension.job }}",status =~ "5.."}[5m]))
+        legend: Aggregate
+      - metric: sum(rate(django_http_responses_total_by_status_total{job=~"{{ dimension.job }}", status =~ "5.."}[5m])) by (instance)
+        legend: '{{ '{{instance}}' }}'
+    {% endfor %}
+
+  - title: (E) Error rate - per API (5xx)
+    type: Graph
+    description: error per API. Server side errors
+    targets:
+    {% for dimension in data %}
+    - metric: sum(rate(django_http_responses_total_by_status_view_method_total{job=~"{{ dimension.job }}", status =~ "5.."}[5m])) by (view,method)
+      legend: '{{ '{{method}} - {{view}}' }}'
+    {% endfor %}
+
+  - title: (D) Latency over all methods (99th percentile)
+    type: Graph
+    description: overall latency
+    targets:
+    {% for dimension in data %}
+      - metric: histogram_quantile(0.99, sum(rate(django_http_requests_latency_including_middlewares_seconds_bucket{job=~"{{ dimension.job }}"}[5m])) by (le))
+        legend: Aggregate
+      - metric: histogram_quantile(0.99, sum(rate(django_http_requests_latency_including_middlewares_seconds_bucket{job=~"{{ dimension.job }}"}[5m])) by (instance,le))
+        legend: '{{ '{{instance}}' }}'
+    {% endfor %}
+
+  - title: (D) Latency per API (99th percentile)
+    type: Graph
+    description: API level latency
+    targets:
+    {% for dimension in data %}
+      - metric: histogram_quantile(0.99, sum(rate(django_http_requests_latency_seconds_by_view_method_bucket{job=~"{{ dimension.job }}"}[5m])) by (view,method,le))
+        legend: '{{ '{{method}} - {{view}}' }}'
+    {% endfor %}

@@ -23,3 +23,7 @@ components:
       - queue_name: ims_task
         job: pos-rabbitmq-metrics
         dead_queue_name:
+
+  django:
+    dimensions:
+      - job: ims-django-metrics
