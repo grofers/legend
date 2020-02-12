@@ -1,0 +1,98 @@
+data_source: Cloudwatch
+reference: https://aws.amazon.com/sqs/
+description: Amazon Simple Queue Service (SQS) is a fully managed message queuing service
+panels:
+  - title: (R) Number Of Messages Delivered
+    type: Graph
+    description: The number of messages returned by calls to the ReceiveMessage action.
+    targets:
+      {% for dimension in data %}
+      - dimensions: {"QueueName": {{ dimension.queue_name }} }
+        metric: NumberOfMessagesReceived
+        namespace: AWS/SQS
+        statistic: Sum
+        alias: '{{ '{{QueueName}}_{{metric}}_{{stat}}' }}'
+      {% endfor %}
+
+  - title: (R) Rate of messages published
+    type: Graph
+    description: The number of messages added to a queue.
+    targets:
+      {% for dimension in data %}
+      - dimensions: {"QueueName": {{ dimension.queue_name }} }
+        metric: NumberOfMessagesSent
+        namespace: AWS/SQS
+        statistic: Sum
+        alias: '{{ '{{QueueName}}_{{metric}}_{{stat}}' }}'
+      {% endfor %}
+
+  - title: (R) Number Of Messages Deleted
+    type: Graph
+    description: Number Of Messages Deleted
+    targets:
+      {% for dimension in data %}
+      - dimensions: {"QueueName": {{ dimension.queue_name }} }
+        metric: NumberOfMessagesDeleted
+        namespace: AWS/SQS
+        statistic: Sum
+        alias: '{{ '{{QueueName}}_{{metric}}_{{stat}}' }}'
+      {% endfor %}
+
+  - title: (S) Queue depth(Total messages)
+    type: Graph
+    description: ApproximateNumberOfMessagesVisible(The number of messages available for retrieval from the queue) and ApproximateNumberOfMessagesNotVisible(The number of messages that are in flight) and NumberOfMessagesDeleted(The number of messages deleted from the queue)
+    targets:
+      {% for dimension in data %}
+      - dimensions: {"QueueName": {{ dimension.queue_name }} }
+        metric: ApproximateNumberOfMessagesVisible
+        namespace: AWS/SQS
+        statistic: Sum
+        alias: '{{ '{{QueueName}}_{{metric}}_{{stat}}' }}'
+      - dimensions: {"QueueName": {{ dimension.queue_name }} }
+        metric: ApproximateNumberOfMessagesNotVisible
+        namespace: AWS/SQS
+        statistic: Sum
+        alias: '{{ '{{QueueName}}_{{metric}}_{{stat}}' }}'
+      - dimensions: {"QueueName": {{ dimension.queue_name }} }
+        metric: NumberOfMessagesDeleted
+        namespace: AWS/SQS
+        statistic: Sum
+        alias: '{{ '{{QueueName}}_{{metric}}_{{stat}}' }}'
+      {% endfor %}
+
+  - title: (R) Number Of Empty Receives
+    type: Graph
+    description: The number of ReceiveMessage API calls that did not return a message.
+    targets:
+      {% for dimension in data %}
+      - dimensions: {"QueueName": {{ dimension.queue_name }} }
+        metric: NumberOfEmptyReceives
+        namespace: AWS/SQS
+        statistic: Sum
+        alias: '{{ '{{QueueName}}_{{metric}}_{{stat}}' }}'
+      {% endfor %}
+
+  - title: (E) Death Queue depth(Total messages)
+    type: Graph
+    description: ApproximateNumberOfMessagesVisible(The number of messages available for retrieval from the queue) and ApproximateNumberOfMessagesNotVisible(The number of messages that are in flight) and NumberOfMessagesDeleted(The number of messages deleted from the queue)
+    targets:
+      {% for dimension in data %}
+      - dimensions: {"QueueName": {{ dimension.dead_queue_name }} }
+        metric: ApproximateNumberOfMessagesVisible
+        namespace: AWS/SQS
+        statistic: Sum
+        alias: '{{ '{{QueueName}}_{{metric}}_{{stat}}' }}'
+      - dimensions: {"QueueName": {{ dimension.dead_queue_name }} }
+        metric: ApproximateNumberOfMessagesNotVisible
+        namespace: AWS/SQS
+        statistic: Sum
+        alias: '{{ '{{QueueName}}_{{metric}}_{{stat}}' }}'
+      - dimensions: {"QueueName": {{ dimension.dead_queue_name }} }
+        metric: NumberOfMessagesDeleted
+        namespace: AWS/SQS
+        statistic: Sum
+        alias: '{{ '{{QueueName}}_{{metric}}_{{stat}}' }}'
+      {% endfor %}
+
+
+

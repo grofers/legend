@@ -14,7 +14,7 @@ tags:
   - retail
 
 components:
-  rabbitmq:
+  sqs:
     dimensions:
-      - queue: ims_task
-        job: pos-rabbitmq-metrics
+      - queue_name: pos_upstream_data_log
+        dead_queue_name: pos_upstream_data_log_dead
