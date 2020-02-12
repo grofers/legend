@@ -1,0 +1,43 @@
+---
+title: Supply Orchestrator
+alert_channels: ["Pager Duty OMS1"]
+environment: Prod
+description: Capacity service for Planning
+references:
+  - deployment: http://jenkins.grofer.io/job/supply-orchestrator/
+  - documentation: https://github.com/grofers/supply-orchestrator/blob/master/README.md
+  - metrics_definition: https://github.com/grofers/kube-infra/tree/master/manifests/loki
+tags:
+  - prod
+  - supply-orchestrator
+  - planning
+
+components:
+
+  elb:
+    dimensions:
+      - load_balancer_name: ad070192b3a8e11eab700061941443b9
+      - load_balancer_name: ad0fa14773a8e11eab700061941443b9
+
+  s3:
+    dimensions:
+      - bucket_name: prod-oms-bulk-uploads
+        filter_id: EntireBucket
+      - bucket_name: prod-oms-bulk-uploads
+        filter_id: supply-orchestrator
+
+  celery:
+    dimensions:
+      - job: supply-orchestrator-celery-metrics
+
+  django:
+    dimensions:
+      - job: supply-orchestrator
+
+  pgsql_rds:
+    dimensions:
+      - db_instance_identifier: prod-supply-orchestrator
+
+  phoenix:
+    dimensions:
+      - job: supply-orchestrator-tracker

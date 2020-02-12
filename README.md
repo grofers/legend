@@ -51,4 +51,4 @@ Run the following command with a dashboard template to generate the dashboard JS
 python main.py -f sample_input.yaml 
 ```
 
-This output of the above command will be saved to `output.json`. This JSON file can be imported the into Grafana to create your dashboard.
+This output of the above command will be saved to `dashboard.json`. This JSON file can be imported the into Grafana to create your dashboard.

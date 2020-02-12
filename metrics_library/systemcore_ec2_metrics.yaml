@@ -70,6 +70,6 @@ panels:
     description: CPU saturation. [https://scoutapm.com/blog/understanding-load-averages]
     targets:
       {% for dimension in data %}
-      - query: SELECT mean(\"value\") FROM \"load_longterm\" WHERE (\"type\" = \'load\' AND \"host\" =~ /^{{ dimension.host }}) AND $timeFilter GROUP BY time($interval), \"host\" fill(null)
+      - query: SELECT mean(\"value\") FROM \"load_longterm\" WHERE (\"type\" = \'load\' AND \"host\" =~ /^{{ dimension.host }}/) AND $timeFilter GROUP BY time($interval), \"host\" fill(null)
         alias_by: $tag_host
       {% endfor %}

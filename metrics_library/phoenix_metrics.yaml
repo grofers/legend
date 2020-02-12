@@ -1,0 +1,24 @@
+data_source: Prometheus
+reference: https://hexdocs.pm/phoenix/overview.html
+description: Phoenix is a web development framework written in Elixir which implements the server-side Model View Controller (MVC) pattern.
+panels:
+
+  - title: (D) Latency over all methods (99th percentile)
+    type: Graph
+    description: overall latency
+    targets:
+    {% for dimension in data %}
+      - metric: histogram_quantile(0.99, sum(rate(phoenix_controller_call_duration_microseconds_bucket{job=~"{{ dimension.job }}"}[5m])) by (le))
+        legend: Aggregate
+      - metric: histogram_quantile(0.99, sum(rate(phoenix_controller_call_duration_microseconds_bucket{job=~"{{ dimension.job }}"}[5m])) by (instance,le))
+        legend: '{{ '{{instance}}' }}'
+    {% endfor %}
+
+  - title: (D) Latency per API (99th percentile)
+    type: Graph
+    description: API level latency
+    targets:
+    {% for dimension in data %}
+      - metric: histogram_quantile(0.99, sum(rate(django_http_requests_latency_seconds_by_view_method_bucket{job=~"{{ dimension.job }}"}[5m])) by (controller,action,le))
+        legend: '{{ '{{method}} - {{view}}' }}'
+    {% endfor %}
