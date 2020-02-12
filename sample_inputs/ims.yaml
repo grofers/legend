@@ -44,6 +44,6 @@ components:
       - host: .*ims.*
   s3:
     dimensions:
-    - bucket_name: retail-bulk-upload
+    - bucket_name: grofers.retail-bulk-upload
       filter_id: EntireBucket
 
