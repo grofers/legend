@@ -1,15 +1,33 @@
 ---
-title: Obelix-Testing
-alert_channels: ["YET TO FILL"]
+title: LM-Obelix
+alert_channels: Opsgin
 environment: Prod
-description: Logging tool for everything deployed on kubernetes
+description: Dashboard for monitoring all the components used in Obelix service
 references:
-  - deployment: http://internal-jenkins-lastmile.grofer.io/job/obelix-build-prod/
+  - deployment: http://internal-jenkins-lastmile.grofer.io/job/obelix-deploy-prod/
   - documentation: https://github.com/grofers/obelix
   - metrics_definition:
 tags:
   - prod
+  - obelix
+  - lastmile
 components:
+  elb:
+    dimensions:
+    - load_balancer_name: prod-lastmile-obelix
+  systemcore_ec2:
+    dimensions:
+    - host: obelix.*.lastmile.
+  mysql_56_rds:
+    dimensions:
+    - db_instance_identifier: prod-lastmile-db
+    - db_instance_identifier: prod-lastmile-db-read-replica-dse
+  springboot:
+    dimensions:
+    - job: lastmile/ec2-obelix-springboot
+  jmx:
+    dimensions:
+    - job: lastmile/ec2-obelix-jmx
   s3:
     dimensions:
     - bucket_name: grofers-prod-lastmile-obelix
@@ -18,13 +36,14 @@ components:
       filter_id: EntireBucket
     - bucket_name: grofers-prod-lastmile-obelix-logs
       filter_id: EntireBucket
-  springboot:
+  rabbitmq:
     dimensions:
-    - job: lastmile/ec2-obelix-springboot
-  jmx:
-    dimensions:
-    - job: lastmile/ec2-obelix-jmx
-  mysql_rds:
-    dimensions:
-    - db_instance_identifier: prod-lastmile-db
-    - db_instance_identifier: prod-lastmile-db-read-replica-dse
+    - job:  lastmile/ec2-obelix-rabbitmq
+      queue_name: obelixOrdersDownload
+    - job:  lastmile/ec2-obelix-rabbitmq
+      queue_name: obelixReturnFlowDpDownload
+    - job:  lastmile/ec2-obelix-rabbitmq
+      queue_name: obelixRoutesUpload
+
+
+
