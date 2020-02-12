@@ -16,7 +16,8 @@ components:
 
   elb:
     dimensions:
-      -
+      - load_balancer_name: ad070192b3a8e11eab700061941443b9
+      - load_balancer_name: ad0fa14773a8e11eab700061941443b9
 
   s3:
     dimensions:
