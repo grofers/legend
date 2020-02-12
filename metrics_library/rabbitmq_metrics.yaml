@@ -7,7 +7,7 @@ panels:
     description: No of consumers per queue
     targets:
       {% for dimension in data %}
-      - metric: rabbitmq_queue_consumers{queue=~"{{ dimension.queue }}",job =~"{{dimension.job}}"}
+      - metric: rabbitmq_queue_consumers{queue=~"{{ dimension.queue_name }}",job =~"{{dimension.job}}"}
         legend: '{{ '{{queue}}' }}'
       {% endfor %}
 
@@ -27,11 +27,11 @@ panels:
     description: Sum of ready and unacknowledged messages. https://stackoverflow.com/questions/31915773/rabbitmq-what-are-ready-and-unacked-types-of-messages
     targets:
       {% for dimension in data %}
-      - metric: rabbitmq_queue_messages{queue=~"{{ dimension.queue }}",job =~"{{dimension.job}}"}
+      - metric: rabbitmq_queue_messages{queue=~"{{ dimension.queue_name }}",job =~"{{dimension.job}}"}
         legend: '{{ '{{queue}}' 'Queue_depth' }}'
-      - metric: rabbitmq_queue_messages_ready{queue=~"{{ dimension.queue }}",job =~"{{dimension.job}}"}
+      - metric: rabbitmq_queue_messages_ready{queue=~"{{ dimension.queue_name }}",job =~"{{dimension.job}}"}
         legend: '{{ '{{queue}}' 'Ready_messages' }}'
-      - metric: rabbitmq_queue_messages_unacknowledged{queue=~"{{ dimension.queue }}",job =~"{{dimension.job}}"}
+      - metric: rabbitmq_queue_messages_unacknowledged{queue=~"{{ dimension.queue_name }}",job =~"{{dimension.job}}"}
         legend: '{{ '{{queue}}' 'Unacknowledged_messages' }}'
       {% endfor %}
 
@@ -40,7 +40,7 @@ panels:
     description: Rate of messages published in a queue.
     targets:
       {% for dimension in data %}
-      - metric: rate(rabbitmq_queue_messages_published_total{queue=~"{{ dimension.queue }}",job =~"{{dimension.job}}"}[5m])
+      - metric: rate(rabbitmq_queue_messages_published_total{queue=~"{{ dimension.queue_name }}",job =~"{{dimension.job}}"}[5m])
         legend: '{{ '{{queue}}' }}'
       {% endfor %}
 
@@ -49,7 +49,7 @@ panels:
     description: Delivered messages = Sum of messages_delivered_total, messages_delivered_no_ack_total, messages_get_total and messages_get_no_ack_total.
     targets:
       {% for dimension in data %}
-      - metric: rate(rabbitmq_queue_messages_deliver_get_total{queue=~"{{ dimension.queue }}", job =~"{{dimension.job}}"}[5m])
+      - metric: rate(rabbitmq_queue_messages_deliver_get_total{queue=~"{{ dimension.queue_name }}", job =~"{{dimension.job}}"}[5m])
         legend: '{{ '{{queue}}' }}'
       {% endfor %}
 
@@ -58,6 +58,20 @@ panels:
     description: Error rate of messages returned to publisher as unroutable
     targets:
       {% for dimension in data %}
-      - metric: rate(rabbitmq_queue_messages_returned_total{queue=~"{{ dimension.queue }}", job =~"{{dimension.job}}"}[5m])
+      - metric: rate(rabbitmq_queue_messages_returned_total{queue=~"{{ dimension.queue_name }}", job =~"{{dimension.job}}"}[5m])
         legend: '{{ '{{queue}}' }}'
       {% endfor %}
+
+  - title: (E) Dead Queue depth(Total messages)
+    type: Graph
+    description: Sum of ready and unacknowledged messages. https://stackoverflow.com/questions/31915773/rabbitmq-what-are-ready-and-unacked-types-of-messages
+    targets:
+      {% for dimension in data %}
+      - metric: rabbitmq_queue_messages{queue=~"{{ dimension.dead_queue_name }}",job =~"{{dimension.job}}"}
+        legend: '{{ '{{queue}}' 'Queue_depth' }}'
+      - metric: rabbitmq_queue_messages_ready{queue=~"{{ dimension.dead_queue_name }}",job =~"{{dimension.job}}"}
+        legend: '{{ '{{queue}}' 'Ready_messages' }}'
+      - metric: rabbitmq_queue_messages_unacknowledged{queue=~"{{ dimension.dead_queue_name }}",job =~"{{dimension.job}}"}
+        legend: '{{ '{{queue}}' 'Unacknowledged_messages' }}'
+      {% endfor %}
+

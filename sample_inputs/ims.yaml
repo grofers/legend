@@ -18,3 +18,8 @@ components:
     dimensions:
       - queue_name: pos_upstream_data_log
         dead_queue_name: pos_upstream_data_log_dead
+  rabbitmq:
+    dimensions:
+      - queue_name: ims_task
+        job: pos-rabbitmq-metrics
+        dead_queue_name:
