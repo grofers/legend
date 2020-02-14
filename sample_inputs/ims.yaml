@@ -38,7 +38,7 @@ components:
       - job_name: pos-celery-metrics
   mysql_ec2:
     dimensions:
-      - master:
+      - masters:
           - host: perconamaster4-mysql-metrics
             db_name: ims
         slaves:
