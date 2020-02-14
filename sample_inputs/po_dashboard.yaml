@@ -9,17 +9,21 @@ references:
 
 tags:
 - prod
+
 components:
+  elb:
+    dimensions:
+      - load_balancer_name: po-retail
   s3:
     dimensions:
     - bucket_name: retail-bulk-upload
       filter_id: EntireBucket
+  django:
+    dimensions:
+      - job: po-django-metrics
   systemcore_ec2:
     dimensions:
     - host: purchaseorder
-  promtail:
-    dimensions:
-    - pod_name: promtail
   redis:
     dimensions:
       - job_name: po-redis-metrics
