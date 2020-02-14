@@ -10,20 +10,20 @@ panels:
       {% for dimension in data %}
         {% for master in dimension.masters %}
       - metric: max(max_over_time(mysql_global_status_threads_connected{job=~"{{ master.host }}"}[5m]) or mysql_global_status_threads_connected{job=~"{{ master.host }}"} ) by (job,instance)
-        legend: '{{ 'CONNECTIONS_{{job}}_{{instance}}' }}'
+        legend: '{{ 'CONNECTIONS_{{job}}' }}'
       - metric: mysql_global_status_max_used_connections{job=~"{{ master.host }}"}
-        legend: '{{ 'MAX_USED_CONNECTIONS_{{job}}_{{instance}}' }}'
+        legend: '{{ 'MAX_USED_CONNECTIONS_{{job}}' }}'
       - metric: mysql_global_variables_max_connections{job=~"{{ master.host }}"}
-        legend: '{{ 'MAX_GLOBAL_CONNECTIONS_{{job}}_{{instance}}' }}'
+        legend: '{{ 'MAX_GLOBAL_CONNECTIONS_{{job}}' }}'
         {% endfor %}
         {% for slave in dimension.slaves %}
       - metric: max(max_over_time(mysql_global_status_threads_connected{job=~"{{ slave.host }}"}[5m]) or mysql_global_status_threads_connected{job=~"{{ slave.host }}"} ) by (job,instance)
-        legend: '{{ 'CONNECTIONS_{{job}}_{{instance}}' }}'
+        legend: '{{ 'CONNECTIONS_{{job}}' }}'
         hide: true
       - metric: mysql_global_status_max_used_connections{job=~"{{ slave.host }}"}
-        legend: '{{ 'MAX_USED_CONNECTIONS_{{job}}_{{instance}}' }}'
+        legend: '{{ 'MAX_USED_CONNECTIONS_{{job}}' }}'
       - metric: mysql_global_variables_max_connections{job=~"{{ slave.host }}"}
-        legend: '{{ 'MAX_GLOBAL_CONNECTIONS_{{job}}_{{instance}}' }}'
+        legend: '{{ 'MAX_GLOBAL_CONNECTIONS_{{job}}' }}'
         {% endfor %}
       {% endfor %}
   - title: (U) Database Connection Utilization (%)
@@ -33,11 +33,25 @@ panels:
       {% for dimension in data %}
         {% for master in dimension.masters %}
       - metric: (max((max_over_time(mysql_global_status_threads_connected{job=~"{{ master.host }}"}[5m]) or mysql_global_status_threads_connected{job=~"{{ master.host }}"})*100/mysql_global_variables_max_connections{job=~"{{ dimension.master }}"} ) by (job,instance))
-        legend: '{{ '{{job}}_{{instance}}' }}'
+        legend: '{{ '{{job}}' }}'
         {% endfor %}
         {% for slave in dimension.slaves %}
       - metric: (max((max_over_time(mysql_global_status_threads_connected{job=~"{{ slave.host }}"}[5m]) or mysql_global_status_threads_connected{job=~"{{ slave.host }}"})*100/mysql_global_variables_max_connections{job=~"{{ slave.host }}"} ) by (job,instance))
-        legend: '{{ '{{job}}_{{instance}}' }}'
+        legend: '{{ '{{job}}' }}'
+        {% endfor %}
+      {% endfor %}
+  - title: (U) AutoIncrement Counter Utilization (%)
+    type: Graph
+    description: Percentage of autoincrement counter is consumed by each table in schema
+    targets:
+      {% for dimension in data %}
+        {% for master in dimension.masters %}
+      - metric: mysql_info_schema_auto_increment_column{job=~"{{ master.host }}", schema=~"{{ master.db_name }}"}*100/mysql_info_schema_auto_increment_column_max{job=~"{{ master.host }}", schema=~"{{ master.db_name }}"}
+        legend: '{{ '{{job}}_{{schema}}_{{table}}' }}'
+        {% endfor %}
+        {% for slave in dimension.slaves %}
+      - metric: mysql_info_schema_auto_increment_column{job=~"{{ slave.host }}", schema=~"{{ slave.db_name }}"}*100/mysql_info_schema_auto_increment_column_max{job=~"{{ slave.host }}", schema=~"{{ slave.db_name }}"}
+        legend: '{{ '{{job}}_{{schema}}_{{table}}' }}'
         {% endfor %}
       {% endfor %}
   - title: (E) Slow Query Count
@@ -47,11 +61,11 @@ panels:
       {% for dimension in data %}
         {% for master in dimension.masters %}
       - metric: rate(mysql_global_status_slow_queries{job=~"{{ master.host }}"}[5m])
-        legend: '{{ '{{job}}_{{instance}}' }}'
+        legend: '{{ '{{job}}' }}'
         {% endfor %}
         {% for slave in dimension.slaves %}
       - metric: rate(mysql_global_status_slow_queries{job=~"{{ slave.host }}"}[5m])
-        legend: '{{ '{{job}}_{{instance}}' }}'
+        legend: '{{ '{{job}}' }}'
         {% endfor %}
       {% endfor %}
   - title: (E) DeadLock Count
@@ -61,11 +75,11 @@ panels:
       {% for dimension in data %}
         {% for master in dimension.masters %}
       - metric: (rate(mysql_global_status_innodb_deadlocks{job=~"{{ master.host }}"}[5m]) or rate(mysql_info_schema_innodb_metrics_lock_lock_deadlocks_total{job=~"{{ master.host }}"}[5m]))
-        legend: '{{ '{{job}}_{{instance}}' }}'
+        legend: '{{ '{{job}}' }}'
         {% endfor %}
         {% for slave in dimension.slaves %}
       - metric: (rate(mysql_global_status_innodb_deadlocks{job=~"{{ slave.host }}"}[5m]) or rate(mysql_info_schema_innodb_metrics_lock_lock_deadlocks_total{job=~"{{ slave.host }}"}[5m]))
-        legend: '{{ '{{job}}_{{instance}}' }}'
+        legend: '{{ '{{job}}' }}'
         {% endfor %}
       {% endfor %}
   - title: (R) Rate of Queries
@@ -75,32 +89,62 @@ panels:
       {% for dimension in data %}
         {% for master in dimension.masters %}
       - metric: rate(mysql_global_status_queries{job=~"{{ master.host }}"}[5m])
-        legend: '{{ '{{job}}_{{instance}}' }}'
+        legend: '{{ '{{job}}' }}'
         {% endfor %}
         {% for slave in dimension.slaves %}
       - metric: rate(mysql_global_status_queries{job=~"{{ slave.host }}"}[5m])
-        legend: '{{ '{{job}}_{{instance}}' }}'
+        legend: '{{ '{{job}}' }}'
         {% endfor %}
       {% endfor %}
-  - title: (R) Rate of Queries
+  - title: (R) Rate of MySQL Temporary Object
     type: Graph
-    description: Rate of queries executed
+    description: Rate of MySQL Temporary Object
     targets:
       {% for dimension in data %}
         {% for master in dimension.masters %}
       - metric: rate(mysql_global_status_created_tmp_tables{job=~"{{ master.host }}"}[5m])
-        legend: '{{ 'Created_Tmp_Tables{{job}}_{{instance}}' }}'
+        legend: '{{ 'Created_Tmp_Tables{{job}}' }}'
       - metric: rate(mysql_global_status_created_tmp_disk_tables{job=~"{{ master.host }}"}[5m])
-        legend: '{{ 'Created_Tmp_Disk_Tables{{job}}_{{instance}}' }}'
+        legend: '{{ 'Created_Tmp_Disk_Tables{{job}}' }}'
       - metric: rate(mysql_global_status_created_tmp_files{job=~"{{ master.host }}"}[5m])
-        legend: '{{ 'Created_Tmp_Files{{job}}_{{instance}}' }}'
+        legend: '{{ 'Created_Tmp_Files{{job}}' }}'
         {% endfor %}
         {% for slave in dimension.slaves %}
       - metric: rate(mysql_global_status_created_tmp_tables{job=~"{{ slave.host }}"}[5m])
-        legend: '{{ 'Created_Tmp_Tables{{job}}_{{instance}}' }}'
+        legend: '{{ 'Created_Tmp_Tables{{job}}' }}'
       - metric: rate(mysql_global_status_created_tmp_disk_tables{job=~"{{ slave.host }}"}[5m])
-        legend: '{{ 'Created_Tmp_Disk_Tables{{job}}_{{instance}}' }}'
+        legend: '{{ 'Created_Tmp_Disk_Tables{{job}}' }}'
       - metric: rate(mysql_global_status_created_tmp_files{job=~"{{ slave.host }}"}[5m])
-        legend: '{{ 'Created_Tmp_Files{{job}}_{{instance}}' }}'
+        legend: '{{ 'Created_Tmp_Files{{job}}' }}'
+        {% endfor %}
+      {% endfor %}
+  - title: (R) Rate of MySQL Temporary Object
+    type: Graph
+    description: Rate of MySQL Temporary Object
+    targets:
+      {% for dimension in data %}
+        {% for master in dimension.masters %}
+      - metric: rate(mysql_global_status_select_full_join{job=~"{{ master.host }}"}[5m])
+        legend: '{{ 'Select_Full_Join_{{job}}' }}'
+      - metric: rate(mysql_global_status_select_full_range_join{job=~"{{ master.host }}"}[5m])
+        legend: '{{ 'Select_Full_Range_Join_{{job}}' }}'
+      - metric: rate(mysql_global_status_select_range{job=~"{{ master.host }}"}[5m])
+        legend: '{{ 'Select_Range_{{job}}' }}'
+      - metric: rate(mysql_global_status_select_range_check{job=~"{{ master.host }}"}[5m])
+        legend: '{{ 'Select_Range_Check_{{job}}' }}'
+      - metric: rate(mysql_global_status_select_range_check{job=~"{{ master.host }}"}[5m])
+        legend: '{{ 'Select_Range_Check_{{job}}' }}'
+        {% endfor %}
+        {% for slave in dimension.slaves %}
+      - metric: rate(mysql_global_status_select_full_join{job=~"{{ slave.host }}"}[5m])
+        legend: '{{ 'Select_Full_Join_{{job}}' }}'
+      - metric: rate(mysql_global_status_select_full_range_join{job=~"{{ slave.host }}"}[5m])
+        legend: '{{ 'Select_Full_Range_Join_{{job}}' }}'
+      - metric: rate(mysql_global_status_select_range{job=~"{{ slave.host }}"}[5m])
+        legend: '{{ 'Select_Range_{{job}}' }}'
+      - metric: rate(mysql_global_status_select_range_check{job=~"{{ slave.host }}"}[5m])
+        legend: '{{ 'Select_Range_Check_{{job}}' }}'
+      - metric: rate(mysql_global_status_select_range_check{job=~"{{ slave.host }}"}[5m])
+        legend: '{{ 'Select_Range_Check_{{job}}' }}'
         {% endfor %}
       {% endfor %}

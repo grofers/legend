@@ -58,9 +58,10 @@ def assemble_panels_dynamic(input):
     assembled_panels = ''
 
     ri = 0
-    r = 1
+    r = 0
     for k, v in input.get('components').items():
         ri += 1
+        r += 1
         assembled_panels += "R_" + str(ri) \
                             + " { gridPos: { h: 4, w: 24, x: 0, y: " + str(r) + " }, }, \n"
         panels_in_row = v.get('metric').get('panels_in_row', 2)
@@ -74,13 +75,16 @@ def assemble_panels_dynamic(input):
         while True:
             r += 1
             p = 0
-            for rpi in range(pi, min(len(v.get('metric').get('panels')), pi + panels_in_row)):
+            row_end = min(len(v.get('metric').get('panels')), pi + panels_in_row)
+            for rpi in range(pi, row_end):
                 assembled_panels += "R_" + str(ri) + "_P_" + str(rpi+1) \
                                    + " { gridPos: { h: 8, w: "+str(width)+", x: "+str(width*p)+", y: " \
                                    + str(r) + " }, }, \n"
                 p += 1
                 pi = rpi
-            if pi == len(v.get('metric').get('panels'))-1:
+                if rpi + 1 == row_end:
+                    pi = rpi + 1
+            if pi >= len(v.get('metric').get('panels')):
                 break
 
     return assembled_panels
