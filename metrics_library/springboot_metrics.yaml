@@ -99,7 +99,7 @@ panels:
         legend: '{{ '{{method}} - {{uri}}' }}'
     {% endfor %}
 
- - title: (D) Latency over all methods (99th percentile)
+  - title: (D) Latency over all methods (99th percentile)
     type: Graph
     description: overall latency
     targets:
