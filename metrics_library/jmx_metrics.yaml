@@ -13,7 +13,7 @@ panels:
         legend:
       {% endfor %}
     alert_config:
-      priority: P1
+      priority: P3
       message: 'Heap Memory is High'
       rule:
         for_duration: 10m
@@ -37,7 +37,7 @@ panels:
         legend:
       {% endfor %}
     alert_config:
-      priority: P1
+      priority: P3
       message: 'Non Heap Memory is High'
       rule:
         for_duration: 10m
