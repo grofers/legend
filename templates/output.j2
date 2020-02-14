@@ -12,8 +12,8 @@ local influxdb = grafana.influxdb;
 local alertCondition = grafana.alertCondition;
 
 {% for component, values in data.components.items() %}
-
-local {{ component }} =
+{% set comp = 'R_' ~ loop.index %}
+local {{ comp }} =
     row.new(title='{{ component }}',
     {% if values.metric.get('hide') is not none %}
         collapse=true,
@@ -21,7 +21,7 @@ local {{ component }} =
     );
     {% for panel_value in values.metric.panels %}
 
-local {{ panel_value.title_var }} =
+local {{ comp }}_P_{{loop.index}} =
     graphPanel.new(
         title='{{ panel_value.title }}',
         datasource='{{ values.metric.data_source }} ({{ data.environment }})',

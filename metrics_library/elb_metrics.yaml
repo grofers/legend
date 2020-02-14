@@ -7,14 +7,16 @@ panels:
     description: Number of Healthy and Unhealthy hosts
     targets:
       {% for dimension in data %}
-    - dimensions: {"LoadBalancerName": {{ dimension.load_balancer_name }} }
-      metric: HealthyHostCount
-      namespace: AWS/ELB
-      statistic: Maximum
-    - dimensions: {"LoadBalancerName": {{ dimension.load_balancer_name }} }
-      metric: UnHealthyHostCount
-      namespace: AWS/ELB
-      statistic: Maximum
+      - dimensions: {"LoadBalancerName": {{ dimension.load_balancer_name }} }
+        metric: HealthyHostCount
+        namespace: AWS/ELB
+        statistic: Maximum
+        alias: '{{ '{{LoadBalancerName}}_{{metric}}_{{stat}}' }}'
+      - dimensions: {"LoadBalancerName": {{ dimension.load_balancer_name }} }
+        metric: UnHealthyHostCount
+        namespace: AWS/ELB
+        statistic: Maximum
+        alias: '{{ '{{LoadBalancerName}}_{{metric}}_{{stat}}' }}'
       {% endfor %}
 
   - title: (S) Pending Requests Count
@@ -22,10 +24,11 @@ panels:
     description: Number of requests pending routing to a healthy instance. The maximum size of the queue is 1,024. Additional requests or connections are rejected when the queue is full.
     targets:
       {% for dimension in data %}
-    - dimensions: {"LoadBalancerName": {{ dimension.load_balancer_name }} }
-      metric: SurgeQueueLength
-      namespace: AWS/ELB
-      statistic: Maximum
+      - dimensions: {"LoadBalancerName": {{ dimension.load_balancer_name }} }
+        metric: SurgeQueueLength
+        namespace: AWS/ELB
+        statistic: Maximum
+        alias: '{{ '{{LoadBalancerName}}_{{metric}}_{{stat}}' }}'
       {% endfor %}
 
   - title: (E) Rejected Requests Count
@@ -37,6 +40,7 @@ panels:
       metric: SpilloverCount
       namespace: AWS/ELB
       statistic: Sum
+      alias: '{{ '{{LoadBalancerName}}_{{metric}}_{{stat}}' }}'
       {% endfor %}
 
   - title: (R) Request Count
@@ -44,10 +48,11 @@ panels:
     description: Number of Requests completed during the specific interval
     targets:
       {% for dimension in data %}
-    - dimensions: {"LoadBalancerName": {{ dimension.load_balancer_name }} }
-      metric: RequestCount
-      namespace: AWS/ELB
-      statistic: Sum
+      - dimensions: {"LoadBalancerName": {{ dimension.load_balancer_name }} }
+        metric: RequestCount
+        namespace: AWS/ELB
+        statistic: Sum
+        alias: '{{ '{{LoadBalancerName}}_{{metric}}_{{stat}}' }}'
       {% endfor %}
 
   - title: (E) Backend 4XX/5XX Count
@@ -59,10 +64,12 @@ panels:
         metric: HTTPCode_Backend_4XX
         namespace: AWS/ELB
         statistic: Sum
+        alias: '{{ '{{LoadBalancerName}}_{{metric}}_{{stat}}' }}'
       - dimensions: {"LoadBalancerName": {{ dimension.load_balancer_name }} }
         metric: HTTPCode_Backend_5XX
         namespace: AWS/ELB
         statistic: Sum
+        alias: '{{ '{{LoadBalancerName}}_{{metric}}_{{stat}}' }}'
       {% endfor %}
 
   - title: (E) ELB 4XX/5XX Count
@@ -78,6 +85,7 @@ panels:
         metric: HTTPCode_ELB_5XX
         namespace: AWS/ELB
         statistic: Sum
+        alias: '{{ '{{LoadBalancerName}}_{{metric}}_{{stat}}' }}'
       {% endfor %}
 
   - title: (E) ELB Backend Connection Errors
@@ -89,6 +97,7 @@ panels:
         metric: BackendConnectionErrors
         namespace: AWS/ELB
         statistic: Sum
+        alias: '{{ '{{LoadBalancerName}}_{{metric}}_{{stat}}' }}'
       {% endfor %}
 
   - title: (D) Request Latency (seconds)
@@ -100,4 +109,5 @@ panels:
       metric: Latency
       namespace: AWS/ELB
       statistic: Maximum
+      alias: '{{ '{{LoadBalancerName}}_{{metric}}_{{stat}}' }}'
       {% endfor %}

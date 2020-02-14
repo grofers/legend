@@ -15,6 +15,7 @@ tags:
 
 components:
   elb:
+    panels_in_row: 2
     dimensions:
       - load_balancer_name: ims-retail-https
   django:
@@ -37,8 +38,14 @@ components:
       - job_name: pos-celery-metrics
   mysql_ec2:
     dimensions:
-      - master: perconamaster4-mysql-metrics
-        slaves: [perconamaster1-mysql-metrics,perconamaster5-mysql-metrics]
+      - master:
+          - host: perconamaster4-mysql-metrics
+            db_name: ims
+        slaves:
+          - host: perconamaster1-mysql-metrics
+            db_name: ims
+          - host: perconamaster5-mysql-metrics
+            db_name: ims
   systemcore_ec2:
     dimensions:
       - host: .*ims.*

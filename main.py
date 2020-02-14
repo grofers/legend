@@ -8,6 +8,7 @@ import subprocess
 
 
 from helpers.utilities import (
+        assemble_panels_dynamic,
         assemble_panels,
         jinja2_to_render,
         str_yaml_to_json,
@@ -88,11 +89,13 @@ def template_builder(input):
 
                 panel['alertrender'] = alertrender
 
-        if (values.get('hide') is not None):
+        if values.get('hide') is not None:
             template['hide'] = values.get('hide', None)
+        if values.get('panels_in_row') is not None:
+            template['panels_in_row'] = values.get('panels_in_row', None)
         values['metric'] = template
 
-    input['assemble_panels'] = assemble_panels(panel_dict)
+    input['assemble_panels'] = assemble_panels_dynamic(input)
 
     output = jinja2_to_render('templates', 'output.j2', data=input)
     return output

@@ -1,26 +1,28 @@
 data_source: Prometheus
 reference: https://www.percona.com/doc/percona-monitoring-and-management/index.metrics-monitor.dashboard.html#pmm-dashboard-mysql-list
 description: Percona Monitored MySQL EC2 Instances
-hide: true
+panels_in_row: 2
 panels:
   - title: (U) Database Connections (Counts)
     type: Graph
     description: Number of database connections
     targets:
       {% for dimension in data %}
-      - metric: max(max_over_time(mysql_global_status_threads_connected{job=~"{{ dimension.master }}"}[5m]) or mysql_global_status_threads_connected{job=~"{{ dimension.master }}"} ) by (job,instance)
+        {% for master in dimension.masters %}
+      - metric: max(max_over_time(mysql_global_status_threads_connected{job=~"{{ master.host }}"}[5m]) or mysql_global_status_threads_connected{job=~"{{ master.host }}"} ) by (job,instance)
         legend: '{{ 'CONNECTIONS_{{job}}_{{instance}}' }}'
-      - metric: mysql_global_status_max_used_connections{job=~"{{ dimension.master }}"}
+      - metric: mysql_global_status_max_used_connections{job=~"{{ master.host }}"}
         legend: '{{ 'MAX_USED_CONNECTIONS_{{job}}_{{instance}}' }}'
-      - metric: mysql_global_variables_max_connections{job=~"{{ dimension.master }}"}
+      - metric: mysql_global_variables_max_connections{job=~"{{ master.host }}"}
         legend: '{{ 'MAX_GLOBAL_CONNECTIONS_{{job}}_{{instance}}' }}'
+        {% endfor %}
         {% for slave in dimension.slaves %}
-      - metric: max(max_over_time(mysql_global_status_threads_connected{job=~"{{ slave }}"}[5m]) or mysql_global_status_threads_connected{job=~"{{ slave }}"} ) by (job,instance)
+      - metric: max(max_over_time(mysql_global_status_threads_connected{job=~"{{ slave.host }}"}[5m]) or mysql_global_status_threads_connected{job=~"{{ slave.host }}"} ) by (job,instance)
         legend: '{{ 'CONNECTIONS_{{job}}_{{instance}}' }}'
         hide: true
-      - metric: mysql_global_status_max_used_connections{job=~"{{ slave }}"}
+      - metric: mysql_global_status_max_used_connections{job=~"{{ slave.host }}"}
         legend: '{{ 'MAX_USED_CONNECTIONS_{{job}}_{{instance}}' }}'
-      - metric: mysql_global_variables_max_connections{job=~"{{ slave }}"}
+      - metric: mysql_global_variables_max_connections{job=~"{{ slave.host }}"}
         legend: '{{ 'MAX_GLOBAL_CONNECTIONS_{{job}}_{{instance}}' }}'
         {% endfor %}
       {% endfor %}
@@ -29,10 +31,76 @@ panels:
     description: Percentage of DB connection utilization
     targets:
       {% for dimension in data %}
-      - metric: (max((max_over_time(mysql_global_status_threads_connected{job=~"{{ dimension.master }}"}[5m]) or mysql_global_status_threads_connected{job=~"{{ dimension.master }}"})*100/mysql_global_variables_max_connections{job=~"{{ dimension.master }}"} ) by (job,instance))
+        {% for master in dimension.masters %}
+      - metric: (max((max_over_time(mysql_global_status_threads_connected{job=~"{{ master.host }}"}[5m]) or mysql_global_status_threads_connected{job=~"{{ master.host }}"})*100/mysql_global_variables_max_connections{job=~"{{ dimension.master }}"} ) by (job,instance))
         legend: '{{ '{{job}}_{{instance}}' }}'
+        {% endfor %}
         {% for slave in dimension.slaves %}
-      - metric: (max((max_over_time(mysql_global_status_threads_connected{job=~"{{ slave }}"}[5m]) or mysql_global_status_threads_connected{job=~"{{ slave }}"})*100/mysql_global_variables_max_connections{job=~"{{ slave }}"} ) by (job,instance))
+      - metric: (max((max_over_time(mysql_global_status_threads_connected{job=~"{{ slave.host }}"}[5m]) or mysql_global_status_threads_connected{job=~"{{ slave.host }}"})*100/mysql_global_variables_max_connections{job=~"{{ slave.host }}"} ) by (job,instance))
         legend: '{{ '{{job}}_{{instance}}' }}'
+        {% endfor %}
+      {% endfor %}
+  - title: (E) Slow Query Count
+    type: Graph
+    description: No. of Slow Queries
+    targets:
+      {% for dimension in data %}
+        {% for master in dimension.masters %}
+      - metric: rate(mysql_global_status_slow_queries{job=~"{{ master.host }}"}[5m])
+        legend: '{{ '{{job}}_{{instance}}' }}'
+        {% endfor %}
+        {% for slave in dimension.slaves %}
+      - metric: rate(mysql_global_status_slow_queries{job=~"{{ slave.host }}"}[5m])
+        legend: '{{ '{{job}}_{{instance}}' }}'
+        {% endfor %}
+      {% endfor %}
+  - title: (E) DeadLock Count
+    type: Graph
+    description: No. of deadlocks happend
+    targets:
+      {% for dimension in data %}
+        {% for master in dimension.masters %}
+      - metric: (rate(mysql_global_status_innodb_deadlocks{job=~"{{ master.host }}"}[5m]) or rate(mysql_info_schema_innodb_metrics_lock_lock_deadlocks_total{job=~"{{ master.host }}"}[5m]))
+        legend: '{{ '{{job}}_{{instance}}' }}'
+        {% endfor %}
+        {% for slave in dimension.slaves %}
+      - metric: (rate(mysql_global_status_innodb_deadlocks{job=~"{{ slave.host }}"}[5m]) or rate(mysql_info_schema_innodb_metrics_lock_lock_deadlocks_total{job=~"{{ slave.host }}"}[5m]))
+        legend: '{{ '{{job}}_{{instance}}' }}'
+        {% endfor %}
+      {% endfor %}
+  - title: (R) Rate of Queries
+    type: Graph
+    description: Rate of queries executed
+    targets:
+      {% for dimension in data %}
+        {% for master in dimension.masters %}
+      - metric: rate(mysql_global_status_queries{job=~"{{ master.host }}"}[5m])
+        legend: '{{ '{{job}}_{{instance}}' }}'
+        {% endfor %}
+        {% for slave in dimension.slaves %}
+      - metric: rate(mysql_global_status_queries{job=~"{{ slave.host }}"}[5m])
+        legend: '{{ '{{job}}_{{instance}}' }}'
+        {% endfor %}
+      {% endfor %}
+  - title: (R) Rate of Queries
+    type: Graph
+    description: Rate of queries executed
+    targets:
+      {% for dimension in data %}
+        {% for master in dimension.masters %}
+      - metric: rate(mysql_global_status_created_tmp_tables{job=~"{{ master.host }}"}[5m])
+        legend: '{{ 'Created_Tmp_Tables{{job}}_{{instance}}' }}'
+      - metric: rate(mysql_global_status_created_tmp_disk_tables{job=~"{{ master.host }}"}[5m])
+        legend: '{{ 'Created_Tmp_Disk_Tables{{job}}_{{instance}}' }}'
+      - metric: rate(mysql_global_status_created_tmp_files{job=~"{{ master.host }}"}[5m])
+        legend: '{{ 'Created_Tmp_Files{{job}}_{{instance}}' }}'
+        {% endfor %}
+        {% for slave in dimension.slaves %}
+      - metric: rate(mysql_global_status_created_tmp_tables{job=~"{{ slave.host }}"}[5m])
+        legend: '{{ 'Created_Tmp_Tables{{job}}_{{instance}}' }}'
+      - metric: rate(mysql_global_status_created_tmp_disk_tables{job=~"{{ slave.host }}"}[5m])
+        legend: '{{ 'Created_Tmp_Disk_Tables{{job}}_{{instance}}' }}'
+      - metric: rate(mysql_global_status_created_tmp_files{job=~"{{ slave.host }}"}[5m])
+        legend: '{{ 'Created_Tmp_Files{{job}}_{{instance}}' }}'
         {% endfor %}
       {% endfor %}
