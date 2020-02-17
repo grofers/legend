@@ -27,6 +27,7 @@ def template_builder(input):
 
     if input.get('alert_channels'):
         alert_ids = get_alert_id(input['alert_channels'])
+        alert_service = input['service']
 
     for component, values in input['components'].items():
 
@@ -68,6 +69,7 @@ def template_builder(input):
             if panel.get('alert_config'):
                 panel['alert_config']['rule']['name'] = panel['title']
                 panel['alert_config']['alert_ids'] = json.dumps(alert_ids)
+                panel['alert_config']['alert_service'] = alert_service
                 alertrender = jinja2_to_render(
                         'templates/alert',
                         'alert.j2',

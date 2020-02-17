@@ -1,6 +1,7 @@
 ---
-title: PO-Testing
-alert_channels: ["Pager Duty OMS1"]
+title: SampleTitle
+service: SampleService
+alert_channels: ["service-opsgenie"]
 environment: Prod
 description: Logging tool for everything deployed on kubernetes
 references:
