@@ -14,6 +14,7 @@ panels:
       alias: '{{ '{{DBInstanceIdentifier}}_{{metric}}_{{stat}}' }}'
       {% endfor %}
     formatY1: percent
+    labelY1: CPU utilization
     alert_config:
       priority: P3
       message: 'CPU Utilisation is High'
@@ -73,7 +74,7 @@ panels:
         statistic: Maximum
         alias: '{{ '{{DBInstanceIdentifier}}_{{metric}}_{{stat}}' }}'
       {% endfor %}
-    formatY1: seconds
+    formatY1: seconds (s)
     alert_config:
       priority: P3
       message: 'Too many database connections'
