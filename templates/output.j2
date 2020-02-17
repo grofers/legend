@@ -33,6 +33,14 @@ local {{ comp }}_P_{{loop.index}} =
         legend_avg='true',
         legend_alignAsTable='true',
         nullPointMode='connected',
+        {% if panel_value.formatY1 %}
+            formatY1='{{ panel_value.formatY1 }}',
+        {%endif%}
+        {% if panel_value.formatY1 %}
+            labelY1='{{ panel_value.labelY1 }}',
+        {%endif%}
+        
+
     )
 
         {% for target in panel_value.targets %}

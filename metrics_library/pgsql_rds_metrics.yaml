@@ -13,14 +13,16 @@ panels:
       statistic: Maximum
       alias: '{{ '{{DBInstanceIdentifier}}_{{metric}}_{{stat}}' }}'
       {% endfor %}
+    formatY1: percent
+    labelY1: CPU utilization
     alert_config:
       priority: P3
       message: 'CPU Utilisation is High'
       rule:
-        for_duration: 10m
+        for_duration: 5m
         evaluate_every: 1m
       conditions:
-        - evaluator_params: 60 
+        - evaluator_params: 60
           evaluator_type: gt
           operator_type: and
           query_ref_id: A # it is according to sequence
@@ -40,100 +42,21 @@ panels:
       statistic: Maximum
       alias: '{{ '{{DBInstanceIdentifier}}_{{metric}}_{{stat}}' }}'
       {% endfor %}
-
-  - title: (U) Freeable Memory
-    type: Graph
-    description: The amount of available random access memory. (For MariaDB, MySQL, Oracle, and PostgreSQL DB instances, this metric reports the value of the MemAvailable field of /proc/meminfo)
-    targets:
-      {% for dimension in data %}
-      - dimensions: {"DBInstanceIdentifier": {{ dimension.db_instance_identifier }}}
-        metric: FreeableMemory
-        namespace: AWS/RDS
-        statistic: Average
-        alias: '{{ '{{DBInstanceIdentifier}}_{{metric}}_{{stat}}' }}'
-        {% endfor %}
-
-  - title: (U) Network Throughput (Bytes)
-    type: Graph
-    description: The incoming (Receive|Transmit) network traffic on the DB instance, including both customer database traffic and Amazon RDS traffic used for monitoring and replication
-    targets:
-      {% for dimension in data %}
-    - dimensions: {"DBInstanceIdentifier": {{ dimension.db_instance_identifier }}}
-      metric: NetworkReceiveThroughput
-      namespace: AWS/RDS
-      statistic: Maximum
-      alias: '{{ '{{DBInstanceIdentifier}}_{{metric}}_{{stat}}' }}'
-    - dimensions: {"DBInstanceIdentifier": {{ dimension.db_instance_identifier }}}
-      metric: NetworkTransmitThroughput
-      namespace: AWS/RDS
-      statistic: Maximum
-      alias: '{{ '{{DBInstanceIdentifier}}_{{metric}}_{{stat}}' }}'
-      {% endfor %}
-
-  - title: (U) Read/Write IOPS 
-    type: Graph
-    description: The average number of disk read/write I/O operations per second 
-    targets:
-      {% for dimension in data %}
-      - dimensions: {"DBInstanceIdentifier": {{ dimension.db_instance_identifier }}}
-        metric: ReadIOPS
-        namespace: AWS/RDS
-        statistic: Maximum
-        alias: '{{ '{{DBInstanceIdentifier}}_{{metric}}_{{stat}}' }}'
-      - dimensions: {"DBInstanceIdentifier": {{ dimension.db_instance_identifier }}}
-        metric: WriteIOPS
-        namespace: AWS/RDS
-        statistic: Maximum
-        alias: '{{ '{{DBInstanceIdentifier}}_{{metric}}_{{stat}}' }}'
-      {% endfor %}
-
-  - title: (U) Free Storage Space
-    type: Graph
-    description: The amount of available storage space
-    targets:
-      {% for dimension in data %}
-      - dimensions: {"DBInstanceIdentifier": {{ dimension.db_instance_identifier }}}
-        metric: FreeStorageSpace
-        namespace: AWS/RDS
-        statistic: Maximum 
-        alias: '{{ '{{DBInstanceIdentifier}}_{{metric}}_{{stat}}' }}'
-        {% endfor %}
-
-  - title: (U) Transaction Log Disk Usage
-    type: Graph
-    description: The disk space used by transaction logs. Applies to PostgreSQL.
-    targets:
-      {% for dimension in data %}
-      - dimensions: {"DBInstanceIdentifier": {{ dimension.db_instance_identifier }}}
-        metric: TransactionLogsDiskUsage
-        namespace: AWS/RDS
-        statistic: Maximum 
-        alias: '{{ '{{DBInstanceIdentifier}}_{{metric}}_{{stat}}' }}'
-        {% endfor %}
-
-  - title: (S) Disk Queue Depth
-    type: Graph
-    description: The number of outstanding IOs (read/write requests) waiting to access the disk.
-    targets:
-      {% for dimension in data %}
-      - dimensions: {"DBInstanceIdentifier": {{ dimension.db_instance_identifier }}}
-        metric: DiskQueueDepth
-        namespace: AWS/RDS
-        statistic: Average
-        alias: '{{ '{{DBInstanceIdentifier}}_{{metric}}_{{stat}}' }}'
-        {% endfor %}
-
-  - title: (S) Swap Usage 
-    type: Graph
-    description: The amount of swap space used on the DB instance. 
-    targets:
-      {% for dimension in data %}
-      - dimensions: {"DBInstanceIdentifier": {{ dimension.db_instance_identifier }}}
-        metric: SwapUsage 
-        namespace: AWS/RDS
-        statistic: Average
-        alias: '{{ '{{DBInstanceIdentifier}}_{{metric}}_{{stat}}' }}'
-        {% endfor %}
+    alert_config:
+      priority: P3
+      message: 'Too many database connections'
+      rule:
+        for_duration: 5m
+        evaluate_every: 1m
+      conditions:
+        - evaluator_params: 500
+          evaluator_type: gt
+          operator_type: and
+          query_ref_id: A # it is according to sequence
+          query_time_end: now
+          query_time_start: 5m
+          reducer_params: []
+          reducer_type: avg
 
   - title: (D) Read/Write latency
     type: Graph
@@ -151,10 +74,156 @@ panels:
         statistic: Maximum
         alias: '{{ '{{DBInstanceIdentifier}}_{{metric}}_{{stat}}' }}'
       {% endfor %}
+    formatY1: seconds (s)
+    alert_config:
+      priority: P3
+      message: 'Too many database connections'
+      rule:
+        for_duration: 5m
+        evaluate_every: 1m
+      conditions:
+        - evaluator_params: 0.010
+          evaluator_type: gt
+          operator_type: and
+          query_ref_id: A # it is according to sequence
+          query_time_end: now
+          query_time_start: 5m
+          reducer_params: []
+          reducer_type: avg
+
+  - title: (U) Read/Write IOPS
+    type: Graph
+    description: The average number of disk read/write I/O operations per second
+    targets:
+      {% for dimension in data %}
+      - dimensions: {"DBInstanceIdentifier": {{ dimension.db_instance_identifier }}}
+        metric: ReadIOPS
+        namespace: AWS/RDS
+        statistic: Maximum
+        alias: '{{ '{{DBInstanceIdentifier}}_{{metric}}_{{stat}}' }}'
+      - dimensions: {"DBInstanceIdentifier": {{ dimension.db_instance_identifier }}}
+        metric: WriteIOPS
+        namespace: AWS/RDS
+        statistic: Maximum
+        alias: '{{ '{{DBInstanceIdentifier}}_{{metric}}_{{stat}}' }}'
+      {% endfor %}
+
+  - title: (U) Freeable Memory
+    type: Graph
+    description: The amount of available random access memory. This metric reports the value of the MemAvailable field of /proc/meminfo)
+    targets:
+      {% for dimension in data %}
+      - dimensions: {"DBInstanceIdentifier": {{ dimension.db_instance_identifier }}}
+        metric: FreeableMemory
+        namespace: AWS/RDS
+        statistic: Average
+        alias: '{{ '{{DBInstanceIdentifier}}_{{metric}}_{{stat}}' }}'
+        {% endfor %}
+    formatY1: bytes
+
+  - title: (U) Free Storage Space
+    type: Graph
+    description: The amount of available storage space
+    targets:
+      {% for dimension in data %}
+      - dimensions: {"DBInstanceIdentifier": {{ dimension.db_instance_identifier }}}
+        metric: FreeStorageSpace
+        namespace: AWS/RDS
+        statistic: Maximum
+        alias: '{{ '{{DBInstanceIdentifier}}_{{metric}}_{{stat}}' }}'
+        {% endfor %}
+    formatY1: bytes
+    alert_config:
+      priority: P3
+      message: 'Free Storage Space is Low'
+      rule:
+        for_duration: 5m
+        evaluate_every: 1m
+      conditions:
+        - evaluator_params: 50
+          evaluator_type: lt
+          operator_type: and
+          query_ref_id: A # it is according to sequence
+          query_time_end: now
+          query_time_start: 5m
+          reducer_params: []
+          reducer_type: min
+
+  - title: (U) Network Throughput (Bytes/Second)
+    type: Graph
+    description: The incoming (Receive|Transmit) network traffic on the DB instance, including both customer database traffic and Amazon RDS traffic used for monitoring and replication
+    targets:
+      {% for dimension in data %}
+      - dimensions: {"DBInstanceIdentifier": {{ dimension.db_instance_identifier }}}
+        metric: NetworkReceiveThroughput
+        namespace: AWS/RDS
+        statistic: Maximum
+        alias: '{{ '{{DBInstanceIdentifier}}_{{metric}}_{{stat}}' }}'
+      - dimensions: {"DBInstanceIdentifier": {{ dimension.db_instance_identifier }}}
+        metric: NetworkTransmitThroughput
+        namespace: AWS/RDS
+        statistic: Maximum
+        alias: '{{ '{{DBInstanceIdentifier}}_{{metric}}_{{stat}}' }}'
+      {% endfor %}
+    formatY1: bytes
+
+  - title: (U) Read/Write Throughput (Bytes/Second)
+    type: Graph
+    description: The average number of bytes read from/written to disk per second.
+    targets:
+      {% for dimension in data %}
+      - dimensions: {"DBInstanceIdentifier": {{ dimension.db_instance_identifier }}}
+        metric: ReadIOPS
+        namespace: AWS/RDS
+        statistic: Maximum
+        alias: '{{ '{{DBInstanceIdentifier}}_{{metric}}_{{stat}}' }}'
+      - dimensions: {"DBInstanceIdentifier": {{ dimension.db_instance_identifier }}}
+        metric: WriteIOPS
+        namespace: AWS/RDS
+        statistic: Maximum
+        alias: '{{ '{{DBInstanceIdentifier}}_{{metric}}_{{stat}}' }}'
+      {% endfor %}
+    formatY1: bytes/sec
+
+  - title: (U) Transaction Log Disk Usage
+    type: Graph
+    description: The disk space used by transaction logs. Applies to PostgreSQL.
+    targets:
+      {% for dimension in data %}
+      - dimensions: {"DBInstanceIdentifier": {{ dimension.db_instance_identifier }}}
+        metric: TransactionLogsDiskUsage
+        namespace: AWS/RDS
+        statistic: Maximum
+        alias: '{{ '{{DBInstanceIdentifier}}_{{metric}}_{{stat}}' }}'
+      {% endfor %}
+
+  - title: (S) Disk Queue Depth
+    type: Graph
+    description: The number of outstanding IOs (read/write requests) waiting to access the disk.
+    targets:
+      {% for dimension in data %}
+      - dimensions: {"DBInstanceIdentifier": {{ dimension.db_instance_identifier }}}
+        metric: DiskQueueDepth
+        namespace: AWS/RDS
+        statistic: Average
+        alias: '{{ '{{DBInstanceIdentifier}}_{{metric}}_{{stat}}' }}'
+      {% endfor %}
+
+  - title: (S) Swap Usage
+    type: Graph
+    description: The amount of swap space used on the DB instance.
+    targets:
+      {% for dimension in data %}
+      - dimensions: {"DBInstanceIdentifier": {{ dimension.db_instance_identifier }}}
+        metric: SwapUsage
+        namespace: AWS/RDS
+        statistic: Average
+        alias: '{{ '{{DBInstanceIdentifier}}_{{metric}}_{{stat}}' }}'
+      {% endfor %}
 
   - title: (D) Replication Lag (Only for read replicas)
     type: Graph
-    description: The max amount of time a Read Replica DB instance lags behind the source DB instance. 
+    description: The max amount of time a Read Replica DB instance lags behind the source DB instance.
     targets:
       {% for dimension in data %}
       - dimensions: {"DBInstanceIdentifier": {{ dimension.db_instance_identifier }}}
@@ -162,28 +231,26 @@ panels:
         namespace: AWS/RDS
         statistic: Maximum
         alias: '{{ '{{DBInstanceIdentifier}}_{{metric}}_{{stat}}' }}'
-        {% endfor %}
+      {% endfor %}
 
   - title: (D) Slow Query Count
     type: Graph
-    description: No of slow queries 
+    description: No of slow queries
     targets:
       {% for dimension in data %}
       - dimensions: {}
         metric: SlowQueryCount-{{ dimension.db_instance_identifier }}
         namespace: RDSCustomMetric
         statistic: Maximum
-        {% endfor %}
+      {% endfor %}
 
   - title: (E) Replication error count (Only for read replica)
     type: Graph
-    description: Replication related errors from logs (Custom Metric)  
+    description: Replication related errors from logs (Custom Metric)
     targets:
       {% for dimension in data %}
       - dimensions: {}
         metric: ReplicationErrorCount-{{ dimension.db_instance_identifier }}
         namespace: RDSCustomMetric
         statistic: Maximum
-        {% endfor %}
-
-
+      {% endfor %}

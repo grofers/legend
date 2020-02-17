@@ -17,7 +17,18 @@ components:
   elb:
     dimensions:
       - load_balancer_name: ad070192b3a8e11eab700061941443b9
-      - load_balancer_name: ad0fa14773a8e11eab700061941443b9
+
+  pgsql_rds:
+    dimensions:
+      - db_instance_identifier: prod-supply-orchestrator
+
+  django:
+    dimensions:
+      - job: supply-orchestrator
+
+  celery:
+    dimensions:
+      - job: supply-orchestrator-celery-metrics
 
   s3:
     dimensions:
@@ -25,19 +36,3 @@ components:
         filter_id: EntireBucket
       - bucket_name: prod-oms-bulk-uploads
         filter_id: supply-orchestrator
-
-  celery:
-    dimensions:
-      - job: supply-orchestrator-celery-metrics
-
-  django:
-    dimensions:
-      - job: supply-orchestrator
-
-  pgsql_rds:
-    dimensions:
-      - db_instance_identifier: prod-supply-orchestrator
-
-  phoenix:
-    dimensions:
-      - job: supply-orchestrator-tracker
