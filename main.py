@@ -46,8 +46,11 @@ def template_builder(input):
             if panel['title'] in tpanel_map.keys():
                 for k in panel.keys():
                     if k == 'alert_config':
-                        for ak in panel[k].keys():
-                            tpanel_map[panel['title']][k][ak] = panel[k][ak]
+                        try:
+                            for ak in panel[k].keys():
+                                    tpanel_map[panel['title']][k][ak] = panel[k][ak]
+                        except:
+                            tpanel_map[panel['title']][k] = panel[k]
                     else:
                         tpanel_map[panel['title']][k] = panel[k]
             else:
@@ -75,21 +78,21 @@ def template_builder(input):
                         'alert.j2',
                         data=panel['alert_config']
                 )
-
                 if panel['alert_config'].get('condition_query'):
                     panel['alert_config']['conditions'] = parse_condition_query(
-                            panel['alert_config']['condition_query']
+                            panel['alert_config']['condition_query'],
+                            panel['targets']
                     )
 
-                for condition in panel['alert_config']['conditions']:
-                    conditionrender = jinja2_to_render(
-                            'templates/alert',
-                            'alert_condition.j2',
-                            data=condition
-                    )
-                    alertrender += conditionrender
+                    for condition in panel['alert_config']['conditions']:
+                        conditionrender = jinja2_to_render(
+                                'templates/alert',
+                                'alert_condition.j2',
+                                data=condition
+                        )
+                        alertrender += conditionrender
 
-                panel['alertrender'] = alertrender
+                    panel['alertrender'] = alertrender
 
         if values.get('hide') is not None:
             template['hide'] = values.get('hide', None)

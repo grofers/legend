@@ -110,22 +110,34 @@ def get_alert_id(alert_channels):
     return (grafana_notification_channel_uid)
 
 
-def parse_condition_query(condition_queries):
+def parse_condition_query(condition_queries,targets):
     conditions = []
-    for condition_query in condition_queries:
-        parts = condition_query.split(',')
-        if len(parts) != 7:
-            raise Exception('Condition query parameters not complete')
+    ref_id_index = ord("A")
+    for t in range(len(targets)):
+        for condition_query in condition_queries:
+            parts = condition_query.split(',')
+            if len(parts) != 7:
+                raise Exception('Condition query parameters not complete')
 
-        conditions.append({
-            'operator_type': parts[0],
-            'reducer_type': parts[1],
-            'query_ref_id': parts[2],
-            'query_time_end': parts[3],
-            'query_time_start': parts[4],
-            'evaluator_type': parts[5],
-            'evaluator_params': parts[6],
-            'reducer_params': [],
-        })
+            if not int(parts[2]) == targets[t].get('ref_no', t):
+                continue
+            ref_id = ref_id_index
+            op = parts[0]
+            if t == 0:
+                op = 'WHEN'
+
+            conditions.append({
+                'operator_type': op,
+                'reducer_type': parts[1],
+                'query_ref_id': chr(ref_id),
+                'query_time_end': parts[3],
+                'query_time_start': parts[4],
+                'evaluator_type': parts[5],
+                'evaluator_params': parts[6],
+                'reducer_params': [],
+            })
+            ref_id_index += 1
+            if ref_id_index == ord("Z"):
+                ref_id_index = ord("A")
 
     return conditions
