@@ -49,9 +49,21 @@ panels:
     {% for dimension in data %}
       - metric: sum(rate(django_http_responses_total_by_status_total{job=~"{{ dimension.job }}",status =~ "5.."}[5m]))
         legend: Aggregate
+        ref_no: 1
       - metric: sum(rate(django_http_responses_total_by_status_total{job=~"{{ dimension.job }}", status =~ "5.."}[5m])) by (instance)
         legend: '{{ '{{instance}}' }}'
+        ref_no: 2
     {% endfor %}
+    alert_config:
+      priority: P3
+      message: 'High error rate (5xx)'
+      rule:
+        for_duration: 5m
+        evaluate_every: 10s
+      condition_query:
+      - OR,avg,1,now,5m,gt,20
+      - OR,avg,2,now,5m,gt,30
+
 
   - title: (E) Error rate - per API (5xx)
     type: Graph
@@ -60,7 +72,16 @@ panels:
     {% for dimension in data %}
     - metric: sum(rate(django_http_responses_total_by_status_view_method_total{job=~"{{ dimension.job }}", status =~ "5.."}[5m])) by (view,method)
       legend: '{{ '{{method}} - {{view}}' }}'
+      ref_no: 1
     {% endfor %}
+    alert_config:
+      priority: P3
+      message: 'High error rate - per API (5xx)'
+      rule:
+        for_duration: 5m
+        evaluate_every: 10s
+      condition_query:
+      - OR,avg,1,now,5m,gt,20
 
   - title: (D) Latency over all methods (99th percentile)
     type: Graph
@@ -69,9 +90,20 @@ panels:
     {% for dimension in data %}
       - metric: histogram_quantile(0.99, sum(rate(django_http_requests_latency_including_middlewares_seconds_bucket{job=~"{{ dimension.job }}"}[5m])) by (le))
         legend: Aggregate
+        ref_no: 1
       - metric: histogram_quantile(0.99, sum(rate(django_http_requests_latency_including_middlewares_seconds_bucket{job=~"{{ dimension.job }}"}[5m])) by (instance,le))
         legend: '{{ '{{instance}}' }}'
+        ref_no: 2
     {% endfor %}
+    alert_config:
+      priority: P3
+      message: 'High latency'
+      rule:
+        for_duration: 5m
+        evaluate_every: 10s
+      condition_query:
+      - OR,avg,1,now,5m,gt,20
+      - OR,avg,2,now,5m,gt,25
 
   - title: (D) Latency per API (99th percentile)
     type: Graph
@@ -80,4 +112,13 @@ panels:
     {% for dimension in data %}
       - metric: histogram_quantile(0.99, sum(rate(django_http_requests_latency_seconds_by_view_method_bucket{job=~"{{ dimension.job }}"}[5m])) by (view,method,le))
         legend: '{{ '{{method}} - {{view}}' }}'
+        ref_no: 1
     {% endfor %}
+    alert_config:
+      priority: P3
+      message: 'High latency - per API'
+      rule:
+        for_duration: 5m
+        evaluate_every: 10s
+      condition_query:
+      - OR,avg,1,now,5m,gt,20
