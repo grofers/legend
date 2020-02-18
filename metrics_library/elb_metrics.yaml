@@ -1,6 +1,6 @@
 data_source: Cloudwatch
 reference: https://docs.aws.amazon.com/elasticloadbalancing/latest/classic/elb-cloudwatch-metrics.html#loadbalancing-metrics-clb
-description: Provide a reliable solution for AWS ELB
+description: Provide a reliable solution for load balancing - AWS ELB
 panels:
   - title: (U) Healthy/Unhealthy Host Count
     type: Graph
@@ -17,8 +17,17 @@ panels:
         namespace: AWS/ELB
         statistic: Maximum
         alias: '{{ '{{LoadBalancerName}}_{{metric}}_{{stat}}' }}'
+        ref_no: 1
       {% endfor %}
-
+    alert_config:
+      priority: P3
+      message: 'Unhealthy hosts for more than 15min'
+      rule:
+        for_duration: 15m
+        evaluate_every: 10s
+      condition_query:
+      - OR,avg,1,now,20m,gt,0
+  
   - title: (S) Pending Requests Count
     type: Graph
     description: Number of requests pending routing to a healthy instance. The maximum size of the queue is 1,024. Additional requests or connections are rejected when the queue is full.
@@ -29,7 +38,16 @@ panels:
         namespace: AWS/ELB
         statistic: Maximum
         alias: '{{ '{{LoadBalancerName}}_{{metric}}_{{stat}}' }}'
+        ref_no: 1
       {% endfor %}
+    alert_config:
+      priority: P3
+      message: 'Number of pending requests high. Max allowed is 1024'
+      rule:
+        for_duration: 5m
+        evaluate_every: 10s
+      condition_query:
+      - OR,avg,1,now,5m,gt,100
 
   - title: (E) Rejected Requests Count
     type: Graph
@@ -70,7 +88,16 @@ panels:
         namespace: AWS/ELB
         statistic: Sum
         alias: '{{ '{{LoadBalancerName}}_{{metric}}_{{stat}}' }}'
+        ref_no: 1
       {% endfor %}
+    alert_config:
+      priority: P3
+      message: 'High rate of backend errors (5xx)'
+      rule:
+        for_duration: 5m
+        evaluate_every: 10s
+      condition_query:
+      - OR,avg,1,now,5m,gt,100
 
   - title: (E) ELB 4XX/5XX Count
     type: Graph
@@ -81,6 +108,7 @@ panels:
         metric: HTTPCode_ELB_4XX
         namespace: AWS/ELB
         statistic: Sum
+        alias: '{{ '{{LoadBalancerName}}_{{metric}}_{{stat}}' }}'
       - dimensions: {"LoadBalancerName": {{ dimension.load_balancer_name }} }
         metric: HTTPCode_ELB_5XX
         namespace: AWS/ELB
@@ -103,6 +131,7 @@ panels:
   - title: (D) Request Latency (seconds)
     type: Graph
     description: Request Latency in seconds
+    formatY1: s
     targets:
       {% for dimension in data %}
     - dimensions: {"LoadBalancerName": {{ dimension.load_balancer_name }} }
@@ -111,3 +140,5 @@ panels:
       statistic: Maximum
       alias: '{{ '{{LoadBalancerName}}_{{metric}}_{{stat}}' }}'
       {% endfor %}
+    
+
