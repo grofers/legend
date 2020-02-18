@@ -16,7 +16,7 @@ def input_yaml_to_json(input_file):
 
 def str_yaml_to_json(str):
     try:
-        return yaml.load(str)
+        return list(yaml.load_all(str))
     except yaml.YAMLError as exc:
         raise Exception(exc)
 
@@ -64,28 +64,31 @@ def assemble_panels_dynamic(input):
         r += 1
         assembled_panels += "R_" + str(ri) \
                             + " { gridPos: { h: 4, w: 24, x: 0, y: " + str(r) + " }, }, \n"
-        panels_in_row = v.get('metric').get('panels_in_row', 2)
-        if panels_in_row < 1:
-            panels_in_row = 2
-        elif panels_in_row > 8:
-            panels_in_row = 8
 
-        width = int(24/panels_in_row)
-        pi = 0
-        while True:
-            r += 1
-            p = 0
-            row_end = min(len(v.get('metric').get('panels')), pi + panels_in_row)
-            for rpi in range(pi, row_end):
-                assembled_panels += "R_" + str(ri) + "_P_" + str(rpi+1) \
-                                   + " { gridPos: { h: 8, w: "+str(width)+", x: "+str(width*p)+", y: " \
-                                   + str(r) + " }, }, \n"
-                p += 1
-                pi = rpi
-                if rpi + 1 == row_end:
-                    pi = rpi + 1
-            if pi >= len(v.get('metric').get('panels')):
-                break
+        for metric_idx in range(len(v['metric'])):  
+            metric = v['metric'][metric_idx]
+            panels_in_row = metric.get('panels_in_row', 2)
+            if panels_in_row < 1:
+                panels_in_row = 2
+            elif panels_in_row > 8:
+                panels_in_row = 8
+
+            width = int(24/panels_in_row)
+            pi = 0
+            while True:
+                r += 1
+                p = 0
+                row_end = min(len(metric.get('panels')), pi + panels_in_row)
+                for rpi in range(pi, row_end):
+                    assembled_panels += "R_" + str(ri) + "_" + str(metric_idx+1) + "_P_" + str(rpi+1) \
+                                    + " { gridPos: { h: 8, w: "+str(width)+", x: "+str(width*p)+", y: " \
+                                    + str(r) + " }, }, \n"
+                    p += 1
+                    pi = rpi
+                    if rpi + 1 == row_end:
+                        pi = rpi + 1
+                if pi >= len(metric.get('panels')):
+                    break
 
     return assembled_panels
 
