@@ -1,0 +1,24 @@
+---
+title: Consul
+service: Consul
+alert_channels: ["Infrastructure-opsgenie"]
+environment: Prod
+description: Service Discovery and KV Store
+references:
+- deployment: https://github.com/grofers/ansible/tree/master/roles/consul
+- documentation: https://www.consul.io/docs/index.html
+- metrics_definition: https://www.consul.io/docs/agent/telemetry.html
+tags:
+- prod
+- infra
+components:
+  consul:
+    dimensions:
+      - region: ap-southeast-1
+  systemcore_ec2:
+    dimensions:
+      - host: consulserver.*.ap-southeast-1.*
+      - host: privateproxy
+  haproxy:
+    dimensions:
+      - backend: consul_prod
