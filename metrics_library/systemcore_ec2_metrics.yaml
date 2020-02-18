@@ -29,8 +29,8 @@ panels:
       {% for dimension in data %}
       - query: SELECT mean(\"value\") FROM \"memory_value\" WHERE (\"type_instance\" = \'used\' AND \"host\" =~ /^{{ dimension.host }}/ AND \"type\" = \'percent\') AND $timeFilter GROUP BY time($interval), \"host\" fill(null)
         alias_by: $tag_host
+        ref_no: 1
       {% endfor %}
-    ref_no: 1
     alert_config:
       priority: P3
       message: 'Memory Utilisation is high'
@@ -48,9 +48,8 @@ panels:
       {% for dimension in data %}
       - query: SELECT mean(\"value\") FROM \"df_value\" WHERE (\"type_instance\" = \'used\' AND \"host\" =~ /^{{ dimension.host }}/ AND \"type\" = \'percent_bytes\') AND $timeFilter GROUP BY time($interval), \"host\" fill(null)
         alias_by: $tag_host
-        rule_
+        ref_no: 1
       {% endfor %}
-    ref_no: 1
     alert_config:
       priority: P4
       message: 'Disk utilisation is high, running out of free space'
