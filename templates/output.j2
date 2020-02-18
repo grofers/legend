@@ -15,16 +15,18 @@ local alertCondition = grafana.alertCondition;
 {% set comp = 'R_' ~ loop.index %}
 local {{ comp }} =
     row.new(title='{{ component }}',
-    {% if values.metric.get('hide') is not none %}
+    {% if values.metric[0].get('hide') is not none %}
         collapse=true,
     {%endif%}
     );
-    {% for panel_value in values.metric.panels %}
+    {% for metric in values.metric %}
+        {% set comp1 = comp ~ "_" ~ loop.index %}
+    {% for panel_value in metric.panels %}
 
-local {{ comp }}_P_{{loop.index}} =
+local {{ comp1 }}_P_{{loop.index}} =
     graphPanel.new(
         title='{{ panel_value.title }}',
-        datasource='{{ values.metric.data_source }} ({{ data.environment }})',
+        datasource='{{ metric.data_source }} ({{ data.environment }})',
         shared_tooltip='true',
         legend_values='true',
         legend_min='true',
@@ -50,6 +52,7 @@ local {{ comp }}_P_{{loop.index}} =
 
 ;
     {% endfor %}
+  {% endfor %}
 
 
 {% endfor %}

@@ -1,7 +1,7 @@
 ---
 title: IMS-Testing
-service: IMS
 alert_channels: ["YET TO FILL"]
+service: IMS
 environment: Prod
 description: IMS service handles the inventory for retail outlets and business logic dependent on the inventory. It sends inventory and prices updates to CMS for inventory and offers.
 references:
@@ -39,14 +39,17 @@ components:
       - job_name: pos-celery-metrics
   mysql_ec2:
     dimensions:
-      - masters:
-          - host: perconamaster4-mysql-metrics
-            db_name: ims
-        slaves:
-          - host: perconamaster1-mysql-metrics
-            db_name: ims
-          - host: perconamaster5-mysql-metrics
-            db_name: ims
+      ec2:
+        - host: perconamaster4-mysql-metrics
+      db:
+        - masters:
+            - host: perconamaster4-mysql-metrics
+              db_name: ims
+          slaves:
+            - host: perconamaster1-mysql-metrics
+              db_name: ims
+            - host: perconamaster5-mysql-metrics
+              db_name: ims
   systemcore_ec2:
     dimensions:
       - host: .*ims.*
@@ -54,4 +57,3 @@ components:
     dimensions:
     - bucket_name: grofers.retail-bulk-upload
       filter_id: EntireBucket
-

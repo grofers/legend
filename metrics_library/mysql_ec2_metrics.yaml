@@ -159,3 +159,6 @@ panels:
         legend: '{{ 'Select_Range_Check_{{job}}' }}'
         {% endfor %}
       {% endfor %}
+---
+{% set data = data.ec2 %} 
+{% include "systemcore_ec2_metrics.yaml" with context %}
