@@ -115,14 +115,17 @@ def get_alert_id(alert_channels):
 
 def parse_condition_query(condition_queries,targets):
     conditions = []
-    ref_id_index = ord("A")
+    ref_id_index = 64
     for t in range(len(targets)):
+        ref_id_index += 1
+        if ref_id_index == ord("Z"):
+            ref_id_index = ord("A")
         for condition_query in condition_queries:
             parts = condition_query.split(',')
             if len(parts) != 7:
                 raise Exception('Condition query parameters not complete')
 
-            if not int(parts[2]) == targets[t].get('ref_no', t):
+            if not int(parts[2]) == targets[t].get('ref_no'):
                 continue
             ref_id = ref_id_index
             op = parts[0]
@@ -139,8 +142,6 @@ def parse_condition_query(condition_queries,targets):
                 'evaluator_params': parts[6],
                 'reducer_params': [],
             })
-            ref_id_index += 1
-            if ref_id_index == ord("Z"):
-                ref_id_index = ord("A")
+
 
     return conditions
