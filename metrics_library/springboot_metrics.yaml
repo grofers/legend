@@ -1,8 +1,6 @@
 data_source: Prometheus
-reference: https://github.com/deadtrickster/prometheus_rabbitmq_exporter/blob/master/README.md#overview
-description: RabbitMQ is an open-source message-broker
-identifierKeys:
-  - job
+reference: https://spring.io/projects/spring-boot
+description: Spring Boot is an open source Java-based framework used to create a micro Service.
 panels:
   - title: (R) Rate of requests (qps) - aggregated over all methods
     type: Graph
@@ -41,7 +39,7 @@ panels:
     targets:
     {% for dimension in data %}
       - metric: sum(rate(http_server_requests_seconds_count{job=~"{{ dimension.job }}", status =~ "4.."}[5m])) by (uri,method)
-        legend: '{{ '{{method}} - {{view}}' }}'
+        legend: '{{ '{{method}} - {{uri}}' }}'
     {% endfor %}
 
   - title: (E) Error rate - aggregated over all methods (5xx)
@@ -51,9 +49,20 @@ panels:
     {% for dimension in data %}
       - metric: sum(rate(http_server_requests_seconds_count{job=~"{{ dimension.job }}",status =~ "5.."}[5m]))
         legend: Aggregate
+        ref_no: 1
       - metric: sum(rate(http_server_requests_seconds_count{job=~"{{ dimension.job }}", status =~ "5.."}[5m])) by (instance)
         legend: '{{ '{{instance}}' }}'
+        ref_no: 2
     {% endfor %}
+    alert_config:
+      priority: P3
+      message: 'High error rate (5xx)'
+      rule:
+        for_duration: 5m
+        evaluate_every: 10s
+      condition_query:
+        - OR,avg,1,now,5m,gt,20
+        - OR,avg,2,now,5m,gt,30
 
   - title: (E) Error rate - per API (5xx)
     type: Graph
@@ -62,7 +71,16 @@ panels:
     {% for dimension in data %}
       - metric: sum(rate(http_server_requests_seconds_count{job=~"{{ dimension.job }}", status =~ "5.."}[5m])) by (uri,method)
         legend: '{{ '{{method}} - {{uri}}' }}'
+        ref_no: 1
     {% endfor %}
+    alert_config:
+      priority: P3
+      message: 'High error rate - per API (5xx)'
+      rule:
+        for_duration: 5m
+        evaluate_every: 10s
+      condition_query:
+        - OR,avg,1,now,5m,gt,5
 
   - title: (D) Avg Latency  - aggregated over all methods
     type: Graph
@@ -91,9 +109,20 @@ panels:
     {% for dimension in data %}
       - metric: histogram_quantile(0.99, sum(rate(http_server_requests_seconds_bucket{job=~"{{ dimension.job }}"}[5m])) by (le))
         legend: Aggregate
+        ref_no: 1
       - metric: histogram_quantile(0.99, sum(rate(http_server_requests_seconds_bucket{job=~"{{ dimension.job }}"}[5m])) by (instance,le))
         legend: '{{ '{{instance}}' }}'
+        ref_no: 2
     {% endfor %}
+    alert_config:
+      priority: P3
+      message: 'High latency'
+      rule:
+        for_duration: 5m
+        evaluate_every: 10s
+      condition_query:
+        - OR,avg,1,now,5m,gt,5
+        - OR,avg,2,now,5m,gt,10
 
   - title: (D) Latency per API (99th percentile)
     type: Graph
@@ -102,4 +131,13 @@ panels:
     {% for dimension in data %}
       - metric: histogram_quantile(0.99, sum(rate(http_server_requests_seconds_bucket{job=~"{{ dimension.job }}"}[5m])) by (uri,method,le))
         legend: '{{ '{{method}} - {{uri}}' }}'
+        ref_no: 1
     {% endfor %}
+    alert_config:
+      priority: P3
+      message: 'High latency - per API'
+      rule:
+        for_duration: 5m
+        evaluate_every: 10s
+      condition_query:
+        - OR,avg,1,now,5m,gt,10
