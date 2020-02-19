@@ -9,35 +9,58 @@ panels:
       {% for dimension in data %}
       - metric: rate(haproxy_backend_current_queue{backend="{{ dimension.backend }}"}[5m])
         legend: '{{ '{{backend}}' }}'
+        ref_no: 1
       {% endfor %}
     alert_config:
+      priority: P3
+      message: High Pending Request Count
+      rule:
+        for_duration: 5m
+        evaluate_every: 1m
+      condition_query:
+        - OR,avg,1,now,5m,gt,5
 
   - title: (R) Request Count
     type: Graph
     description: Total number of Requests on the backend in an interval
     targets:
-      {% for dimension in data %}
+    {% for dimension in data %}
     - metric: sum(rate(haproxy_backend_http_responses_total{backend="{{ dimension.backend }}"}[5m])) by (backend)
       legend: '{{ '{{backend}}' }}'
-      {% endfor %}
-    alert_config:
+    {% endfor %}
 
-  - title: (E) Errors
+  - title: (E) HTTP 4XX Count
     type: Graph
-    description: Responses with 4xx or 5xx
+    description: Responses with http 4xx code
     targets:
-      {% for dimension in data %}
-    - metric: rate(haproxy_backend_http_responses_total{backend="{{ dimension.backend }}",code=~"4xx|5xx"}[5m])
+    {% for dimension in data %}
+    - metric: rate(haproxy_backend_http_responses_total{backend="{{ dimension.backend }}",code=~"4xx"}[5m])
       legend: '{{ '{{code}}-{{backend}}' }}'
-      {% endfor %}
+    {% endfor %}
+
+  - title: (E) HTTP 5XX Count
+    type: Graph
+    description: Responses with http 5xx code
+    targets:
+    {% for dimension in data %}
+    - metric: rate(haproxy_backend_http_responses_total{backend="{{ dimension.backend }}",code=~"5xx"}[5m])
+      legend: '{{ '{{code}}-{{backend}}' }}'
+      ref_no: 1
+    {% endfor %}
     alert_config:
+      priority: P3
+      message: High 5XX Count
+      rule:
+        for_duration: 5m
+        evaluate_every: 1m
+      condition_query:
+        - OR,avg,1,now,5m,gt,5
 
   - title: (D) Request Latency
     type: Graph
     description: Average Latency per Request
     targets:
-      {% for dimension in data %}
+    {% for dimension in data %}
     - metric: rate(haproxy_backend_http_response_time_average_seconds{backend="{{ dimension.backend }}"}[5m])
       legend: '{{ '{{backend}}' }}'
-      {% endfor %}
-    alert_config:
+    {% endfor %}
