@@ -41,5 +41,14 @@ panels:
     description: Number of rejected connections
     targets:
       {% for dimension in data %}
-      - metric: redis_rejected_connections_total{job=~"{{ dimension.job_name }}"}
+      - metric: rate(redis_rejected_connections_total{job=~"{{ dimension.job_name }}"}[5m])
+        ref_no: 1
       {% endfor %}
+    alert_config:
+      priority: P4
+      message: 'Total rejected connections is high'
+      rule:
+        for_duration: 10m
+        evaluate_every: 1m
+      condition_query:
+        - OR,avg,1,now,10m,gt,0
