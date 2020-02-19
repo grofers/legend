@@ -40,7 +40,7 @@ components:
   mysql_ec2:
     dimensions:
       ec2:
-        - host: perconamaster4-mysql-metrics
+        - host: perconamaster*
       db:
         - masters:
             - host: perconamaster4-mysql-metrics

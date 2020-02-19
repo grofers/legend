@@ -7,7 +7,7 @@ panels:
     type: Graph
     description: Number of database connections
     targets:
-      {% for dimension in data %}
+      {% for dimension in data.db %}
         {% for master in dimension.masters %}
       - metric: max(max_over_time(mysql_global_status_threads_connected{job=~"{{ master.host }}"}[5m]) or mysql_global_status_threads_connected{job=~"{{ master.host }}"} ) by (job,instance)
         legend: '{{ 'CONNECTIONS_{{job}}' }}'
@@ -26,11 +26,13 @@ panels:
         legend: '{{ 'MAX_GLOBAL_CONNECTIONS_{{job}}' }}'
         {% endfor %}
       {% endfor %}
+
   - title: (U) Database Connection Utilization (%)
     type: Graph
     description: Percentage of DB connection utilization
+    formatY1: percent
     targets:
-      {% for dimension in data %}
+      {% for dimension in data.db %}
         {% for master in dimension.masters %}
       - metric: (max((max_over_time(mysql_global_status_threads_connected{job=~"{{ master.host }}"}[5m]) or mysql_global_status_threads_connected{job=~"{{ master.host }}"})*100/mysql_global_variables_max_connections{job=~"{{ master.host }}"} ) by (job,instance))
         legend: '{{ '{{job}}' }}'
@@ -49,41 +51,85 @@ panels:
           for_duration: 5m
           evaluate_every: 10s
         condition_query:
-        - OR,avg,1,now,5m,gt,20
-        - OR,avg,2,now,5m,gt,30
+        - OR,avg,1,now,5m,gt,85
+        - OR,avg,2,now,5m,gt,85
+
   - title: (U) AutoIncrement Counter Utilization (%)
     type: Graph
     description: Percentage of autoincrement counter is consumed by each table in schema
+    formatY1: percent
     targets:
-      {% for dimension in data %}
+      {% for dimension in data.db %}
         {% for master in dimension.masters %}
       - metric: mysql_info_schema_auto_increment_column{job=~"{{ master.host }}", schema=~"{{ master.db_name }}"}*100/mysql_info_schema_auto_increment_column_max{job=~"{{ master.host }}", schema=~"{{ master.db_name }}"}
         legend: '{{ '{{job}}_{{schema}}_{{table}}' }}'
+        ref_no: 1
         {% endfor %}
         {% for slave in dimension.slaves %}
       - metric: mysql_info_schema_auto_increment_column{job=~"{{ slave.host }}", schema=~"{{ slave.db_name }}"}*100/mysql_info_schema_auto_increment_column_max{job=~"{{ slave.host }}", schema=~"{{ slave.db_name }}"}
         legend: '{{ '{{job}}_{{schema}}_{{table}}' }}'
+        ref_no: 2
         {% endfor %}
       {% endfor %}
+    alert_config:
+        priority: P2
+        message: '(U) AutoIncrement Counter Utilization (%) is HIGH'
+        rule:
+          for_duration: 5m
+          evaluate_every: 10s
+        condition_query:
+        - OR,avg,1,now,5m,gt,90
+        - OR,avg,2,now,5m,gt,90
+
   - title: (E) Slow Query Count
     type: Graph
     description: No. of Slow Queries
     targets:
-      {% for dimension in data %}
+      {% for dimension in data.db %}
         {% for master in dimension.masters %}
       - metric: rate(mysql_global_status_slow_queries{job=~"{{ master.host }}"}[5m])
         legend: '{{ '{{job}}' }}'
+        ref_no: 1
         {% endfor %}
         {% for slave in dimension.slaves %}
       - metric: rate(mysql_global_status_slow_queries{job=~"{{ slave.host }}"}[5m])
         legend: '{{ '{{job}}' }}'
+        ref_no: 2
         {% endfor %}
       {% endfor %}
+
+  - title: (E) Slow Query (%)
+    type: Graph
+    description: Slow Queries (%)
+    formatY1: percent
+    targets:
+      {% for dimension in data.db %}
+        {% for master in dimension.masters %}
+      - metric: rate(mysql_global_status_slow_queries{job="phoenixmysqlmaster1-mysql-metrics"}[5m])*100 / rate(mysql_global_status_queries{job="phoenixmysqlmaster1-mysql-metrics"}[5m])
+        legend: '{{ '{{job}}' }}'
+        ref_no: 1
+        {% endfor %}
+        {% for slave in dimension.slaves %}
+      - metric: rate(mysql_global_status_slow_queries{job="phoenixmysqlmaster1-mysql-metrics"}[5m])*100 / rate(mysql_global_status_queries{job="phoenixmysqlmaster1-mysql-metrics"}[5m])
+        legend: '{{ '{{job}}' }}'
+        ref_no: 2
+        {% endfor %}
+      {% endfor %}
+    alert_config:
+        priority: P3
+        message: '(E) Slow Query (%) with respect to Rate to Queries is HIGH'
+        rule:
+          for_duration: 5m
+          evaluate_every: 10s
+        condition_query:
+        - OR,avg,1,now,5m,gt,5
+        - OR,avg,2,now,5m,gt,5
+
   - title: (E) DeadLock Count
     type: Graph
     description: No. of deadlocks happend
     targets:
-      {% for dimension in data %}
+      {% for dimension in data.db %}
         {% for master in dimension.masters %}
       - metric: (rate(mysql_global_status_innodb_deadlocks{job=~"{{ master.host }}"}[5m]) or rate(mysql_info_schema_innodb_metrics_lock_lock_deadlocks_total{job=~"{{ master.host }}"}[5m]))
         legend: '{{ '{{job}}' }}'
@@ -93,11 +139,21 @@ panels:
         legend: '{{ '{{job}}' }}'
         {% endfor %}
       {% endfor %}
+    alert_config:
+        priority: P3
+        message: '(E) DeadLock Count is HIGH'
+        rule:
+          for_duration: 5m
+          evaluate_every: 10s
+        condition_query:
+        - OR,avg,1,now,5m,gt,0
+        - OR,avg,2,now,5m,gt,0
+
   - title: (R) Rate of Queries
     type: Graph
     description: Rate of queries executed
     targets:
-      {% for dimension in data %}
+      {% for dimension in data.db %}
         {% for master in dimension.masters %}
       - metric: rate(mysql_global_status_queries{job=~"{{ master.host }}"}[5m])
         legend: '{{ '{{job}}' }}'
@@ -107,11 +163,12 @@ panels:
         legend: '{{ '{{job}}' }}'
         {% endfor %}
       {% endfor %}
+
   - title: (R) Rate of MySQL Temporary Object
     type: Graph
     description: Rate of MySQL Temporary Object
     targets:
-      {% for dimension in data %}
+      {% for dimension in data.db %}
         {% for master in dimension.masters %}
       - metric: rate(mysql_global_status_created_tmp_tables{job=~"{{ master.host }}"}[5m])
         legend: '{{ 'Created_Tmp_Tables{{job}}' }}'
@@ -129,11 +186,12 @@ panels:
         legend: '{{ 'Created_Tmp_Files{{job}}' }}'
         {% endfor %}
       {% endfor %}
+
   - title: (U) MySQL Select Range
     type: Graph
-    description: MySQL Select Range
+    description: "MySQL Select Range - Ref: https://www.percona.com/doc/percona-monitoring-and-management/dashboard.mysql-overview.html#dashboard-mysql-overview-select-types"
     targets:
-      {% for dimension in data %}
+      {% for dimension in data.db %}
         {% for master in dimension.masters %}
       - metric: rate(mysql_global_status_select_full_join{job=~"{{ master.host }}"}[5m])
         legend: '{{ 'Select_Full_Join_{{job}}' }}'
@@ -159,6 +217,28 @@ panels:
         legend: '{{ 'Select_Range_Check_{{job}}' }}'
         {% endfor %}
       {% endfor %}
+
+  - title: (D) MySQL Replication Lag
+    type: Graph
+    description: MySQL Replication in Seconds
+    formatY1: s
+    targets:
+      {% for dimension in data.db %}
+        {% for slave in dimension.slaves %}
+      - metric: mysql_slave_status_seconds_behind_master{job=~"{{ slave.host }}"}
+        legend: '{{ '{{job}}_{{channel_name}}' }}'
+        ref_no: 1
+        {% endfor %}
+      {% endfor %}
+    alert_config:
+        priority: P4
+        message: '(D) MySQL Replication Lag is HIGH'
+        rule:
+          for_duration: 15m
+          evaluate_every: 10s
+        condition_query:
+        - OR,avg,1,now,15m,gt,2700
+
 ---
 {% set data = data.ec2 %} 
 {% include "systemcore_ec2_metrics.yaml" with context %}
