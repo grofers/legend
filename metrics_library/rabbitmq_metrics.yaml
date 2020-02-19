@@ -20,7 +20,18 @@ panels:
         legend: Max_File_descriptors
       - metric: process_open_fds{job="{{ dimension.job }}"}
         legend: '{{ '{{instance}}' }}'
+      - metric: (process_open_fds{job="{{ dimension.job }}"}/process_max_fds{job="{{ dimension.job }}"})*100
+        legend: open file descriptors utilisation percent
+        ref_no: 1
       {% endfor %}
+    alert_config:
+      priority: P2
+      message: 'Open file descriptors utilisation high'
+      rule:
+        for_duration: 5m
+        evaluate_every: 10s
+      condition_query:
+        - OR,avg,1,now,5m,gt,80
 
   - title: (S) Queue depth(Total messages)
     type: Graph
@@ -60,7 +71,16 @@ panels:
       {% for dimension in data %}
       - metric: rate(rabbitmq_queue_messages_returned_total{queue=~"{{ dimension.queue_name }}", job =~"{{dimension.job}}"}[5m])
         legend: '{{ '{{queue}}' }}'
+        ref_no: 1
       {% endfor %}
+    alert_config:
+      priority: P2
+      message: 'RabbitMQ - messages unroutable'
+      rule:
+        for_duration: 2m
+        evaluate_every: 10s
+      condition_query:
+        - OR,avg,1,now,5m,gt,1
 
   - title: (E) Dead Queue depth(Total messages)
     type: Graph
@@ -69,9 +89,17 @@ panels:
       {% for dimension in data %}
       - metric: rabbitmq_queue_messages{queue=~"{{ dimension.dead_queue_name }}",job =~"{{dimension.job}}"}
         legend: '{{ '{{queue}}' 'Queue_depth' }}'
+        ref_no: 1
       - metric: rabbitmq_queue_messages_ready{queue=~"{{ dimension.dead_queue_name }}",job =~"{{dimension.job}}"}
         legend: '{{ '{{queue}}' 'Ready_messages' }}'
       - metric: rabbitmq_queue_messages_unacknowledged{queue=~"{{ dimension.dead_queue_name }}",job =~"{{dimension.job}}"}
         legend: '{{ '{{queue}}' 'Unacknowledged_messages' }}'
       {% endfor %}
-
+    alert_config:
+      priority: P4
+      message: 'RabbitMQ - dead queue depth increasing'
+      rule:
+        for_duration: 10m
+        evaluate_every: 10s
+      condition_query:
+        - OR,avg,1,now,5m,gt,10
