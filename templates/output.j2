@@ -38,11 +38,12 @@ local {{ comp1 }}_P_{{loop.index}} =
         {% if panel_value.formatY1 %}
             formatY1='{{ panel_value.formatY1 }}',
         {%endif%}
-        {% if panel_value.formatY1 %}
+        {% if panel_value.labelY1 %}
             labelY1='{{ panel_value.labelY1 }}',
         {%endif%}
-        
-
+        {% if panel_value.decimals %}
+            decimals='{{ panel_value.decimals }}',
+        {%endif%}
     )
 
         {% for target in panel_value.targets %}
