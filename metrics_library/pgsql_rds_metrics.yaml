@@ -12,24 +12,17 @@ panels:
       namespace: AWS/RDS
       statistic: Maximum
       alias: '{{ '{{DBInstanceIdentifier}}_{{metric}}_{{stat}}' }}'
+      ref_no: 1
       {% endfor %}
     formatY1: percent
-    labelY1: CPU utilization
     alert_config:
       priority: P3
       message: 'CPU Utilisation is High'
       rule:
         for_duration: 5m
         evaluate_every: 1m
-      conditions:
-        - evaluator_params: 60
-          evaluator_type: gt
-          operator_type: and
-          query_ref_id: A # it is according to sequence
-          query_time_end: now
-          query_time_start: 5m
-          reducer_params: []
-          reducer_type: avg
+      condition_query:
+        - OR,avg,1,now,5m,gt,75
 
   - title: (U) Database Connection Count
     type: Graph
@@ -41,22 +34,16 @@ panels:
       namespace: AWS/RDS
       statistic: Maximum
       alias: '{{ '{{DBInstanceIdentifier}}_{{metric}}_{{stat}}' }}'
+      ref_no: 1
       {% endfor %}
     alert_config:
-      priority: P3
+      priority: P4
       message: 'Too many database connections'
       rule:
         for_duration: 5m
         evaluate_every: 1m
-      conditions:
-        - evaluator_params: 500
-          evaluator_type: gt
-          operator_type: and
-          query_ref_id: A # it is according to sequence
-          query_time_end: now
-          query_time_start: 5m
-          reducer_params: []
-          reducer_type: avg
+      condition_query:
+        - OR,avg,1,now,5m,gt,500
 
   - title: (D) Read/Write latency
     type: Graph
@@ -68,28 +55,15 @@ panels:
         namespace: AWS/RDS
         statistic: Maximum
         alias: '{{ '{{DBInstanceIdentifier}}_{{metric}}_{{stat}}' }}'
+        ref_no: 1
       - dimensions: {"DBInstanceIdentifier": {{ dimension.db_instance_identifier }}}
         metric: WriteLatency
         namespace: AWS/RDS
         statistic: Maximum
         alias: '{{ '{{DBInstanceIdentifier}}_{{metric}}_{{stat}}' }}'
+        ref_no: 2
       {% endfor %}
-    formatY1: seconds (s)
-    alert_config:
-      priority: P3
-      message: 'Too many database connections'
-      rule:
-        for_duration: 5m
-        evaluate_every: 1m
-      conditions:
-        - evaluator_params: 0.010
-          evaluator_type: gt
-          operator_type: and
-          query_ref_id: A # it is according to sequence
-          query_time_end: now
-          query_time_start: 5m
-          reducer_params: []
-          reducer_type: avg
+    formatY1: s
 
   - title: (U) Read/Write IOPS
     type: Graph
@@ -107,6 +81,7 @@ panels:
         statistic: Maximum
         alias: '{{ '{{DBInstanceIdentifier}}_{{metric}}_{{stat}}' }}'
       {% endfor %}
+    formatY1: iops
 
   - title: (U) Freeable Memory
     type: Graph
@@ -131,7 +106,8 @@ panels:
         namespace: AWS/RDS
         statistic: Maximum
         alias: '{{ '{{DBInstanceIdentifier}}_{{metric}}_{{stat}}' }}'
-        {% endfor %}
+        ref_no: 1
+      {% endfor %}
     formatY1: bytes
     alert_config:
       priority: P3
@@ -139,15 +115,8 @@ panels:
       rule:
         for_duration: 5m
         evaluate_every: 1m
-      conditions:
-        - evaluator_params: 50
-          evaluator_type: lt
-          operator_type: and
-          query_ref_id: A # it is according to sequence
-          query_time_end: now
-          query_time_start: 5m
-          reducer_params: []
-          reducer_type: min
+      condition_query:
+        - OR,min,1,now,5m,lt,50*1024*1024*1024
 
   - title: (U) Network Throughput (Bytes/Second)
     type: Graph
@@ -165,7 +134,7 @@ panels:
         statistic: Maximum
         alias: '{{ '{{DBInstanceIdentifier}}_{{metric}}_{{stat}}' }}'
       {% endfor %}
-    formatY1: bytes
+    formatY1: Bps
 
   - title: (U) Read/Write Throughput (Bytes/Second)
     type: Graph
@@ -173,17 +142,17 @@ panels:
     targets:
       {% for dimension in data %}
       - dimensions: {"DBInstanceIdentifier": {{ dimension.db_instance_identifier }}}
-        metric: ReadIOPS
+        metric: ReadThroughput
         namespace: AWS/RDS
         statistic: Maximum
         alias: '{{ '{{DBInstanceIdentifier}}_{{metric}}_{{stat}}' }}'
       - dimensions: {"DBInstanceIdentifier": {{ dimension.db_instance_identifier }}}
-        metric: WriteIOPS
+        metric: WriteThroughput
         namespace: AWS/RDS
         statistic: Maximum
         alias: '{{ '{{DBInstanceIdentifier}}_{{metric}}_{{stat}}' }}'
       {% endfor %}
-    formatY1: bytes/sec
+    formatY1: Bps
 
   - title: (U) Transaction Log Disk Usage
     type: Graph

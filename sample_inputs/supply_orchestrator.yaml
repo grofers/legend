@@ -29,7 +29,7 @@ components:
 
   celery:
     dimensions:
-      - job: supply-orchestrator-celery-metrics
+      - job_name: supply-orchestrator-celery-metrics
 
   s3:
     dimensions:
