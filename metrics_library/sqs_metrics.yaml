@@ -72,7 +72,7 @@ panels:
         alias: '{{ '{{QueueName}}_{{metric}}_{{stat}}' }}'
       {% endfor %}
 
-  - title: (E) Death Queue depth(Total messages)
+  - title: (E) Dead Queue depth(Total messages)
     type: Graph
     description: ApproximateNumberOfMessagesVisible(The number of messages available for retrieval from the queue) and ApproximateNumberOfMessagesNotVisible(The number of messages that are in flight) and NumberOfMessagesDeleted(The number of messages deleted from the queue)
     targets:
@@ -82,6 +82,7 @@ panels:
         namespace: AWS/SQS
         statistic: Sum
         alias: '{{ '{{QueueName}}_{{metric}}_{{stat}}' }}'
+        ref_no: 1
       - dimensions: {"QueueName": {{ dimension.dead_queue_name }} }
         metric: ApproximateNumberOfMessagesNotVisible
         namespace: AWS/SQS
@@ -93,6 +94,14 @@ panels:
         statistic: Sum
         alias: '{{ '{{QueueName}}_{{metric}}_{{stat}}' }}'
       {% endfor %}
+    alert_config:
+      priority: P4
+      message: 'dead queue depth is high'
+      rule:
+        for_duration: 5m
+        evaluate_every: 1m
+      condition_query:
+        - OR,avg,1,now,5m,gt,100
 
 
 
