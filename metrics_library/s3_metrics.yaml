@@ -39,7 +39,16 @@ panels:
       namespace: AWS/S3
       statistic: Sum
       alias: '{{ '{{BucketName}}_{{metric}}_{{stat}}' }}'
+      ref_no: 1
       {% endfor %}
+    alert_config:
+      priority: P4
+      message: 'Error rate for errors 4xx errors on S3'
+      rule:
+        for_duration: 5m
+        evaluate_every: 10s
+      condition_query:
+      - OR,avg,1,now,5m,gt,60
 
   - title: (E) Server Errors - 5xx
     type: Graph
@@ -51,11 +60,21 @@ panels:
       namespace: AWS/S3
       statistic: Sum
       alias: '{{ '{{BucketName}}_{{metric}}_{{stat}}' }}'
+      ref_no: 1
       {% endfor %}
+    alert_config:
+      priority: P5
+      message: 'Server side errors for S3'
+      rule:
+        for_duration: 5m
+        evaluate_every: 10s
+      condition_query:
+      - OR,avg,1,now,5m,gt,60
 
   - title: (D) Request Latency - 99th percentile
     type: Graph
     description: The elapsed per-request time from the first byte received to the last byte sent to an Amazon S3 bucket. This includes the time taken to receive the request body and send the response body, which is not included in FirstByteLatency. 
+    formatY1: s
     targets:
       {% for dimension in data %}
     - dimensions: {"BucketName": {{ dimension.bucket_name }} ,"FilterId": {{ dimension.filter_id }}}
@@ -68,4 +87,13 @@ panels:
       namespace: AWS/S3
       statistic: p99
       alias: '{{ '{{BucketName}}_{{metric}}_{{stat}}' }}'
+      ref_no: 1
       {% endfor %}
+    alert_config:
+      priority: P4
+      message: 'Request FirstByteLatency for S3'
+      rule:
+        for_duration: 5m
+        evaluate_every: 10s
+      condition_query:
+      - OR,avg,1,now,5m,gt,5
