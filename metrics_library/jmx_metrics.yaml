@@ -10,47 +10,39 @@ panels:
     targets:
       {% for dimension in data %}
       - metric: sum by (instance) ((jvm_memory_bytes_used{job=~"{{ dimension.job }}",area="heap"})*100)/(sum by (instance) (jvm_memory_bytes_max{job=~"{{ dimension.job }}",area="heap"}))
-        legend:
+        legend: '{{ '{{instance}}' }}'
+        ref_no: 1
       {% endfor %}
+    labelY1: Utilization
+    formatY1: percent
     alert_config:
       priority: P3
       message: 'Heap Memory is High'
       rule:
         for_duration: 10m
         evaluate_every: 1m
-      conditions:
-        - evaluator_params: 90
-          evaluator_type: gt
-          operator_type: and
-          query_ref_id: A # it is according to sequence
-          query_time_end: now
-          query_time_start: 5m
-          reducer_params: []
-          reducer_type: avg
+      condition_query:
+        - OR,avg,1,now,5m,gt,90
 
-  - title: (U) Non Heap Utilized
+  - title: (U) Total Memory Utilization
     type: Graph
-    description: Non Heap Utilized percentage for each instance
+    description: Total Memory Utilization percentage for each instance
     targets:
       {% for dimension in data %}
-      - metric: sum by (instance) ((jvm_memory_bytes_used{job=~"{{ dimension.job }}",area="nonheap"})*100)/(sum by (instance) (jvm_memory_bytes_max{job=~"{{ dimension.job }}",area="nonheap"}))
-        legend:
+      - metric: sum by (instance) ((jvm_memory_bytes_used{job=~"{{ dimension.job }}"})*100)/(sum by (instance) (java_lang_OperatingSystem_TotalPhysicalMemorySize{job=~"{{ dimension.job }}"}))
+        legend: '{{ '{{instance}}' }}'
+        ref_no: 1
       {% endfor %}
+    labelY1: Utilization
+    formatY1: percent
     alert_config:
       priority: P3
-      message: 'Non Heap Memory is High'
+      message: 'Total Memory Utilization is High'
       rule:
         for_duration: 10m
         evaluate_every: 1m
-      conditions:
-        - evaluator_params: 90
-          evaluator_type: gt
-          operator_type: and
-          query_ref_id: A # it is according to sequence
-          query_time_end: now
-          query_time_start: 5m
-          reducer_params: []
-          reducer_type: avg
+      condition_query:
+        - OR,avg,1,now,5m,gt,90
 
   - title: (U) User Threads Count
     type: Graph
@@ -82,6 +74,27 @@ panels:
       - metric: process_open_fds{job="{{ dimension.job }}"}
         legend: '{{ '{{instance}}' }}'
       {% endfor %}
+
+
+  - title: (S) File Descriptors Percentage
+    type: Graph
+    description: open file descriptors Percentage
+    targets:
+      {% for dimension in data %}
+      - metric: sum by (instance) ((process_open_fds{job="{{ dimension.job }}"})*100)/(sum by (instance) (process_max_fds{job="{{ dimension.job }}"}))
+        legend: '{{ '{{instance}}' }}'
+        ref_no: 1
+      {% endfor %}
+    labelY1: Utilization
+    formatY1: percent
+    alert_config:
+      priority: P3
+      message: 'File Descriptors Percentage is High'
+      rule:
+        for_duration: 10m
+        evaluate_every: 1m
+      condition_query:
+        - OR,avg,1,now,5m,gt,10
 
   - title: (E) DeadLock Threads Count
     type: Graph

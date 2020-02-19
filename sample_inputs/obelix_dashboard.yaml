@@ -1,6 +1,7 @@
 ---
 title: LM-Obelix
 alert_channels: ["LM-Opsgenie"]
+service: Obelix
 environment: Prod
 description: Dashboard for monitoring all the components used in Obelix service
 references:

@@ -4,7 +4,7 @@ description: Provide a reliable solution for mysql rds
 panels:
   - title: (U) CPU Utilization Percentage
     type: Graph
-    description:
+    description: The percentage of CPU utilization.
     targets:
       {% for dimension in data %}
     - dimensions: {"DBInstanceIdentifier": {{ dimension.db_instance_identifier }}}
@@ -12,11 +12,22 @@ panels:
       namespace: AWS/RDS
       statistic: Maximum
       alias: '{{ '{{DBInstanceIdentifier}}_{{metric}}_{{stat}}' }}'
+      ref_no: 1
       {% endfor %}
+    labelY1: Utilization
+    formatY1: percent
+    alert_config:
+      priority: P3
+      message: 'CPU Utilisation is High'
+      rule:
+        for_duration: 10m
+        evaluate_every: 1m
+      condition_query:
+        - OR,avg,1,now,5m,gt,75
 
   - title: (U) Database Connection Count
     type: Graph
-    description:
+    description: The number of database connections in use
     targets:
       {% for dimension in data %}
     - dimensions: {"DBInstanceIdentifier": {{ dimension.db_instance_identifier }}}
@@ -25,10 +36,19 @@ panels:
       statistic: Maximum
       alias: '{{ '{{DBInstanceIdentifier}}_{{metric}}_{{stat}}' }}'
       {% endfor %}
+      ref_no: 1
+    alert_config:
+      priority: P4
+      message: 'Too many database connections'
+      rule:
+        for_duration: 5m
+        evaluate_every: 1m
+      condition_query:
+        - OR,avg,1,now,5m,gt,200
 
   - title: (U) Freeable Memory
     type: Graph
-    description:
+    description: The amount of available random access memory. This metric reports the value of the MemAvailable field of /proc/meminfo)
     targets:
       {% for dimension in data %}
       - dimensions: {"DBInstanceIdentifier": {{ dimension.db_instance_identifier }}}
@@ -37,10 +57,12 @@ panels:
         statistic: Average
         alias: '{{ '{{DBInstanceIdentifier}}_{{metric}}_{{stat}}' }}'
         {% endfor %}
+    labelY1: Freeable Memory
+    formatY1: bytes
 
-  - title: (U) Network Throughput (Bytes)
+  - title: (U) Network Throughput (Bytes/Second)
     type: Graph
-    description:
+    description: The incoming (Receive|Transmit) network traffic on the DB instance, including both customer database traffic and Amazon RDS traffic used for monitoring and replication
     targets:
       {% for dimension in data %}
     - dimensions: {"DBInstanceIdentifier": {{ dimension.db_instance_identifier }}}
@@ -54,27 +76,31 @@ panels:
       statistic: Maximum
       alias: '{{ '{{DBInstanceIdentifier}}_{{metric}}_{{stat}}' }}'
       {% endfor %}
+    labelY1: Throughput(Bytes/Second)
+    formatY1: Bps
 
-  - title: (U) Read/Write IOPS utilisation
+  - title: (U) Read/Write Throughput (Bytes/Second)
     type: Graph
-    description: Read and Write IOPS utilisation
+    description: The average number of bytes read from/written to disk per second.
     targets:
       {% for dimension in data %}
       - dimensions: {"DBInstanceIdentifier": {{ dimension.db_instance_identifier }}}
-        metric: ReadIOPS
+        metric: ReadThroughput
         namespace: AWS/RDS
         statistic: Maximum
         alias: '{{ '{{DBInstanceIdentifier}}_{{metric}}_{{stat}}' }}'
       - dimensions: {"DBInstanceIdentifier": {{ dimension.db_instance_identifier }}}
-        metric: WriteIOPS
+        metric: WriteThroughput
         namespace: AWS/RDS
         statistic: Maximum
         alias: '{{ '{{DBInstanceIdentifier}}_{{metric}}_{{stat}}' }}'
       {% endfor %}
+    labelY1: Throughput
+    formatY1: Bps
 
   - title: (U) Free Storage Space
     type: Graph
-    description:
+    description: The amount of available storage space
     targets:
       {% for dimension in data %}
       - dimensions: {"DBInstanceIdentifier": {{ dimension.db_instance_identifier }}}
@@ -82,11 +108,22 @@ panels:
         namespace: AWS/RDS
         statistic: Minimum
         alias: '{{ '{{DBInstanceIdentifier}}_{{metric}}_{{stat}}' }}'
+        ref_no: 1
         {% endfor %}
+    labelY1: Free Space
+    formatY1: bytes
+    alert_config:
+      priority: P3
+      message: 'Free Storage Space is Low'
+      rule:
+        for_duration: 5m
+        evaluate_every: 1m
+      condition_query:
+        - OR,min,1,now,5m,lt,50*1024*1024*1024
 
   - title: (S) Disk Queue Depth
     type: Graph
-    description:
+    description: The number of outstanding IOs (read/write requests) waiting to access the disk.
     targets:
       {% for dimension in data %}
       - dimensions: {"DBInstanceIdentifier": {{ dimension.db_instance_identifier }}}
@@ -98,7 +135,7 @@ panels:
 
   - title: (D) Read/Write latency
     type: Graph
-    description: Read and Write latency
+    description: The maximum amount of time taken per disk read/write I/O operation.
     targets:
       {% for dimension in data %}
       - dimensions: {"DBInstanceIdentifier": {{ dimension.db_instance_identifier }}}
@@ -112,10 +149,12 @@ panels:
         statistic: Maximum
         alias: '{{ '{{DBInstanceIdentifier}}_{{metric}}_{{stat}}' }}'
       {% endfor %}
+    labelY1: seconds
+    formatY1: s
 
   - title: (D) Replication Lag (Only for read replicas)
     type: Graph
-    description:
+    description: The max amount of time a Read Replica DB instance lags behind the source DB instance.
     targets:
       {% for dimension in data %}
       - dimensions: {"DBInstanceIdentifier": {{ dimension.db_instance_identifier }}}
@@ -123,11 +162,22 @@ panels:
         namespace: AWS/RDS
         statistic: Maximum
         alias: '{{ '{{DBInstanceIdentifier}}_{{metric}}_{{stat}}' }}'
+        ref_no: 1
         {% endfor %}
+    labelY1: seconds
+    formatY1: s
+    alert_config:
+      priority: P4
+      message: 'Replication Lag is High'
+      rule:
+        for_duration: 5m
+        evaluate_every: 1m
+      condition_query:
+        - OR,min,1,now,5m,gt,10
 
   - title: (D) Slow Query Count
     type: Graph
-    description:
+    description:  No of slow queries
     targets:
       {% for dimension in data %}
       - dimensions: {}
@@ -138,7 +188,7 @@ panels:
 
   - title: (E) Replication error count (Only for read replica)
     type: Graph
-    description:
+    description: Replication related errors from logs (Custom Metric)
     targets:
       {% for dimension in data %}
       - dimensions: {}
