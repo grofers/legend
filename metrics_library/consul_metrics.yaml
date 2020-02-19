@@ -9,23 +9,17 @@ panels:
       {% for dimension in data %}
       - metric: rate(consul_raft_commitTime_sum{region="{{ dimension.region }}"}[5m])/rate(consul_raft_commitTime_count{region="{{ dimension.region }}"}[5m])
         legend: raft_commit_latency
+        ref_no: 1
       {% endfor %}
-    formatY1: milliseconds (ms)
+    formatY1: ms
     alert_config:
-      priority: P3
+      priority: P4
       message: High Raft Commit Latency
       rule:
         for_duration: 5m
         evaluate_every: 1m
-      conditions:
-        - evaluator_params: 90
-          evaluator_type: gt
-          operator_type: and
-          query_ref_id: A
-          query_time_end: now
-          query_time_start: 5m
-          reducer_params: []
-          reducer_type: avg
+      condition_query:
+        - OR,avg,1,now,5m,gt,90
 
   - title: (R) Consul HTTP Get Rate
     type: Graph
@@ -52,21 +46,16 @@ panels:
       {% for dimension in data %}
       - metric: consul_autopilot_healthy{region="{{ dimension.region }}"}
         legend: autopilot_status
+        ref_no: 1
       {% endfor %}
     alert_config:
       priority: P4
       message: Consul Cluster Unhealthy
       rule:
-        for_duration: 5m
+        for_duration: 2m
         evaluate_every: 1m
-      conditions:
-        - evaluator_params: 1
-          evaluator_type: lt
-          operator_type: and
-          query_ref_id: A
-          query_time_end: now
-          query_time_start: 5m
-          reducer_params: []
+      condition_query:
+        - OR,avg,1,now,5m,lt,1
 
   - title: (E) Consul GC Time
     type: Graph
@@ -76,7 +65,7 @@ panels:
       - metric: consul_runtime_gc_pause_ns{region="{{ dimension.region }}",quantile="0.9"}/1000000000
         legend: '{{ '{{instance}}' }}'
       {% endfor %}
-    formatY1: seconds (s)
+    formatY1: s
 
   - title: (D) Time to KV Apply
     type: Graph
@@ -85,20 +74,14 @@ panels:
       {% for dimension in data %}
       - metric: rate(consul_kvs_apply_sum{region="{{ dimension.region }}"}[5m])/rate(consul_kvs_apply_count{region="{{ dimension.region }}"}[5m])
         legend: kv_apply_time
+        ref_no: 1
       {% endfor %}
-    formatY1: milliseconds (ms)
+    formatY1: ms
     alert_config:
       priority: P3
       message: High KV Apply Latency
       rule:
         for_duration: 5m
         evaluate_every: 1m
-      conditions:
-        - evaluator_params: 90
-          evaluator_type: gt
-          operator_type: and
-          query_ref_id: A
-          query_time_end: now
-          query_time_start: 5m
-          reducer_params: []
-          reducer_type: avg
+      condition_query:
+        - OR,avg,1,now,5m,gt,90
