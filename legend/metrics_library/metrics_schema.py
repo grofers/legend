@@ -61,6 +61,11 @@ consul_schema = {
         'region': {'type': 'string', 'required': True},
     }}}}
 
+vault_schema = {
+    'dimensions': {'type': 'list', 'schema': {'type': 'dict', 'schema': {
+        'environment': {'type': 'string', 'required': True},
+    }}}}
+
 promtail_schema = {
     'dimensions': {'type': 'list', 'schema': {'type': 'dict', 'schema': {
         # Desc about the metric

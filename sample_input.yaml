@@ -83,3 +83,6 @@ components:
   haproxy:
     dimensions:
       - backend: consul_prod
+  vault:
+    dimensions:
+      - environment: prod

@@ -1,0 +1,24 @@
+---
+title: Vault
+service: Vault
+grafana_folder: TestRELegend
+alert_channels: ["Infrastructure-opsgenie"]
+environment: Prod
+description: Secret management tool from hashicorp
+references:
+  deployment: https://github.com/grofers/ansible-role-hashicorp-vault
+  documentation: https://www.vaultproject.io/docs/
+  metrics_definition: https://www.vaultproject.io/docs/configuration/telemetry/
+tags:
+- prod
+- infra
+components:
+  vault:
+    dimensions:
+      - environment: prod
+  platform_ec2:
+    dimensions:
+      - host: vault.*.ap-southeast-1.*
+  elb:
+    dimensions:
+      - load_balancer_name: stage-infra-vault
