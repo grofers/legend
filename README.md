@@ -37,7 +37,7 @@ mkvirtualenv -p /usr/local/bin/python3 legend
 
 Install requirements from requirements.txt
 ```
-pip3 install -r requirements.txt
+pip install -e .
 ```
 
 Set GRAFANA_API_KEY in ENV
@@ -50,7 +50,7 @@ echo 'export GRAFANA_API_KEY="<your_grafana_key>"' >> ~/.zshrc # only if you hav
 Run the following command with a dashboard template to generate the dashboard JSON -
 
 ```
-python main.py -f sample_input.yaml 
+GRAFANA_API_KEY=<your-grafana-key> legend -f sample_input.yaml
 ```
 
 This output of the above command will be saved to `dashboard.json`. This JSON file can be imported the into Grafana to create your dashboard.
