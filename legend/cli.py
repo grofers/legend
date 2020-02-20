@@ -3,11 +3,14 @@
 import argparse
 import os
 
-from .legend import template_builder
-from .legend import generate_dashboard_from_jsonnet
+from .legend import create_dashboard
 
 
 from .helpers.utilities import input_yaml_to_json
+
+GRAFANA_API_KEY = os.environ['GRAFANA_API_KEY']
+GRAFANA_HOST = os.environ['GRAFANA_HOST']
+GRAFANA_PROTOCOL = os.environ['GRAFANA_PROTOCOL']
 
 
 def main():
@@ -24,15 +27,9 @@ def main():
         raise Exception("Unable to find the file")
 
     input = input_yaml_to_json(input_file)
-    jsonnet = template_builder(input)
+    print(create_dashboard(GRAFANA_API_KEY, GRAFANA_HOST, GRAFANA_PROTOCOL,
+                           input))
 
-    jsonnet_path = 'output.jsonnet'
-    with open('output.jsonnet', 'w') as f:
-        f.write(jsonnet)
-
-    dashboard_json = generate_dashboard_from_jsonnet(jsonnet_path)
-    with open('dashboard.json', 'w') as f:
-        f.write(dashboard_json.decode('utf-8'))
 
 if __name__ == '__main__':
     main()

@@ -5,6 +5,9 @@ import os
 import re
 import subprocess
 
+from uuid import uuid4
+
+from grafana_api.grafana_face import GrafanaFace
 
 from .helpers.utilities import (
     assemble_panels_dynamic,
@@ -23,7 +26,7 @@ def convert_to_alnum(st):
     return re.sub(r'\W+', '', st)
 
 
-def template_builder(input_dashboard):
+def render_jsonnet(input):
     panel_dict = {}
 
     if input_dashboard.get('alert_channels'):
@@ -119,3 +122,32 @@ def generate_dashboard_from_jsonnet(path):
     )
 
     return output
+
+
+def generate_dashboard_json(spec):
+    jsonnet = render_jsonnet(spec)
+    jsonnet_tmp_path = os.path.join('/tmp', 'legend-%s.jsonnet' % uuid4())
+
+    with open(jsonnet_tmp_path, 'w') as f:
+        f.write(jsonnet)
+
+    return generate_dashboard_from_jsonnet(jsonnet_tmp_path)
+
+
+def create_or_update_dashboard(auth, host, protocol, spec, id=None):
+    grafana_api = GrafanaFace(auth=auth, host=host, protocol=protocol)
+
+    dashboard_json = generate_dashboard_json(spec)
+    dashboard_dict = dict(dashboard=json.loads(dashboard_json.decode('utf-8')))
+    if id is not None:
+        dashboard_dict['dashboard'].update(id=id)
+        dashboard_dict.update(overwrite=True)
+
+    resp = grafana_api.dashboard.update_dashboard(dashboard_dict)
+    return resp
+
+
+def delete_dashboard(auth, host, protocol, uid):
+    grafana_api = GrafanaFace(auth=auth, host=host, protocol=protocol)
+
+    return grafana_api.dashboard.delete_dashboard(dashboard_uid=uid)
