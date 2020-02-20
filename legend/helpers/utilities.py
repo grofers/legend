@@ -3,7 +3,7 @@ import yaml
 
 from jinja2 import Environment, FileSystemLoader
 
-import helpers.constants
+from ..helpers import constants
 
 
 def input_yaml_to_json(input_file):
@@ -95,8 +95,8 @@ def assemble_panels_dynamic(input_dashboard):
 
 def get_alert_id(alert_channels):
     grafana_notification_channel_uid = []
-    grafana_api_key = helpers.constants.GRAFANA_API_KEY
-    grafana_url = helpers.constants.GRAFANA_URL
+    grafana_api_key = constants.GRAFANA_API_KEY
+    grafana_url = constants.GRAFANA_URL
     api_url = grafana_url + "/alert-notifications/lookup"
     headers = {
         'Authorization': 'Bearer ' + grafana_api_key,

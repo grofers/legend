@@ -1,20 +1,22 @@
 #!/usr/bin/env python
 
-import argparse
 import json
 import os
 import re
 import subprocess
 
 
-from helpers.utilities import (
-        assemble_panels_dynamic,
-        jinja2_to_render,
-        str_yaml_to_json,
-        input_yaml_to_json,
-        get_alert_id,
-        parse_condition_query
+from .helpers.utilities import (
+    assemble_panels_dynamic,
+    jinja2_to_render,
+    str_yaml_to_json,
+    input_yaml_to_json,
+    get_alert_id,
+    parse_condition_query
 )
+
+make_abs_path = lambda d: os.path.join(
+    os.path.dirname(os.path.abspath(__file__)), d)
 
 
 def convert_to_alnum(st):
@@ -33,7 +35,7 @@ def template_builder(input_dashboard):
         panel_dict[component] = []
 
         template_str = jinja2_to_render(
-                'metrics_library',
+                make_abs_path('metrics_library'),
                 '{}_metrics.yaml'.format(component.lower()),
                 data=values.get('dimensions',[])
         )
@@ -62,7 +64,7 @@ def template_builder(input_dashboard):
                 for target in panel['targets']:
                     datasource_str = template['data_source'].lower()
                     render = jinja2_to_render(
-                            'templates/datasource',
+                            make_abs_path('templates/datasource'),
                             '{}.j2'.format(datasource_str),
                             data=target
                     )
@@ -74,7 +76,7 @@ def template_builder(input_dashboard):
                     panel['alert_config']['alert_ids'] = json.dumps(alert_ids)
                     panel['alert_config']['alert_service'] = alert_service
                     alertrender = jinja2_to_render(
-                            'templates/alert',
+                            make_abs_path('templates/alert'),
                             'alert.j2',
                             data=panel['alert_config']
                     )
@@ -86,7 +88,7 @@ def template_builder(input_dashboard):
 
                         for condition in panel['alert_config']['conditions']:
                             conditionrender = jinja2_to_render(
-                                    'templates/alert',
+                                    make_abs_path('templates/alert'),
                                     'alert_condition.j2',
                                     data=condition
                             )
@@ -103,7 +105,9 @@ def template_builder(input_dashboard):
         values['metric'] = templates
 
     input_dashboard['assemble_panels'] = assemble_panels_dynamic(input_dashboard)
-    output = jinja2_to_render('templates', 'output.j2', data=input_dashboard)
+    input_dashboard['grafonnet_path'] = os.environ['GRAFONNET_PATH']
+    output = jinja2_to_render(make_abs_path('templates'), 'output.j2', data=input_dashboard)
+
     return output
 
 
@@ -115,28 +119,3 @@ def generate_dashboard_from_jsonnet(path):
     )
 
     return output
-
-
-if __name__ == '__main__':
-    parser = argparse.ArgumentParser(
-        description='Generate dashboard with pre filled metrics'
-    )
-    parser.add_argument('-f', '--file', dest='input_file',
-                        help='input file', required=True)
-    args = parser.parse_args()
-
-    input_file = args.input_file
-
-    if not os.path.exists(input_file):
-        raise Exception("Unable to find the file")
-
-    input_dashboard = input_yaml_to_json(input_file)
-    jsonnet = template_builder(input_dashboard)
-
-    jsonnet_path = 'output.jsonnet'
-    with open('output.jsonnet', 'w') as f:
-        f.write(jsonnet)
-
-    dashboard_json = generate_dashboard_from_jsonnet(jsonnet_path)
-    with open('dashboard.json', 'w') as f:
-        f.write(dashboard_json.decode('utf-8'))
