@@ -86,6 +86,7 @@ panels:
   - title: (D) Latency over all methods (99th percentile)
     type: Graph
     description: overall latency
+    formatY1: s
     targets:
     {% for dimension in data %}
       - metric: histogram_quantile(0.99, sum(rate(django_http_requests_latency_including_middlewares_seconds_bucket{job=~"{{ dimension.job }}"}[5m])) by (le))

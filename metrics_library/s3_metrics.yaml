@@ -87,7 +87,6 @@ panels:
       namespace: AWS/S3
       statistic: p99
       alias: '{{ '{{BucketName}}_{{metric}}_{{stat}}' }}'
-      ref_no: 1
       {% endfor %}
     alert_config:
       priority: P4
