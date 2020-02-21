@@ -133,10 +133,12 @@ panels:
         {% for master in dimension.masters %}
       - metric: (rate(mysql_global_status_innodb_deadlocks{job=~"{{ master.host }}"}[5m]) or rate(mysql_info_schema_innodb_metrics_lock_lock_deadlocks_total{job=~"{{ master.host }}"}[5m]))
         legend: '{{ '{{job}}' }}'
+        ref_no: 1
         {% endfor %}
         {% for slave in dimension.slaves %}
       - metric: (rate(mysql_global_status_innodb_deadlocks{job=~"{{ slave.host }}"}[5m]) or rate(mysql_info_schema_innodb_metrics_lock_lock_deadlocks_total{job=~"{{ slave.host }}"}[5m]))
         legend: '{{ '{{job}}' }}'
+        ref_no: 2
         {% endfor %}
       {% endfor %}
     alert_config:
