@@ -3,7 +3,7 @@
 import argparse
 import os
 
-from .legend import create_dashboard
+from .legend import create_or_update_dashboard
 
 
 from .helpers.utilities import input_yaml_to_json
@@ -27,8 +27,8 @@ def main():
         raise Exception("Unable to find the file")
 
     input = input_yaml_to_json(input_file)
-    print(create_dashboard(GRAFANA_API_KEY, GRAFANA_HOST, GRAFANA_PROTOCOL,
-                           input))
+    print(create_or_update_dashboard(GRAFANA_API_KEY, GRAFANA_HOST,
+                                     GRAFANA_PROTOCOL, input))
 
 
 if __name__ == '__main__':

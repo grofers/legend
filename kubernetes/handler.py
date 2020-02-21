@@ -18,7 +18,7 @@ logger.setLevel(getattr(logging, LOG_LEVEL))
 
 GRAFANA_API_KEY = os.environ['GRAFANA_API_KEY']
 GRAFANA_HOST = os.environ['GRAFANA_HOST']
-GRAFANA_PROTOCOL = os.environ['GRAFANA_PROTOCOL']
+GRAFANA_PROTOCOL = os.environ.get('GRAFANA_PROTOCOL', 'https')
 
 logger.info(('Starting grafana-dashboards operator to create to manage '
              'Grafana dashboards at %s://%s.'), GRAFANA_PROTOCOL, GRAFANA_HOST)
@@ -55,7 +55,7 @@ def create_handler(spec, name, **kwargs):
     logger.info('Creating new Grafana dashboard: %s', name)
     kopf.info(spec, reason='CreatingDashboard',
               message='Creating new grafana-dashboard.')
-    logger.debug('Got the following keyword args for creaating the object: %s',
+    logger.debug('Got the following keyword args for creating the object: %s',
                  kwargs)
 
     try:

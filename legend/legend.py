@@ -26,7 +26,7 @@ def convert_to_alnum(st):
     return re.sub(r'\W+', '', st)
 
 
-def render_jsonnet(input):
+def generate_jsonnet(input):
     panel_dict = {}
 
     if input_dashboard.get('alert_channels'):
@@ -125,7 +125,7 @@ def generate_dashboard_from_jsonnet(path):
 
 
 def generate_dashboard_json(spec):
-    jsonnet = render_jsonnet(spec)
+    jsonnet = generate_jsonnet(spec)
     jsonnet_tmp_path = os.path.join('/tmp', 'legend-%s.jsonnet' % uuid4())
 
     with open(jsonnet_tmp_path, 'w') as f:
