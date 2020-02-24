@@ -89,12 +89,10 @@ panels:
         {% for master in dimension.masters %}
       - metric: rate(mysql_global_status_slow_queries{job=~"{{ master.host }}"}[5m])
         legend: '{{ '{{job}}' }}'
-        ref_no: 1
         {% endfor %}
         {% for slave in dimension.slaves %}
       - metric: rate(mysql_global_status_slow_queries{job=~"{{ slave.host }}"}[5m])
         legend: '{{ '{{job}}' }}'
-        ref_no: 2
         {% endfor %}
       {% endfor %}
 
