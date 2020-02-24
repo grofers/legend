@@ -23,11 +23,6 @@ Install Jsonnet with brew
 brew install jsonnet
 ```
 
-Clone grafonnet-lib repository to your local
-```
-git clone git@github.com:grafana/grafonnet-lib.git
-```
-
 ### Generate Dashboards
 
 Clone this repository to your local
@@ -43,6 +38,13 @@ mkvirtualenv -p /usr/local/bin/python3 legend
 Install requirements from requirements.txt
 ```
 pip3 install -r requirements.txt
+```
+
+Set GRAFANA_API_KEY in ENV
+```bash
+echo 'export GRAFANA_API_KEY="<your_grafana_key>"' >> ~/.bashrc
+echo 'export GRAFANA_API_KEY="<your_grafana_key>"' >> ~/.bash_profile
+echo 'export GRAFANA_API_KEY="<your_grafana_key>"' >> ~/.zshrc # only if you have zsh
 ```
  
 Run the following command with a dashboard template to generate the dashboard JSON -

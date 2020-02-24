@@ -42,8 +42,8 @@ components:
           for_duration: 1m
           evaluate_every: 10s
         condition_query:
-          - WHEN,avg,1,now,5m,gt,20
-          - AND,avg,2,now,5m,gt,30
+          - OR,avg,1,now,5m,gt,20
+          - OR,avg,2,now,5m,gt,30
     - title: (R) Request Count - Read/Write
       alert_config:
         priority: P2
@@ -52,8 +52,7 @@ components:
           for_duration: 5m
           evaluate_every: 10s
         condition_query:
-          - WHEN,avg,1,now,5m,gt,20
-          - AND,avg,2,now,5m,gt,30
+          - OR,avg,1,now,5m,gt,20
 
   systemcore_ec2:
     dimensions:

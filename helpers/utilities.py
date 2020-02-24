@@ -9,14 +9,14 @@ import helpers.constants
 def input_yaml_to_json(input_file):
     with open(input_file, 'r') as stream:
         try:
-            return yaml.load(stream)
+            return yaml.safe_load(stream)
         except yaml.YAMLError as exc:
             raise Exception(exc)
 
 
-def str_yaml_to_json(str):
+def str_yaml_to_json(st):
     try:
-        return list(yaml.load_all(str))
+        return list(yaml.safe_load_all(st))
     except yaml.YAMLError as exc:
         raise Exception(exc)
 
@@ -45,7 +45,7 @@ def assemble_panels(panels_dict):
                                    + v[i + 1] \
                                    + " { gridPos: { h: 8, w: 12, x: 12, y: " \
                                    + str(n) + " }, }, \n"
-            except IndexError as e:
+            except IndexError:
                 assembled_panels += v[i] + \
                                    "  { gridPos: { h: 8, w: 12, x: 0, y: " + \
                                    str(n) + " }, }, \n"
@@ -53,13 +53,13 @@ def assemble_panels(panels_dict):
 
     return assembled_panels
 
-def assemble_panels_dynamic(input):
+def assemble_panels_dynamic(input_dashboard):
 
     assembled_panels = ''
 
     ri = 0
     r = 0
-    for k, v in input.get('components').items():
+    for _, v in input_dashboard.get('components').items():
         ri += 1
         r += 1
         assembled_panels += "R_" + str(ri) \
@@ -116,7 +116,7 @@ def get_alert_id(alert_channels):
 def parse_condition_query(condition_queries,targets):
     conditions = []
     ref_id_index = 64
-    for t in range(len(targets)):
+    for t,_ in enumerate(targets):
         ref_id_index += 1
         if ref_id_index == ord("Z"):
             ref_id_index = ord("A")
@@ -124,7 +124,6 @@ def parse_condition_query(condition_queries,targets):
             parts = condition_query.split(',')
             if len(parts) != 7:
                 raise Exception('Condition query parameters not complete')
-
             if not int(parts[2]) == targets[t].get('ref_no'):
                 continue
             ref_id = ref_id_index

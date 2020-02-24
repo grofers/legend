@@ -9,7 +9,6 @@ import subprocess
 
 from helpers.utilities import (
         assemble_panels_dynamic,
-        assemble_panels,
         jinja2_to_render,
         str_yaml_to_json,
         input_yaml_to_json,
@@ -18,18 +17,18 @@ from helpers.utilities import (
 )
 
 
-def convert_to_alnum(str):
-    return re.sub(r'\W+', '', str)
+def convert_to_alnum(st):
+    return re.sub(r'\W+', '', st)
 
 
-def template_builder(input):
+def template_builder(input_dashboard):
     panel_dict = {}
 
-    if input.get('alert_channels'):
-        alert_ids = get_alert_id(input['alert_channels'])
-        alert_service = input['service']
+    if input_dashboard.get('alert_channels'):
+        alert_ids = get_alert_id(input_dashboard['alert_channels'])
+        alert_service = input_dashboard['service']
 
-    for component, values in input['components'].items():
+    for component, values in input_dashboard['components'].items():
 
         panel_dict[component] = []
 
@@ -49,8 +48,8 @@ def template_builder(input):
                         if k == 'alert_config':
                             try:
                                 for ak in panel[k].keys():
-                                        tpanel_map[panel['title']][k][ak] = panel[k][ak]
-                            except:
+                                    tpanel_map[panel['title']][k][ak] = panel[k][ak]
+                            except KeyError:
                                 tpanel_map[panel['title']][k] = panel[k]
                         else:
                             tpanel_map[panel['title']][k] = panel[k]
@@ -96,13 +95,15 @@ def template_builder(input):
                         panel['alertrender'] = alertrender
 
         if values.get('hide') is not None:
-            template['hide'] = values.get('hide', None)
+            if len(templates) > 0:
+                templates[0]['hide'] = values.get('hide', None)
         if values.get('panels_in_row') is not None:
-            template['panels_in_row'] = values.get('panels_in_row', None)
+            if len(templates) > 0:
+                templates[0]['panels_in_row'] = values.get('panels_in_row', None)
         values['metric'] = templates
 
-    input['assemble_panels'] = assemble_panels_dynamic(input)
-    output = jinja2_to_render('templates', 'output.j2', data=input)
+    input_dashboard['assemble_panels'] = assemble_panels_dynamic(input_dashboard)
+    output = jinja2_to_render('templates', 'output.j2', data=input_dashboard)
     return output
 
 
@@ -129,8 +130,8 @@ if __name__ == '__main__':
     if not os.path.exists(input_file):
         raise Exception("Unable to find the file")
 
-    input = input_yaml_to_json(input_file)
-    jsonnet = template_builder(input)
+    input_dashboard = input_yaml_to_json(input_file)
+    jsonnet = template_builder(input_dashboard)
 
     jsonnet_path = 'output.jsonnet'
     with open('output.jsonnet', 'w') as f:

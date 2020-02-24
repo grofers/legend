@@ -12,21 +12,25 @@ panels:
       namespace: AWS/S3
       statistic: Sum
       alias: '{{ '{{BucketName}}_{{metric}}_{{stat}}' }}'
+      ref_no: 1
     - dimensions: {"BucketName": {{ dimension.bucket_name }} ,"FilterId": {{ dimension.filter_id }}}
       metric: PostRequests
       namespace: AWS/S3
       statistic: Sum
       alias: '{{ '{{BucketName}}_{{metric}}_{{stat}}' }}'
+      ref_no: 2
     - dimensions: {"BucketName": {{ dimension.bucket_name }} ,"FilterId": {{ dimension.filter_id }}}
       metric: GetRequests
       namespace: AWS/S3
       statistic: Sum
       alias: '{{ '{{BucketName}}_{{metric}}_{{stat}}' }}'
+      ref_no: 3
     - dimensions: {"BucketName": {{ dimension.bucket_name }} ,"FilterId": {{ dimension.filter_id }}}
       metric: AllRequests
       namespace: AWS/S3
       statistic: Sum
       alias: '{{ '{{BucketName}}_{{metric}}_{{stat}}' }}'
+      ref_no: 4
       {% endfor %}
     
   - title: (E) Client Errors - 4xx
