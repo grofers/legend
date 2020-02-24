@@ -1,5 +1,6 @@
 ---
 title: IMS-Testing
+grafana_folder: TestRELegend
 alert_channels: ["YET TO FILL"]
 service: IMS
 environment: Prod

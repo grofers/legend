@@ -144,3 +144,41 @@ def parse_condition_query(condition_queries,targets):
 
 
     return conditions
+
+
+def get_grafana_folder_id(grafana_folder_name):
+    grafana_api_key = constants.GRAFANA_API_KEY
+    grafana_url = constants.GRAFANA_URL
+    api_url = grafana_url + "/api/folders"
+    headers = {
+        'Authorization': 'Bearer ' + grafana_api_key,
+        'Content-Type': 'application/json',
+        'Accept': 'application/json'
+    }
+
+    r = requests.get(api_url, headers=headers)
+    r.raise_for_status()
+    for g_data in r.json():
+        if g_data["title"] == grafana_folder_name:
+            return g_data["id"]
+
+    return None
+
+
+def create_grafana_folder(grafana_folder_name):
+    grafana_api_key = constants.GRAFANA_API_KEY
+    grafana_url = constants.GRAFANA_URL
+    api_url = grafana_url + "/api/folders"
+    headers = {
+        'Authorization': 'Bearer ' + grafana_api_key,
+        'Content-Type': 'application/json',
+        'Accept': 'application/json'
+    }
+    data = {
+        "title": grafana_folder_name
+    }
+
+    r = requests.post(api_url, headers=headers, data=data)
+    r.raise_for_status()
+
+    return = r["id"]

@@ -15,7 +15,9 @@ from .helpers.utilities import (
     str_yaml_to_json,
     input_yaml_to_json,
     get_alert_id,
-    parse_condition_query
+    parse_condition_query,
+    get_grafana_folder_id,
+    create_grafana_folder_id,
 )
 
 make_abs_path = lambda d: os.path.join(
@@ -138,9 +140,16 @@ def create_or_update_dashboard(auth, host, protocol, spec, id=None):
     grafana_api = GrafanaFace(auth=auth, host=host, protocol=protocol)
 
     dashboard_json = generate_dashboard_json(spec)
-    dashboard_dict = dict(dashboard=json.loads(dashboard_json.decode('utf-8')))
+
+    # Create dashboard based on the folder
+    grafana_folder = spec['grafana_folder']
+
+    grafana_folder_id = get_grafana_folder_id(grafana_folder)
+    if folder_id is None:
+        grafana_folder_id = create_grafana_folder(grafana_folder)
+
     if id is not None:
-        dashboard_dict['dashboard'].update(id=id)
+        dashboard_dict['dashboard'].update(folderId=grafana_folder_id)
         dashboard_dict.update(overwrite=True)
 
     resp = grafana_api.dashboard.update_dashboard(dashboard_dict)
