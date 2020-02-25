@@ -13,11 +13,10 @@ from .helpers.utilities import (
     assemble_panels_dynamic,
     jinja2_to_render,
     str_yaml_to_json,
-    input_yaml_to_json,
     get_alert_id,
     parse_condition_query,
     get_grafana_folder_id,
-    create_grafana_folder_id,
+    create_grafana_folder,
 )
 
 make_abs_path = lambda d: os.path.join(
@@ -27,12 +26,12 @@ make_abs_path = lambda d: os.path.join(
 def convert_to_alnum(st):
     return re.sub(r'\W+', '', st)
 
-
-def generate_jsonnet(input_dashboard):
+def generate_jsonnet(input_dashboard, GRAFANA_API_KEY, GRAFANA_URL):
     component_description = {}
 
     if input_dashboard.get('alert_channels'):
-        alert_ids = get_alert_id(input_dashboard['alert_channels'])
+        alert_ids = get_alert_id(
+            input_dashboard['alert_channels'], GRAFANA_API_KEY, GRAFANA_URL)
         alert_service = input_dashboard['service']
 
     for component, values in input_dashboard['components'].items():
@@ -116,15 +115,14 @@ def generate_jsonnet(input_dashboard):
 
     input_dashboard['component_desc'] = component_description
     input_dashboard['assemble_panels'] = assemble_panels_dynamic(input_dashboard)
-    input_dashboard['grafonnet_path'] = os.environ['GRAFONNET_PATH']
     output = jinja2_to_render(make_abs_path('templates'), 'output.j2', data=input_dashboard)
 
     return output
 
 
-def generate_dashboard_from_jsonnet(path):
+def generate_dashboard_from_jsonnet(GRAFONNET_LIB, jsonnet_file_path):
     cmd_env_vars = dict(os.environ)
-    exec_command = 'jsonnet -J grafonnet-lib %s' % path
+    exec_command = 'jsonnet -J %s %s' % (GRAFONNET_LIB, jsonnet_file_path)
     output = subprocess.check_output(
         exec_command.split(' '), env=cmd_env_vars
     )
@@ -132,31 +130,38 @@ def generate_dashboard_from_jsonnet(path):
     return output
 
 
-def generate_dashboard_json(spec):
-    jsonnet = generate_jsonnet(spec)
+def generate_dashboard_json(spec, GRAFONNET_LIB, GRAFANA_API_KEY, GRAFANA_URL):
+    jsonnet = generate_jsonnet(spec, GRAFANA_API_KEY, GRAFANA_URL)
     jsonnet_tmp_path = os.path.join('/tmp', 'legend-%s.jsonnet' % uuid4())
 
     with open(jsonnet_tmp_path, 'w') as f:
         f.write(jsonnet)
 
-    return generate_dashboard_from_jsonnet(jsonnet_tmp_path)
+    return json.loads(generate_dashboard_from_jsonnet(GRAFONNET_LIB, jsonnet_tmp_path))
 
 
-def create_or_update_dashboard(auth, host, protocol, spec, id=None):
+def create_or_update_dashboard(auth, host, protocol, spec, GRAFONNET_LIB, dashboard_id=None):
     grafana_api = GrafanaFace(auth=auth, host=host, protocol=protocol)
 
-    dashboard_json = generate_dashboard_json(spec)
+    GRAFANA_API_KEY = auth
+    GRAFANA_URL = '%s://%s' % (protocol, host)
+
+    dashboard_json = generate_dashboard_json(
+        spec, GRAFONNET_LIB, GRAFANA_API_KEY, GRAFANA_URL)
 
     # Create dashboard based on the folder
     grafana_folder = spec['grafana_folder']
 
-    grafana_folder_id = get_grafana_folder_id(grafana_folder)
-    if folder_id is None:
-        grafana_folder_id = create_grafana_folder(grafana_folder)
+    grafana_folder_id = get_grafana_folder_id(
+        grafana_folder, GRAFANA_API_KEY, GRAFANA_URL)
+    if grafana_folder_id is None:
+        grafana_folder_id = create_grafana_folder(
+            grafana_folder, GRAFANA_API_KEY, GRAFANA_URL)
 
-    if id is not None:
-        dashboard_dict['dashboard'].update(folderId=grafana_folder_id)
-        dashboard_dict.update(overwrite=True)
+    dashboard_dict = {}
+    dashboard_dict.update(dashboard=dashboard_json)
+    dashboard_dict.update(folderId=int(grafana_folder_id))
+    dashboard_dict.update(overwrite=True)
 
     resp = grafana_api.dashboard.update_dashboard(dashboard_dict)
     return resp

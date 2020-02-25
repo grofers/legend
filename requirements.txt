@@ -4,3 +4,4 @@ requests==2.22.0
 pylint==2.4.4
 prospector==1.2.0
 grafana-api==1.0.0
+configparser==4.0.2

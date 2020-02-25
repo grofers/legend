@@ -40,20 +40,19 @@ Install requirements from requirements.txt
 pip install -e .
 ```
 
-Set GRAFANA_API_KEY in ENV
-```bash
-echo 'export GRAFANA_API_KEY="<your_grafana_key>"' >> ~/.bashrc
-echo 'export GRAFANA_API_KEY="<your_grafana_key>"' >> ~/.bash_profile
-echo 'export GRAFANA_API_KEY="<your_grafana_key>"' >> ~/.zshrc # only if you have zsh
+Set the grafana configurations in `legend.cfg`
 ```
+legend -f sample_input.yaml
+```
+
+OR
  
 Run the following command with a dashboard template to generate the dashboard JSON -
 
 ```
-GRAFANA_API_KEY=<your-grafana-key> GRAFANA_HOST=grafana.grofers.com GRAFANA_PROTOCOL=https GRAFONNET_PATH=<path-to-grafonnet> legend -f sample_input.yaml
+GRAFANA_API_KEY=<your-grafana-key> GRAFANA_HOST=grafana.grofers.com GRAFANA_PROTOCOL=https GRAFONNET_LIB=<path-to-grafonnet-lib> legend -f sample_input.yaml
 ```
 
-This output of the above command will be saved to `dashboard.json`. This JSON file can be imported the into Grafana to create your dashboard.
 
 ### Generate Dashboards via Kubernetes
 

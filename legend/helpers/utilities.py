@@ -3,7 +3,7 @@ import yaml
 
 from jinja2 import Environment, FileSystemLoader
 
-from ..helpers import constants
+# from ..helpers import constants
 
 
 def input_yaml_to_json(input_file):
@@ -53,6 +53,7 @@ def assemble_panels(panels_dict):
 
     return assembled_panels
 
+
 def assemble_panels_dynamic(input_dashboard):
 
     assembled_panels = ''
@@ -93,13 +94,11 @@ def assemble_panels_dynamic(input_dashboard):
     return assembled_panels
 
 
-def get_alert_id(alert_channels):
+def get_alert_id(alert_channels, GRAFANA_API_KEY, GRAFANA_URL):
     grafana_notification_channel_uid = []
-    grafana_api_key = constants.GRAFANA_API_KEY
-    grafana_url = constants.GRAFANA_URL
-    api_url = grafana_url + "/alert-notifications/lookup"
+    api_url = GRAFANA_URL + "/api/alert-notifications/lookup"
     headers = {
-        'Authorization': 'Bearer ' + grafana_api_key,
+        'Authorization': 'Bearer ' + GRAFANA_API_KEY,
         'Content-Type': 'application/json',
         'Accept': 'application/json'
     }
@@ -113,7 +112,7 @@ def get_alert_id(alert_channels):
     return (grafana_notification_channel_uid)
 
 
-def parse_condition_query(condition_queries,targets):
+def parse_condition_query(condition_queries, targets):
     conditions = []
     ref_id_index = 64
     for t,_ in enumerate(targets):
@@ -146,12 +145,10 @@ def parse_condition_query(condition_queries,targets):
     return conditions
 
 
-def get_grafana_folder_id(grafana_folder_name):
-    grafana_api_key = constants.GRAFANA_API_KEY
-    grafana_url = constants.GRAFANA_URL
-    api_url = grafana_url + "/api/folders"
+def get_grafana_folder_id(grafana_folder_name, GRAFANA_API_KEY, GRAFANA_URL):
+    api_url = GRAFANA_URL + "/api/folders"
     headers = {
-        'Authorization': 'Bearer ' + grafana_api_key,
+        'Authorization': 'Bearer ' + GRAFANA_API_KEY,
         'Content-Type': 'application/json',
         'Accept': 'application/json'
     }
@@ -160,17 +157,15 @@ def get_grafana_folder_id(grafana_folder_name):
     r.raise_for_status()
     for g_data in r.json():
         if g_data["title"] == grafana_folder_name:
-            return g_data["id"]
+            return int(g_data["id"])
 
     return None
 
 
-def create_grafana_folder(grafana_folder_name):
-    grafana_api_key = constants.GRAFANA_API_KEY
-    grafana_url = constants.GRAFANA_URL
-    api_url = grafana_url + "/api/folders"
+def create_grafana_folder(grafana_folder_name, GRAFANA_API_KEY, GRAFANA_URL):
+    api_url = GRAFANA_URL + "/api/folders"
     headers = {
-        'Authorization': 'Bearer ' + grafana_api_key,
+        'Authorization': 'Bearer ' + GRAFANA_API_KEY,
         'Content-Type': 'application/json',
         'Accept': 'application/json'
     }
@@ -181,4 +176,4 @@ def create_grafana_folder(grafana_folder_name):
     r = requests.post(api_url, headers=headers, data=data)
     r.raise_for_status()
 
-    return = r["id"]
+    return (r["id"])

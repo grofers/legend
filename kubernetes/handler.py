@@ -32,12 +32,12 @@ if DEV:
 def create_or_update_handler(spec, name, **kwargs):
     body = kwargs['body']
     spec = body['spec']
-    id = None
+    dashboard_id = None
     if 'status' in body:
-        id = body['status']['create_handler']['id']
+        dashboard_id = body['status']['create_handler']['id']
 
     resp = legend.create_or_update_dashboard(GRAFANA_API_KEY, GRAFANA_HOST,
-                                             GRAFANA_PROTOCOL, spec, id)
+                                             GRAFANA_PROTOCOL, spec, dashboard_id)
     grafana_url = urljoin('%s://%s' % (GRAFANA_PROTOCOL, GRAFANA_HOST),
                           resp['url'])
     logger.debug(resp)
