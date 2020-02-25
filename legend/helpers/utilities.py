@@ -1,5 +1,6 @@
 import requests
 import yaml
+import os
 
 from jinja2 import Environment, FileSystemLoader
 
@@ -177,3 +178,8 @@ def create_grafana_folder(grafana_folder_name, GRAFANA_API_KEY, GRAFANA_URL):
     r.raise_for_status()
 
     return (r["id"])
+
+
+def mkdir(path):
+    if not os.path.isdir(path):
+        os.makedirs(path)

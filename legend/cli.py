@@ -6,11 +6,13 @@ import configparser
 
 from .legend import create_or_update_dashboard
 
-
-from .helpers.utilities import input_yaml_to_json
+from .helpers.utilities import (
+    input_yaml_to_json
+)
 
 
 def main():
+
     parser = argparse.ArgumentParser(
         description='Generate dashboard with pre filled metrics'
     )
@@ -35,7 +37,6 @@ def main():
         GRAFANA_API_KEY = config.get('grafana', 'api_key')
         GRAFANA_PROTOCOL = config.get('grafana', 'protocol')
         GRAFANA_HOST = config.get('grafana', 'host')
-        GRAFONNET_LIB = config.get('grafonnet-lib', 'grafonnet_lib')
 
     if os.environ.get('GRAFANA_API_KEY') is not None:
         GRAFANA_API_KEY = os.environ['GRAFANA_API_KEY']
@@ -43,12 +44,10 @@ def main():
         GRAFANA_HOST = os.environ['GRAFANA_HOST']
     if os.environ.get('GRAFANA_PROTOCOL') is not None:
         GRAFANA_PROTOCOL = os.environ['GRAFANA_PROTOCOL']
-    if os.environ.get('GRAFONNET_LIB') is not None:
-        GRAFONNET_LIB = os.environ['GRAFONNET_LIB']
 
     spec = input_yaml_to_json(input_file)
     print(create_or_update_dashboard(GRAFANA_API_KEY, GRAFANA_HOST,
-                                     GRAFANA_PROTOCOL, spec, GRAFONNET_LIB))
+                                     GRAFANA_PROTOCOL, spec))
 
 
 if __name__ == '__main__':

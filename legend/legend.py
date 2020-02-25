@@ -4,6 +4,7 @@ import json
 import os
 import re
 import subprocess
+from git import Repo
 
 from uuid import uuid4
 
@@ -17,14 +18,46 @@ from .helpers.utilities import (
     parse_condition_query,
     get_grafana_folder_id,
     create_grafana_folder,
+    mkdir
 )
+
+from . import (
+    LEGEND_HOME,
+    GRAFONNET_REPO_URL,
+    GRAFONNET_REPO_NAME
+)
+
 
 make_abs_path = lambda d: os.path.join(
     os.path.dirname(os.path.abspath(__file__)), d)
 
 
+def install_grafonnet_lib():
+    legend_path = os.path.join(LEGEND_HOME)
+    mkdir(legend_path)
+    grafonnet_repo = os.path.join(
+        LEGEND_HOME, GRAFONNET_REPO_NAME)
+    grafonnet_path = os.path.join(
+        LEGEND_HOME, GRAFONNET_REPO_NAME)
+    if not os.path.isdir(grafonnet_path):
+        try:
+            repo = Repo.clone_from(GRAFONNET_REPO_URL, grafonnet_path)
+        except Exception:
+            raise ValueError("Error cloning grafonnet-lib folder from GitHub")
+    else:
+        try:
+            # Update from master
+            repo = Repo(grafonnet_path)
+            repo.heads.master.checkout()
+            repo.git.pull("origin", "master")
+        except Exception:
+            raise ValueError("Not a valid git repo/unable to pull master")
+    pass
+
+
 def convert_to_alnum(st):
     return re.sub(r'\W+', '', st)
+
 
 def generate_jsonnet(input_dashboard, GRAFANA_API_KEY, GRAFANA_URL):
     component_description = {}
@@ -120,9 +153,10 @@ def generate_jsonnet(input_dashboard, GRAFANA_API_KEY, GRAFANA_URL):
     return output
 
 
-def generate_dashboard_from_jsonnet(GRAFONNET_LIB, jsonnet_file_path):
+def generate_dashboard_from_jsonnet(jsonnet_file_path):
     cmd_env_vars = dict(os.environ)
-    exec_command = 'jsonnet -J %s %s' % (GRAFONNET_LIB, jsonnet_file_path)
+    grafonnet_lib = os.path.join(LEGEND_HOME, GRAFONNET_REPO_NAME)
+    exec_command = 'jsonnet -J %s %s' % (grafonnet_lib, jsonnet_file_path)
     output = subprocess.check_output(
         exec_command.split(' '), env=cmd_env_vars
     )
@@ -130,24 +164,25 @@ def generate_dashboard_from_jsonnet(GRAFONNET_LIB, jsonnet_file_path):
     return output
 
 
-def generate_dashboard_json(spec, GRAFONNET_LIB, GRAFANA_API_KEY, GRAFANA_URL):
+def generate_dashboard_json(spec, GRAFANA_API_KEY, GRAFANA_URL):
     jsonnet = generate_jsonnet(spec, GRAFANA_API_KEY, GRAFANA_URL)
     jsonnet_tmp_path = os.path.join('/tmp', 'legend-%s.jsonnet' % uuid4())
 
     with open(jsonnet_tmp_path, 'w') as f:
         f.write(jsonnet)
 
-    return json.loads(generate_dashboard_from_jsonnet(GRAFONNET_LIB, jsonnet_tmp_path))
+    return json.loads(generate_dashboard_from_jsonnet(jsonnet_tmp_path))
 
 
-def create_or_update_dashboard(auth, host, protocol, spec, GRAFONNET_LIB, dashboard_id=None):
+def create_or_update_dashboard(auth, host, protocol, spec, dashboard_id=None):
+    install_grafonnet_lib()
     grafana_api = GrafanaFace(auth=auth, host=host, protocol=protocol)
 
     GRAFANA_API_KEY = auth
     GRAFANA_URL = '%s://%s' % (protocol, host)
 
     dashboard_json = generate_dashboard_json(
-        spec, GRAFONNET_LIB, GRAFANA_API_KEY, GRAFANA_URL)
+        spec, GRAFANA_API_KEY, GRAFANA_URL)
 
     # Create dashboard based on the folder
     grafana_folder = spec['grafana_folder']

@@ -29,6 +29,10 @@ Clone this repository to your local
 ```
 git clone git@github.com:grofers/legend.git
 ```
+Legend Home
+Legend is dependent upon grafonnet-lib, which is clones in the `LEGEND_HOME`
+The default `LEGEND_HOME` is the `~/.legend` for user, you can alter it by setting it as environment variable
+If you want to use an other version of grafonnet-lib, you can set that folder to be in the path of `LEGEND_HOME`
 
 Create a python3 virtualenv
 ```
@@ -50,7 +54,7 @@ OR
 Run the following command with a dashboard template to generate the dashboard JSON -
 
 ```
-GRAFANA_API_KEY=<your-grafana-key> GRAFANA_HOST=grafana.grofers.com GRAFANA_PROTOCOL=https GRAFONNET_LIB=<path-to-grafonnet-lib> legend -f sample_input.yaml
+GRAFANA_API_KEY=<your-grafana-key> GRAFANA_HOST=grafana.grofers.com GRAFANA_PROTOCOL=https legend -f sample_input.yaml
 ```
 
 
