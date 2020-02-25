@@ -1,3 +1,4 @@
+component: pgsql
 data_source: Cloudwatch
 reference: https://aws.amazon.com/rds/postgresql/
 description: USE-RED metrics for Postgres RDS

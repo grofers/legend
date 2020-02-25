@@ -1,3 +1,4 @@
+component: mysql_56_rds
 data_source: Cloudwatch
 reference: https://aws.amazon.com/rds/mysql/
 description: Provide a reliable solution for mysql rds
