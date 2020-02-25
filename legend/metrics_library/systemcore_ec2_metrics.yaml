@@ -1,3 +1,4 @@
+component: systemcore_ec2
 data_source: InfluxDB
 reference: https://www.slideshare.net/OpsStack/how-to-monitoring-the-sre-golden-signals-ebook/
 description: System core metrics 

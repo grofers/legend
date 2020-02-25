@@ -1,3 +1,4 @@
+component: elb
 data_source: Cloudwatch
 reference: https://docs.aws.amazon.com/elasticloadbalancing/latest/classic/elb-cloudwatch-metrics.html#loadbalancing-metrics-clb
 description: Provide a reliable solution for load balancing - AWS ELB

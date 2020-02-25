@@ -28,16 +28,14 @@ def convert_to_alnum(st):
     return re.sub(r'\W+', '', st)
 
 
-def generate_jsonnet(input):
-    panel_dict = {}
+def generate_jsonnet(input_dashboard):
+    component_description = {}
 
     if input_dashboard.get('alert_channels'):
         alert_ids = get_alert_id(input_dashboard['alert_channels'])
         alert_service = input_dashboard['service']
 
     for component, values in input_dashboard['components'].items():
-
-        panel_dict[component] = []
 
         template_str = jinja2_to_render(
                 make_abs_path('metrics_library'),
@@ -48,6 +46,14 @@ def generate_jsonnet(input):
 
         # Adding custom panels and adding custom alerts
         for template in templates:
+
+            component_name = component
+            if template.get('component') is not None:
+                component_name = template.get('component')
+            if component_description.get(component_name) is None:
+                component_description[component_name] = {'reference': template.get('reference', ''),
+                                                         'description': template.get('description', '')}
+
             tpanel_map = {x['title']: x for x in template['panels']}
             for panel in values.get('panels', []):
                 if panel['title'] in tpanel_map.keys():
@@ -65,7 +71,6 @@ def generate_jsonnet(input):
 
             for panel in template['panels']:
                 panel['title_var'] = convert_to_alnum(panel['title'])
-                panel_dict[component].append(panel['title_var'])
                 for target in panel['targets']:
                     datasource_str = template['data_source'].lower()
                     render = jinja2_to_render(
@@ -109,6 +114,7 @@ def generate_jsonnet(input):
                 templates[0]['panels_in_row'] = values.get('panels_in_row', None)
         values['metric'] = templates
 
+    input_dashboard['component_desc'] = component_description
     input_dashboard['assemble_panels'] = assemble_panels_dynamic(input_dashboard)
     input_dashboard['grafonnet_path'] = os.environ['GRAFONNET_PATH']
     output = jinja2_to_render(make_abs_path('templates'), 'output.j2', data=input_dashboard)

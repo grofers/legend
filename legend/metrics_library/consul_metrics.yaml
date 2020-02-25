@@ -1,3 +1,4 @@
+component: consul
 data_source: Prometheus
 reference: https://www.consul.io/docs/agent/telemetry.html
 description: Provides service discovery and KV store

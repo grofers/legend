@@ -1,3 +1,4 @@
+component: redis
 data_source: Prometheus
 reference: https://redis.io/documentation
 description: Redis is an in-memory data structure project implementing a distributed, in-memory key-value database with optional durability

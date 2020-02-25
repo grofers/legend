@@ -1,3 +1,4 @@
+component: s3
 data_source: Cloudwatch
 reference: https://aws.amazon.com/s3/
 description: Provide a reliable solution for object level storage. 

@@ -1,3 +1,4 @@
+component: sqs
 data_source: Cloudwatch
 reference: https://aws.amazon.com/sqs/
 description: Amazon Simple Queue Service (SQS) is a fully managed message queuing service

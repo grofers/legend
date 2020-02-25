@@ -1,3 +1,4 @@
+component: mysql_ec2
 data_source: Prometheus
 reference: https://www.percona.com/doc/percona-monitoring-and-management/index.metrics-monitor.dashboard.html#pmm-dashboard-mysql-list
 description: Percona Monitored MySQL EC2 Instances

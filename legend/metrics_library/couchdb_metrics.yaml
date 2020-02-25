@@ -1,3 +1,4 @@
+component: couchdb
 data_source: Prometheus
 reference: https://couchdb.apache.org/
 description: A CouchDB server hosts named databases, which store documents. Each document is uniquely named in the database, and CouchDB provides a RESTful HTTP API for reading and updating (add, edit, delete) database documents.
