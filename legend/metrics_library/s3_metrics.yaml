@@ -1,11 +1,11 @@
 component: s3
 data_source: Cloudwatch
 reference: https://aws.amazon.com/s3/
-description: Provide a reliable solution for object level storage. 
+description: Provide a reliable solution for object level storage.
 panels:
   - title: (R) Request Count - Read/Write
     type: Graph
-    description: The number of HTTP GET requests made for objects in an Amazon S3 bucket. This doesn't include list operations. The number of HTTP PUT requests made for objects in an Amazon S3 bucket. 
+    description: The number of HTTP GET requests made for objects in an Amazon S3 bucket. This doesn\'t include list operations. The number of HTTP PUT requests made for objects in an Amazon S3 bucket.
     targets:
       {% for dimension in data %}
     - dimensions: {"BucketName": {{ dimension.bucket_name }} ,"FilterId": {{ dimension.filter_id }}}
