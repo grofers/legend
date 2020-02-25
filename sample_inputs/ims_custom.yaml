@@ -1,0 +1,82 @@
+---
+title: IMS-CUSTOM
+grafana_folder: TestRELegend
+alert_channels: ["YET TO FILL"]
+service: IMS
+environment: Prod
+description: IMS service handles the inventory for retail outlets and business logic dependent on the inventory. It sends inventory and prices updates to CMS for inventory and offers.
+references:
+  - deployment: https://github.com/grofers/retail_ims/blob/master/README.md
+  - documentation: https://github.com/grofers/retail_ims/blob/master/README.md
+  - metrics definition: https://github.com/grofers/retail_ims/blob/master/README.md
+tags:
+  - prod
+  - warehouse
+  - wh
+  - retail
+
+components:
+  elb:
+    panels_in_row: 2
+    dimensions:
+      - load_balancer_name: ims-retail-https
+  django:
+    dimensions:
+      - job: ims-django-metrics
+    panels:
+      - title: (R) [IMP] Rate of requests per API
+        type: Graph
+        description: qps per API
+        targets:
+          - metric: sum(rate(django_http_requests_total_by_view_transport_method_total{job=~"ims-django-metrics",view=~"ims.views.inventory.inventory_log",method=~"POST"}[5m])) by (view,method)
+            legend: '{{method}} - {{view}}'
+            ref_no: 1
+          - metric: sum(rate(django_http_requests_total_by_view_transport_method_total{job=~"ims-django-metrics",view=~"ims.views.cms_update.update_item_inventory_to_cms",method=~"POST"}[5m])) by (view,method)
+            legend: '{{method}} - {{view}}'
+            ref_no: 1
+          - metric: sum(rate(django_http_requests_total_by_view_transport_method_total{job=~"ims-django-metrics",view=~"ims.views.cms_update.handle_inventory_log_creation",method=~"POST"}[5m])) by (view,method)
+            legend: '{{method}} - {{view}}'
+            ref_no: 1
+    alert_config:
+      priority: P4
+      message: 'Rate has fallen below for [IMP] APIs'
+      rule:
+        for_duration: 15m
+        evaluate_every: 10s
+      condition_query:
+      - OR,avg,1,now,5m,lt,1000
+  sqs:
+    dimensions:
+      - queue_name: pos_upstream_data_log
+        dead_queue_name: pos_upstream_data_log_dead
+  rabbitmq:
+    dimensions:
+      - queue_name: ims_task
+        job: pos-rabbitmq-metrics
+        dead_queue_name:
+  redis:
+    dimensions:
+      - job_name: ims-redis-metrics
+  celery:
+    dimensions:
+      - job_name: pos-celery-metrics
+  mysql_ec2:
+    dimensions:
+      ec2:
+        - host: perconamaster*
+      db:
+        - masters:
+            - host: perconamaster4-mysql-metrics
+              db_name: ims
+          slaves:
+            - host: perconamaster1-mysql-metrics
+              db_name: ims
+            - host: perconamaster5-mysql-metrics
+              db_name: ims
+  systemcore_ec2:
+    dimensions:
+      - host: .*ims.*
+  s3:
+    dimensions:
+    - bucket_name: grofers.retail-bulk-upload
+      filter_id: EntireBucket
