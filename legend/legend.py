@@ -1,27 +1,34 @@
 #!/usr/bin/env python
 
-import argparse
 import json
 import os
 import re
 import subprocess
 
+from uuid import uuid4
 
-from helpers.utilities import (
-        assemble_panels_dynamic,
-        jinja2_to_render,
-        str_yaml_to_json,
-        input_yaml_to_json,
-        get_alert_id,
-        parse_condition_query
+from grafana_api.grafana_face import GrafanaFace
+
+from .helpers.utilities import (
+    assemble_panels_dynamic,
+    jinja2_to_render,
+    str_yaml_to_json,
+    input_yaml_to_json,
+    get_alert_id,
+    parse_condition_query,
+    get_grafana_folder_id,
+    create_grafana_folder_id,
 )
+
+make_abs_path = lambda d: os.path.join(
+    os.path.dirname(os.path.abspath(__file__)), d)
 
 
 def convert_to_alnum(st):
     return re.sub(r'\W+', '', st)
 
 
-def template_builder(input_dashboard):
+def generate_jsonnet(input):
     panel_dict = {}
 
     if input_dashboard.get('alert_channels'):
@@ -33,7 +40,7 @@ def template_builder(input_dashboard):
         panel_dict[component] = []
 
         template_str = jinja2_to_render(
-                'metrics_library',
+                make_abs_path('metrics_library'),
                 '{}_metrics.yaml'.format(component.lower()),
                 data=values.get('dimensions',[])
         )
@@ -62,7 +69,7 @@ def template_builder(input_dashboard):
                 for target in panel['targets']:
                     datasource_str = template['data_source'].lower()
                     render = jinja2_to_render(
-                            'templates/datasource',
+                            make_abs_path('templates/datasource'),
                             '{}.j2'.format(datasource_str),
                             data=target
                     )
@@ -74,7 +81,7 @@ def template_builder(input_dashboard):
                     panel['alert_config']['alert_ids'] = json.dumps(alert_ids)
                     panel['alert_config']['alert_service'] = alert_service
                     alertrender = jinja2_to_render(
-                            'templates/alert',
+                            make_abs_path('templates/alert'),
                             'alert.j2',
                             data=panel['alert_config']
                     )
@@ -86,7 +93,7 @@ def template_builder(input_dashboard):
 
                         for condition in panel['alert_config']['conditions']:
                             conditionrender = jinja2_to_render(
-                                    'templates/alert',
+                                    make_abs_path('templates/alert'),
                                     'alert_condition.j2',
                                     data=condition
                             )
@@ -103,7 +110,9 @@ def template_builder(input_dashboard):
         values['metric'] = templates
 
     input_dashboard['assemble_panels'] = assemble_panels_dynamic(input_dashboard)
-    output = jinja2_to_render('templates', 'output.j2', data=input_dashboard)
+    input_dashboard['grafonnet_path'] = os.environ['GRAFONNET_PATH']
+    output = jinja2_to_render(make_abs_path('templates'), 'output.j2', data=input_dashboard)
+
     return output
 
 
@@ -117,26 +126,37 @@ def generate_dashboard_from_jsonnet(path):
     return output
 
 
-if __name__ == '__main__':
-    parser = argparse.ArgumentParser(
-        description='Generate dashboard with pre filled metrics'
-    )
-    parser.add_argument('-f', '--file', dest='input_file',
-                        help='input file', required=True)
-    args = parser.parse_args()
+def generate_dashboard_json(spec):
+    jsonnet = generate_jsonnet(spec)
+    jsonnet_tmp_path = os.path.join('/tmp', 'legend-%s.jsonnet' % uuid4())
 
-    input_file = args.input_file
-
-    if not os.path.exists(input_file):
-        raise Exception("Unable to find the file")
-
-    input_dashboard = input_yaml_to_json(input_file)
-    jsonnet = template_builder(input_dashboard)
-
-    jsonnet_path = 'output.jsonnet'
-    with open('output.jsonnet', 'w') as f:
+    with open(jsonnet_tmp_path, 'w') as f:
         f.write(jsonnet)
 
-    dashboard_json = generate_dashboard_from_jsonnet(jsonnet_path)
-    with open('dashboard.json', 'w') as f:
-        f.write(dashboard_json.decode('utf-8'))
+    return generate_dashboard_from_jsonnet(jsonnet_tmp_path)
+
+
+def create_or_update_dashboard(auth, host, protocol, spec, id=None):
+    grafana_api = GrafanaFace(auth=auth, host=host, protocol=protocol)
+
+    dashboard_json = generate_dashboard_json(spec)
+
+    # Create dashboard based on the folder
+    grafana_folder = spec['grafana_folder']
+
+    grafana_folder_id = get_grafana_folder_id(grafana_folder)
+    if folder_id is None:
+        grafana_folder_id = create_grafana_folder(grafana_folder)
+
+    if id is not None:
+        dashboard_dict['dashboard'].update(folderId=grafana_folder_id)
+        dashboard_dict.update(overwrite=True)
+
+    resp = grafana_api.dashboard.update_dashboard(dashboard_dict)
+    return resp
+
+
+def delete_dashboard(auth, host, protocol, uid):
+    grafana_api = GrafanaFace(auth=auth, host=host, protocol=protocol)
+
+    return grafana_api.dashboard.delete_dashboard(dashboard_uid=uid)

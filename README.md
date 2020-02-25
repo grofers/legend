@@ -1,4 +1,4 @@
-# Legend
+``# Legend
 
 <p align="center">
   <img src="http://www.desigifs.com/sites/default/files/2013/BalaKrj2.gif" alt="Legend"/>
@@ -37,7 +37,7 @@ mkvirtualenv -p /usr/local/bin/python3 legend
 
 Install requirements from requirements.txt
 ```
-pip3 install -r requirements.txt
+pip install -e .
 ```
 
 Set GRAFANA_API_KEY in ENV
@@ -50,7 +50,49 @@ echo 'export GRAFANA_API_KEY="<your_grafana_key>"' >> ~/.zshrc # only if you hav
 Run the following command with a dashboard template to generate the dashboard JSON -
 
 ```
-python main.py -f sample_input.yaml 
+GRAFANA_API_KEY=<your-grafana-key> GRAFANA_HOST=grafana.grofers.com GRAFANA_PROTOCOL=https GRAFONNET_PATH=<path-to-grafonnet> legend -f sample_input.yaml
 ```
 
 This output of the above command will be saved to `dashboard.json`. This JSON file can be imported the into Grafana to create your dashboard.
+
+### Generate Dashboards via Kubernetes
+
+legend exposes itself as a CRD.
+
+#### Minikube Setup
+
+You can set it up in your minikube for trying out and development:
+
+Start minikube:
+
+```
+minikube start
+```
+
+Start a proxy to minikube in a terminal and leave it open:
+
+```
+kubectl proxy
+```
+
+Setup the development environment:
+
+```
+mkvirtualenv legend
+pip install -e .
+pip install -r kubernetes/requirements.txt
+```
+
+Setup the CRD and start the operator:
+
+```
+cd kubernetes
+kubectl apply -f crd.yaml
+GRAFANA_API_KEY=<your-grafana-key> GRAFANA_HOST=grafana.grofers.com GRAFANA_PROTOCOL=https GRAFONNET_PATH=<path-to-grafonnet> DEV=true LOG_LEVEL=DEBUG kopf run handler.py
+```
+
+Create your dashboard:
+
+```
+kubectl apply -f test/obj.yaml
+```
