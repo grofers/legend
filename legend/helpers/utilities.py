@@ -75,12 +75,12 @@ def assemble_panels_dynamic(input_dashboard):
             elif panels_in_row > 8:
                 panels_in_row = 8
 
-            width = int(24/panels_in_row)
             pi = 0
             while True:
                 r += 1
                 p = 0
                 row_end = min(len(metric.get('panels')), pi + panels_in_row)
+                width = int(24 / (row_end - pi))
                 for rpi in range(pi, row_end):
                     assembled_panels += "R_" + str(ri) + "_" + str(metric_idx+1) + "_P_" + str(rpi+1) \
                                     + " { gridPos: { h: 8, w: "+str(width)+", x: "+str(width*p)+", y: " \

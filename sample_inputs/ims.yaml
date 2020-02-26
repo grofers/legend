@@ -1,7 +1,7 @@
 ---
 title: IMS-Testing
 grafana_folder: TestRELegend
-alert_channels: ["YET TO FILL"]
+alert_channels: ["WH-opsgenie"]
 service: IMS
 environment: Prod
 description: IMS service handles the inventory for retail outlets and business logic dependent on the inventory. It sends inventory and prices updates to CMS for inventory and offers.
