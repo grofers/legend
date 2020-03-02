@@ -28,7 +28,7 @@ panels:
         evaluate_every: 10s
       condition_query:
       - OR,avg,1,now,20m,gt,0
-  
+
   - title: (S) Pending Requests Count
     type: Graph
     description: Number of requests pending routing to a healthy instance. The maximum size of the queue is 1,024. Additional requests or connections are rejected when the queue is full.
@@ -119,7 +119,7 @@ panels:
 
   - title: (E) ELB Backend Connection Errors
     type: Graph
-    description: The number of connections that were not successfully established between the load balancer and the registered instances. Because the load balancer retries the connection when there are errors, this count can exceed the request rate. Note that this count also includes any connection errors related to health checks. 
+    description: The number of connections that were not successfully established between the load balancer and the registered instances. Because the load balancer retries the connection when there are errors, this count can exceed the request rate. Note that this count also includes any connection errors related to health checks.
     targets:
       {% for dimension in data %}
       - dimensions: {"LoadBalancerName": {{ dimension.load_balancer_name }} }
@@ -141,5 +141,3 @@ panels:
       statistic: Maximum
       alias: '{{ '{{LoadBalancerName}}_{{metric}}_{{stat}}' }}'
       {% endfor %}
-    
-

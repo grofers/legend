@@ -4,7 +4,8 @@ grafana_folder: TestRELegend
 alert_channels: ["WH-opsgenie"]
 service: IMS
 environment: Prod
-description: IMS service handles the inventory for retail outlets and business logic dependent on the inventory. It sends inventory and prices updates to CMS for inventory and offers.
+description: IMS service handles the inventory for retail outlets and business/ 
+logic dependent on the inventory. It sends inventory and prices updates to CMS for inventory and offers.
 references:
   - deployment: https://github.com/grofers/retail_ims/blob/master/README.md
   - documentation: https://github.com/grofers/retail_ims/blob/master/README.md

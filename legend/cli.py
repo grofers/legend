@@ -26,7 +26,6 @@ def publish_main():
 def cli_main():
     pass
 
-
 @cli_main.command()
 @click.argument("input_file", required=True, type=click.Path())
 @click.option("-c", '--config_file')

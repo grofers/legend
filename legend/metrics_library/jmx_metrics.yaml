@@ -105,4 +105,3 @@ panels:
       - metric: jvm_threads_deadlocked{job="{{ dimension.job }}"}
         legend: '{{ '{{instance}}' }}'
       {% endfor %}
-

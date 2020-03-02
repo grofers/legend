@@ -1,5 +1,10 @@
 *.pyc
 
+legend/bin/
+legend/pyvenv.cfg
+sample_output.json
+transformed.yaml
+
 .idea/
 
 .DS_Store
@@ -13,6 +18,8 @@ output.jsonnet
 dashboard.json
 
 x.txt
+
+.vscode/
 
 grafonnet-lib
 

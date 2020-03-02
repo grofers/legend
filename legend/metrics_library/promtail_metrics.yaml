@@ -2,7 +2,7 @@ component: promtail
 data_source: Prometheus
 reference: https://github.com/grafana/loki/tree/master/docs/clients/promtail
 description: Scrapes logs from pods and pushes them to loki, deployed as daemonset across all nodes
-identifier_keys: 
+identifier_keys:
   - pod_name
 panels:
   - title: (E) Missing pods

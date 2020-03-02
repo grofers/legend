@@ -241,5 +241,5 @@ panels:
         - OR,avg,1,now,15m,gt,2700
 
 ---
-{% set data = data.ec2 %} 
+{% set data = data.ec2 %}
 {% include "systemcore_ec2_metrics.yaml" with context %}

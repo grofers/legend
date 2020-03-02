@@ -177,6 +177,7 @@ def get_grafana_folder_id(grafana_folder_name, GRAFANA_API_KEY, GRAFANA_URL):
 
 
 def create_grafana_folder(grafana_folder_name, GRAFANA_API_KEY, GRAFANA_URL):
+    print(grafana_folder_name)
     api_url = GRAFANA_URL + "/api/folders"
     headers = {
         'Authorization': 'Bearer ' + GRAFANA_API_KEY,
@@ -189,5 +190,5 @@ def create_grafana_folder(grafana_folder_name, GRAFANA_API_KEY, GRAFANA_URL):
 
     r = requests.post(api_url, headers=headers, data=json.dumps(data))
     r.raise_for_status()
-
-    return (r["id"])
+    res = r.json()
+    return (res["id"])

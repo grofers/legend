@@ -197,5 +197,3 @@ panels:
         namespace: RDSCustomMetric
         statistic: Maximum
         {% endfor %}
-
-

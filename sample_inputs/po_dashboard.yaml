@@ -1,6 +1,8 @@
 ---
 title: PO-Dashboard
 alert_channels: ["PO-opsgenie"]
+grafana_folder: TestRELegend
+service: PO
 environment: Prod
 description: Purchase order management system
 references:

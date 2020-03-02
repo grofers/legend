@@ -231,6 +231,7 @@ def create_or_update_grafana_dashboard(
 
     # Create dashboard based on the folder, if a new dashboard
     if isinstance(dashboard_id, str):
+
         # Check if the folder exists
         id = get_grafana_folder_id(
             dashboard_id, auth, grafana_url)

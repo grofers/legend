@@ -1,6 +1,7 @@
 ---
 title: Supply Orchestrator
 alert_channels: ["Pager Duty OMS1"]
+grafana_folder: TestRELegend
 service: Supply Orchestrator
 environment: Prod
 description: Capacity service for Planning

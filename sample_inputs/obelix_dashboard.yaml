@@ -2,6 +2,7 @@
 title: LM-Obelix
 alert_channels: ["LM-Opsgenie"]
 service: Obelix
+grafana_folder: TestRELegend
 environment: Prod
 description: Dashboard for monitoring all the components used in Obelix service
 references:

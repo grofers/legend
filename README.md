@@ -49,6 +49,28 @@ Set the grafana configurations in `legend.cfg`
 legend [OPTIONS] COMMAND [ARGS]
 ```
 
+OR
+ 
+Run the following command with a dashboard template to generate the dashboard JSON -
+
+```
+GRAFANA_API_KEY=<your-grafana-key> GRAFANA_HOST=grafana.grofers.com GRAFANA_PROTOCOL=https legend -f sample_input.yaml
+```
+
+### To run your tests locally
+
+Export grafana settings to your local environment
+```
+export GRAFANA_API_KEY=<YOUR_GRAFANA_API_KEY>
+export GRAFANA_HOST=grafana-stage.grofers.io
+export GRAFANA_PROTOCOL=https
+```
+
+Run the test script
+```
+./test.sh
+```
+
 ### Generate Dashboards via Kubernetes
 
 legend exposes itself as a CRD.

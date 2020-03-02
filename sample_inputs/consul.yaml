@@ -1,6 +1,7 @@
 ---
 title: Consul
 service: Consul
+grafana_folder: TestRELegend
 alert_channels: ["Infrastructure-opsgenie"]
 environment: Prod
 description: Service Discovery and KV Store
