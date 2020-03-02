@@ -5,7 +5,7 @@ pipeline {
       }
     }
   stages {
-    stage("Set secrets"){
+    stage("Running tests for dashboard"){
         steps {
           script{
 
@@ -23,21 +23,21 @@ pipeline {
 
           withVault([configuration: configuration, vaultSecrets: secrets]) {
                   sh '''
-                    chmod u+x test.sh 
-                    ./test.sh
+                    chmod u+x tests.sh 
+                    ./tests.sh
                   '''
           }
         }
       }
     }
-    stage("Running yaml linter"){
-      steps {
-        sh '''
-          yamllint  -d relaxed .
-          # All files added for yaml lint check
-          '''
-      }
-    }
+    // stage("Running yaml linter"){
+    //   steps {
+    //     sh '''
+    //       yamllint  -d relaxed .
+    //       # All files added for yaml lint check
+    //       '''
+    //   }
+    // }
     // stage("Running pylint"){
     //   steps{
     //     sh '''

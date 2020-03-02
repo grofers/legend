@@ -68,7 +68,7 @@ export GRAFANA_PROTOCOL=https
 
 Run the test script
 ```
-./test.sh
+./tests.sh
 ```
 
 ### Generate Dashboards via Kubernetes
