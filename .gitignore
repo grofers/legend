@@ -152,5 +152,7 @@ dmypy.json
 # pytype static type analyzer
 .pytype/
 
+.legend
+.legend/
 
 legend.cfg

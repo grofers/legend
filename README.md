@@ -46,21 +46,17 @@ pip install -e .
 
 Set the grafana configurations in `legend.cfg`
 ```
-legend -f sample_input.yaml
+legend [OPTIONS] COMMAND [ARGS]
 ```
-
-OR
- 
-Run the following command with a dashboard template to generate the dashboard JSON -
-
-```
-GRAFANA_API_KEY=<your-grafana-key> GRAFANA_HOST=grafana.grofers.com GRAFANA_PROTOCOL=https legend -f sample_input.yaml
-```
-
 
 ### Generate Dashboards via Kubernetes
 
 legend exposes itself as a CRD.
+
+#### Deploying via CRD
+
+Set the appropraite context 
+`kubectl apply -f <>`
 
 #### Minikube Setup
 
@@ -91,7 +87,7 @@ Setup the CRD and start the operator:
 ```
 cd kubernetes
 kubectl apply -f crd.yaml
-GRAFANA_API_KEY=<your-grafana-key> GRAFANA_HOST=grafana.grofers.com GRAFANA_PROTOCOL=https GRAFONNET_PATH=<path-to-grafonnet> DEV=true LOG_LEVEL=DEBUG kopf run handler.py
+GRAFANA_API_KEY=<> GRAFANA_HOST=grafana.grofers.com GRAFANA_PROTOCOL=https LEGEND_HOME=<> DEV=true LOG_LEVEL=DEBUG kopf run handler.py
 ```
 
 Create your dashboard:

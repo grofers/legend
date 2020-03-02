@@ -1,10 +1,13 @@
 import requests
+import json
 import yaml
 import os
-
+import re
 from jinja2 import Environment, FileSystemLoader
 
-# from ..helpers import constants
+
+def convert_to_alnum(st):
+    return re.sub(r'\W+', '', st)
 
 
 def input_yaml_to_json(input_file):
@@ -146,6 +149,16 @@ def parse_condition_query(condition_queries, targets):
     return conditions
 
 
+def mkdir(path):
+    if not os.path.isdir(path):
+        os.makedirs(path)
+
+
+def check_if_file_exists(path):
+    if not os.path.exists(path):
+        raise Exception("Unable to find the  file ", path)
+
+
 def get_grafana_folder_id(grafana_folder_name, GRAFANA_API_KEY, GRAFANA_URL):
     api_url = GRAFANA_URL + "/api/folders"
     headers = {
@@ -174,12 +187,7 @@ def create_grafana_folder(grafana_folder_name, GRAFANA_API_KEY, GRAFANA_URL):
         "title": grafana_folder_name
     }
 
-    r = requests.post(api_url, headers=headers, data=data)
+    r = requests.post(api_url, headers=headers, data=json.dumps(data))
     r.raise_for_status()
 
     return (r["id"])
-
-
-def mkdir(path):
-    if not os.path.isdir(path):
-        os.makedirs(path)

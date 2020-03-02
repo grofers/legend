@@ -1,54 +1,81 @@
 #!/usr/bin/env python
 
-import argparse
 import os
-import configparser
+from urllib.parse import urljoin
+import json
+import click
 
-from .legend import create_or_update_dashboard
+from .legend import (
 
+    load_legend_config, 
+    generate_jsonnet,
+    generate_dashboard_from_jsonnet,
+    create_or_update_grafana_dashboard
+)
 from .helpers.utilities import (
+    check_if_file_exists,
     input_yaml_to_json
 )
 
 
-def main():
-
-    parser = argparse.ArgumentParser(
-        description='Generate dashboard with pre filled metrics'
-    )
-    parser.add_argument('-f', '--file', dest='input_file',
-                        help='input file', required=True)
-    parser.add_argument('-c', '--config', dest='input_config', default='legend.cfg',
-                        help='input configuration', required=False)
-
-    args = parser.parse_args()
-
-    input_file = args.input_file
-    input_config = args.input_config
-
-    if not os.path.exists(input_file):
-        raise Exception("Unable to find the file")
-
-    if input_config is not None:
-        if not os.path.exists(input_config):
-            raise Exception("Unable to find the configuration file")
-        config = configparser.SafeConfigParser()
-        config.read(input_config)
-        GRAFANA_API_KEY = config.get('grafana', 'api_key')
-        GRAFANA_PROTOCOL = config.get('grafana', 'protocol')
-        GRAFANA_HOST = config.get('grafana', 'host')
-
-    if os.environ.get('GRAFANA_API_KEY') is not None:
-        GRAFANA_API_KEY = os.environ['GRAFANA_API_KEY']
-    if os.environ.get('GRAFANA_HOST') is not None:
-        GRAFANA_HOST = os.environ['GRAFANA_HOST']
-    if os.environ.get('GRAFANA_PROTOCOL') is not None:
-        GRAFANA_PROTOCOL = os.environ['GRAFANA_PROTOCOL']
-
-    spec = input_yaml_to_json(input_file)
-    print(create_or_update_dashboard(GRAFANA_API_KEY, GRAFANA_HOST,
-                                     GRAFANA_PROTOCOL, spec))
+def publish_main():
+    pass
 
 
-if __name__ == '__main__':
-    main()
+@click.group()
+def cli_main():
+    pass
+
+
+@cli_main.command()
+@click.argument("input_file", required=True, type=click.Path())
+@click.option("-c", '--config_file')
+@click.option("-s", '--silent', is_flag=True)
+@click.option("-o", '--output_file')
+def build(input_file, config_file, silent, output_file):
+    check_if_file_exists(input_file)
+    legend_config = load_legend_config(config_file=config_file)
+    input_spec = input_yaml_to_json(input_file)
+    jsonnet_file = generate_jsonnet(input_spec, legend_config)
+    dashboard_json = generate_dashboard_from_jsonnet(jsonnet_file)
+    if not silent:
+        click.echo("%s"  % dashboard_json)
+    if output_file is not None:
+        with open(output_file, 'w') as f:
+            f.write(json.dumps(dashboard_json))
+
+
+@cli_main.command()
+@click.argument("input_json", required=True, type=click.Path())
+@click.option("-f", "--grafana_folder", required=True)
+@click.option("-c", '--config_file')
+def publish(input_json, grafana_folder, config_file):
+    check_if_file_exists(input_json)
+    legend_config = load_legend_config(config_file=config_file)
+    with open(input_json) as json_data:
+        dashboard_json = json.load(json_data)
+    resp = create_or_update_grafana_dashboard(
+        dashboard_json, legend_config, str(grafana_folder))
+
+    grafana_url = urljoin('%s://%s' %
+                        (legend_config['grafana_protocol'], legend_config['grafana_host']), resp['url'])
+
+    click.echo("Dashboard built and applied! %s" % grafana_url)
+
+
+@cli_main.command()
+@click.argument("input_file", type=click.Path())
+@click.option("-c", '--config_file', )
+def apply(input_file, config_file):
+    check_if_file_exists(input_file)
+    legend_config = load_legend_config(config_file=config_file)
+    input_spec = input_yaml_to_json(input_file)
+    jsonnet_file = generate_jsonnet(input_spec, legend_config)
+    dashboard_json = generate_dashboard_from_jsonnet(jsonnet_file)
+    resp = create_or_update_grafana_dashboard(
+        dashboard_json, legend_config, str(input_spec['grafana_folder']))
+
+    grafana_url = urljoin('%s://%s' %
+                          (legend_config['grafana_protocol'], legend_config['grafana_host']), resp['url'])
+
+    click.echo("Dashboard built and applied! %s" % grafana_url)

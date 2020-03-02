@@ -5,8 +5,13 @@ import kopf
 
 from urllib.parse import urljoin
 
-from legend import legend
-
+from legend.legend import (
+    delete_dashboard,
+    generate_jsonnet,
+    load_legend_config,
+    generate_dashboard_from_jsonnet,
+    create_or_update_grafana_dashboard
+)
 
 LOG_LEVEL = os.environ.get('LOG_LEVEL', 'INFO')
 DEV = os.environ.get('DEV', False)
@@ -16,13 +21,7 @@ logging.basicConfig(format='%(module)s [%(levelname)s] %(message)s',
 logger = logging.getLogger(__name__)
 logger.setLevel(getattr(logging, LOG_LEVEL))
 
-GRAFANA_API_KEY = os.environ['GRAFANA_API_KEY']
-GRAFANA_HOST = os.environ['GRAFANA_HOST']
-GRAFANA_PROTOCOL = os.environ.get('GRAFANA_PROTOCOL', 'https')
-
-logger.info(('Starting grafana-dashboards operator to create to manage '
-             'Grafana dashboards at %s://%s.'), GRAFANA_PROTOCOL, GRAFANA_HOST)
-
+logger.info('Starting grafana-dashboards operator to create to manage')
 
 if DEV:
     logger.info('Startin DEV mode')
@@ -32,14 +31,26 @@ if DEV:
 def create_or_update_handler(spec, name, **kwargs):
     body = kwargs['body']
     spec = body['spec']
-    dashboard_id = None
-    if 'status' in body:
-        dashboard_id = body['status']['create_handler']['id']
 
-    resp = legend.create_or_update_dashboard(GRAFANA_API_KEY, GRAFANA_HOST,
-                                             GRAFANA_PROTOCOL, spec, dashboard_id)
-    grafana_url = urljoin('%s://%s' % (GRAFANA_PROTOCOL, GRAFANA_HOST),
-                          resp['url'])
+    dashboard_id = str(spec['grafana_folder'])
+    # While  trying to update the dashboard, checking if it was successful in
+    # the previous run
+    if status in body['status']:
+        try:
+            dashboard_id = int(status['create_handler']['id'])
+        except KeyError:
+            dashboard_id = int(status['update_handler']['id'])
+
+    legend_config = load_legend_config()
+    jsonnet_file = generate_jsonnet(spec, legend_config)
+    dashboard_json = generate_dashboard_from_jsonnet(jsonnet_file)
+    resp = create_or_update_grafana_dashboard(
+        dashboard_json, legend_config, dashboard_id)
+
+    host = legend_config["grafana_host"]
+    protocol = legend_config["grafana_protocol"]
+    grafana_url = urljoin('%s://%s' % (protocol, host), resp['url'])
+
     logger.debug(resp)
 
     return {
@@ -103,19 +114,24 @@ def delete_handler(spec, name, body, **kwargs):
               message='Deleting grafana dashboard.')
     logger.debug('Got the following keyword args for deleting the object: %s',
                  kwargs)
-    uid = body['status']['create_handler']['uid']
 
-    try:
-        legend.delete_dashboard(GRAFANA_API_KEY, GRAFANA_HOST,
-                                GRAFANA_PROTOCOL, uid)
-        kopf.info(spec, reason='DeletedDashboard',
-                  message='Finished deleting dashboard:  %s.' % name)
-        logger.info('Finished deleting Grafana dashboard: %s', name)
-        return {'status': 'Deleted'}
-    except Exception as e:
-        logger.error(('Failed to delete dashboard due to the following '
-                      'exception: %s'), e)
-        kopf.exception(spec, reason='APIError',
-                       message=('Failed to delete dashboard due to API '
-                                'error: %s' % e))
-        raise e
+    # Fetch the uid / try deleting the dashboard only if the object creation
+    # was successful earlier
+    status = body['status']
+    if (status.get('create_handler') or status.get('update_handler')):
+        uid = body['status']['create_handler']['uid']
+
+        try:
+            legend_config = load_legend_config()
+            delete_dashboard(legend_config, uid)
+            kopf.info(spec, reason='DeletedDashboard',
+                    message='Finished deleting dashboard:  %s.' % name)
+            logger.info('Finished deleting Grafana dashboard: %s', name)
+            return {'status': 'Deleted'}
+        except Exception as e:
+            logger.error(('Failed to delete dashboard due to the following '
+                        'exception: %s'), e)
+            kopf.exception(spec, reason='APIError',
+                        message=('Failed to delete dashboard due to API '
+                                    'error: %s' % e))
+            raise e

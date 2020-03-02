@@ -1,5 +1,6 @@
 ---
 title: SampleTitle
+grafana_folder: TestRELegend
 service: SampleService
 alert_channels: ["service-opsgenie"]
 environment: Prod

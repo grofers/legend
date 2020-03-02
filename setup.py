@@ -9,17 +9,19 @@ def get_requirements():
 
     return reqs.split()
 
+
 setup(
     name='legend',
     version='0.1',
-    description=('The legendary Grafana dashboard generator.'),
+    description='The legendary Grafana dashboard generator.',
     author='Grofers Engineering',
     author_email='tech@grofers.com',
     url='https://github.com/grofers/legend',
     packages=find_packages(),
+    package_data={'': ["*.yaml", "*.j2", "*.yml", "*.libsonnet"]},
     install_requires=get_requirements(),
     entry_points='''
         [console_scripts]
-        legend=legend.cli:main
+        legend=legend.cli:cli_main
     '''
 )

@@ -2,12 +2,13 @@
 apiVersion: grofers.io/v1
 kind: GrafanaDashboard
 metadata:
-  name: sample-title-8
+  name: sample-title-9
   labels:
     app: sample-title
 spec:
-  title: SampleTitle Vaidik 9
-  service: SampleService Vaidik
+  title: SampleTitle1
+  grafana_folder: TestRELegend
+  service: SampleService
   alert_channels: ["service-opsgenie"]
   environment: Prod
   description: Logging tool for everything deployed on kubernetes
@@ -42,7 +43,7 @@ spec:
           statistic: Sum
           alias: '{{ metric }}'
           ref_no: 2
-  
+
     systemcore_ec2:
       dimensions:
       - host: purchaseorder
