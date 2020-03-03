@@ -1,6 +1,6 @@
 #! /bin/sh
 
-set -e 
+set -ex
 
 export LEGEND_HOME=/tmp/.legend 
 
@@ -22,6 +22,7 @@ echo "Running legend build test and checking all sample inputs and metrics libra
 
 for f in sample_inputs/*.yaml
     do
+        echo "Running legend build for sample_inputs/$f"
         sed '/grafana_folder:/ s/: .*/: test-ci/' $f > transformed.yaml
         legend apply transformed.yaml
         rm transformed.yaml

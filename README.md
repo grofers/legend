@@ -62,7 +62,7 @@ GRAFANA_API_KEY=<your-grafana-key> GRAFANA_HOST=grafana.grofers.com GRAFANA_PROT
 Export grafana settings to your local environment
 ```
 export GRAFANA_API_KEY=<YOUR_GRAFANA_API_KEY>
-export GRAFANA_HOST=grafana-stage.grofers.io
+export GRAFANA_HOST=grafana-stage.grofer.io
 export GRAFANA_PROTOCOL=https
 ```
 
