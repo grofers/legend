@@ -1,4 +1,4 @@
-``# Legend
+# Legend
 
 <p align="center">
   <img src="http://www.desigifs.com/sites/default/files/2013/BalaKrj2.gif" alt="Legend"/>
