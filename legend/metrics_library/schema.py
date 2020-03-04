@@ -14,6 +14,7 @@ from .metrics_schema import (
     consul_schema,
     promtail_schema,
     celery_schema,
+    platform_k8s_deployment_schema,
     redis_schema,
     systemcore_ec2_schema,
     s3_schema
@@ -79,6 +80,7 @@ schema = {
         'schema': {
             'celery': {'type': 'dict', 'schema':  md(default_panels_schema, celery_schema), 'required': False},
             'promtail': {'type': 'dict', 'schema':  md(default_panels_schema, promtail_schema), 'required': False},
+            'platform_k8s_deployment': {'type': 'dict', 'schema': md(default_panels_schema, platform_k8s_deployment_schema), 'required': False},
             'redis': {'type': 'dict', 'schema':  md(default_panels_schema, redis_schema), 'required': False},
             'systemcore_ec2': {'type': 'dict', 'schema':  md(default_panels_schema, systemcore_ec2_schema), 'required': False},
             's3': {'type': 'dict', 'schema': md(default_panels_schema, s3_schema), 'required': False},

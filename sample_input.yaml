@@ -45,3 +45,6 @@ components:
   celery:
     dimensions:
       - job_name: po-celery-metrics
+  platform_k8s_deployment:
+    dimensions:
+      - deployment_name: snorlax-app

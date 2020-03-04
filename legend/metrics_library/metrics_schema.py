@@ -3,6 +3,11 @@ pgsql_rds_schema = {
         'db_instance_identifier': {'type': 'string', 'required': True},
     }}}}
 
+platform_k8s_deployment_schema = {
+    'dimensions': {'type': 'list', 'schema': {'type': 'dict', 'schema': {
+        'deployment_name': {'type': 'string', 'required': True},
+    }}}}
+
 mysql_56_rds_schema = {
     'dimensions': {'type': 'list', 'schema': {'type': 'dict', 'schema': {
         'db_instance_identifier': {'type': 'string', 'required': True},

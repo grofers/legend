@@ -1,0 +1,115 @@
+component: platform_k8s_deployment
+data_source: Prometheus
+reference: https://blog.freshtracks.io/a-deep-dive-into-kubernetes-metrics-part-3-container-resource-metrics-361c5ee46e66
+description: Kubernetes Deployment
+panels:
+  - title: (U) CPU Utilisation
+    type: Graph
+    description: current cpu utilisation per container
+    targets:
+      {% for dimension in data %}
+      - metric: round(((sum(rate(container_cpu_usage_seconds_total{container!~"POD", pod=~"^{{ dimension.deployment_name }}.*"}[5m])) by (container_name) / sum(label_join(kube_pod_container_resource_limits_cpu_cores{pod=~"^{{ dimension.deployment_name }}.*"}, "container_name", "", "container")) by (container_name)) * 100), 0.1)
+        legend: '{{ '{{container_name}}' }}'
+        ref_no: 1
+      {% endfor %}
+    formatY1: percent
+    alert_config:
+      priority: P3
+      message: High CPU Utilisation
+      rule:
+        for_duration: 5m
+        evaluate_every: 1m
+      condition_query:
+        - OR,avg,1,now,5m,gt,80
+
+  - title: (S) CPU Saturation
+    type: Graph
+    description: Amount of time the container was throttled
+    targets:
+      {% for dimension in data %}
+      - metric: sum(rate(container_cpu_cfs_throttled_seconds_total{container!~"POD", pod=~"^{{ dimension.deployment_name }}.*"}[5m])) by (container_name)
+        legend: '{{ '{{container_name}}' }}'
+      {% endfor %}
+    formatY1: s
+
+  - title: (U) Memory Utilisation
+    type: Graph
+    description: Current memory usage per container
+    targets:
+      {% for dimension in data %}
+      - metric: round(((sum(container_memory_working_set_bytes{container!~"POD", pod=~"^{{ dimension.deployment_name }}.*"}) by (container_name) / sum(label_join(kube_pod_container_resource_limits_memory_bytes{pod=~"^{{ dimension.deployment_name }}.*"}, "container_name", "", "container")) by (container_name)) * 100), 0.1)
+        legend: '{{ '{{container_name}}' }}'
+        ref_no: 1
+      {% endfor %}
+    formatY1: percent
+    alert_config:
+      priority: P3
+      message: High Memory Utilisation
+      rule:
+        for_duration: 5m
+        evaluate_every: 1m
+      condition_query:
+        - OR,avg,1,now,5m,gt,80
+
+  - title: (S) Memory Saturation
+    type: Graph
+    description: Amount of available memory from the limit
+    targets:
+      {% for dimension in data %}
+      - metric: (sum(container_memory_working_set_bytes{pod=~"^{{ dimension.deployment_name }}.*"}) by (container_name) / sum(label_join(kube_pod_container_resource_limits_memory_bytes{pod=~"^{{ dimension.deployment_name }}.*"}, "container_name", "", "container")) by (container_name))
+        legend: '{{ '{{container_name}}' }}'
+      {% endfor %}
+    formatY1: bytes
+
+  - title: (U) Disk Utilisation
+    type: Graph
+    description: bytes read/written
+    targets:
+      {% for dimension in data %}
+      - metric: sum(rate(container_fs_writes_bytes_total{pod=~"^{{ dimension.deployment_name }}.*"}[5m])) by (container_name,device)
+        legend: '{{ '{{container_name}} {{device}} Writes' }}'
+      - metric: sum(rate(container_fs_reads_bytes_total{pod=~"^{{ dimension.deployment_name }}.*"}[5m])) by (container_name,device)
+        legend: '{{ '{{container_name}} {{device}} Reads' }}'
+      {% endfor %}
+    formatY1: bytes
+
+  - title: (U) Network Utilisation
+    type: Graph
+    description: bytes received/transmitted
+    targets:
+      {% for dimension in data %}
+      - metric: sum(rate(container_network_receive_bytes_total{pod=~"^{{ dimension.deployment_name }}.*"}[5m])) by (pod, interface)
+        legend: '{{ '{{pod}} rx' }}'
+      - metric: sum(rate(container_network_transmit_bytes_total{pod=~"^{{ dimension.deployment_name }}.*"}[5m])) by (pod, interface)
+        legend: '{{ '{{pod}} tx' }}'
+      {% endfor %}
+
+  - title: (E) Network Errors
+    type: Graph
+    description: Number of network errors
+    targets:
+      {% for dimension in data %}
+      - metric: sum(rate(container_network_receive_errors_total{pod=~"^{{ dimension.deployment_name }}.*"}[5m])) by (pod)
+        legend: '{{ '{{pod}} rx' }}'
+      - metric: sum(rate(container_network_transmit_errors_total{pod=~"^{{ dimension.deployment_name }}.*"}[5m])) by (pod)
+        legend: '{{ '{{pod}} tx' }}'
+      {% endfor %}
+
+  - title: (E) Unavailable Replica Percentage
+    type: Graph
+    description: Percentage of replicas not available in the deployment
+    targets:
+      {% for dimension in data %}
+      - metric: round(((kube_deployment_status_replicas_unavailable{deployment=~"^{{ dimension.deployment_name }}.*"}/kube_deployment_status_replicas{deployment=~"^{{ dimension.deployment_name }}.*"}) * 100), 1)
+        legend: '{{ '{{deployment}}' }}'
+        ref_no: 1
+      {% endfor %}
+    formatY1: percent
+    alert_config:
+      priority: P2
+      message: High Unavailable Replica Percentage
+      rule:
+        for_duration: 5m
+        evaluate_every: 1m
+      condition_query:
+        - OR,avg,1,now,5m,gt,60
