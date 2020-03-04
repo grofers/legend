@@ -23,7 +23,7 @@ components:
   django:
     dimensions:
       - job: po-django-metrics
-  systemcore_ec2:
+  platform_ec2:
     dimensions:
     - host: purchaseorder
   redis:

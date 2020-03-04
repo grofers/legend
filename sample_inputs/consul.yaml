@@ -16,7 +16,7 @@ components:
   consul:
     dimensions:
       - region: ap-southeast-1
-  systemcore_ec2:
+  platform_ec2:
     dimensions:
       - host: consulserver.*.ap-southeast-1.*
       - host: privateproxy

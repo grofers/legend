@@ -16,7 +16,7 @@ from .metrics_schema import (
     celery_schema,
     platform_k8s_deployment_schema,
     redis_schema,
-    systemcore_ec2_schema,
+    platform_ec2_schema,
     s3_schema
 )
 
@@ -82,7 +82,7 @@ schema = {
             'promtail': {'type': 'dict', 'schema':  md(default_panels_schema, promtail_schema), 'required': False},
             'platform_k8s_deployment': {'type': 'dict', 'schema': md(default_panels_schema, platform_k8s_deployment_schema), 'required': False},
             'redis': {'type': 'dict', 'schema':  md(default_panels_schema, redis_schema), 'required': False},
-            'systemcore_ec2': {'type': 'dict', 'schema':  md(default_panels_schema, systemcore_ec2_schema), 'required': False},
+            'platform_ec2': {'type': 'dict', 'schema':  md(default_panels_schema, platform_ec2_schema), 'required': False},
             's3': {'type': 'dict', 'schema': md(default_panels_schema, s3_schema), 'required': False},
             'consul': {'type': 'dict', 'schema':  md(default_panels_schema, consul_schema), 'required': False},
             'couchdb': {'type': 'dict', 'schema':  md(default_panels_schema, couchdb_schema), 'required': False},

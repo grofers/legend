@@ -24,7 +24,7 @@ components:
   django:
     dimensions:
       - job: vms-django-metrics
-  systemcore_ec2:
+  platform_ec2:
     dimensions:
     - host: vms
   redis:

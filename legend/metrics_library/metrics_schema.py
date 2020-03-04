@@ -77,7 +77,7 @@ redis_schema = {
         'job_name': {'type': 'string', 'required': True},
     }}}}
 
-systemcore_ec2_schema = {
+platform_ec2_schema = {
     'dimensions': {'type': 'list', 'schema': {'type': 'dict', 'schema': {
         'host': {'type': 'string', 'required': True},
     }}}}

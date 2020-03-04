@@ -32,10 +32,42 @@ components:
               db_name: ims
             - host: perconamaster5-mysql-metrics
               db_name: ims
-       
-  systemcore_ec2:
+  sqs:
+    dimensions:
+      - queue_name: pos_upstream_data_log
+        dead_queue_name: pos_upstream_data_log_dead
+  rabbitmq:
+    dimensions:
+      - queue_name: ims_task
+        job: pos-rabbitmq-metrics
+  mysql_56_rds:
+    dimensions:
+    - db_instance_identifier: prod-lastmile-db
+    - db_instance_identifier: prod-lastmile-db-read-replica-dse
+  springboot:
+    dimensions:
+    - job: lastmile/ec2-obelix-springboot
+  jmx:
+    dimensions:
+    - job: lastmile/ec2-obelix-jmx
+  pgsql_rds:
+    dimensions:
+      - db_instance_identifier: prod-supply-orchestrator
+  platform_ec2:
     dimensions:
       - host: purchaseorder
+  platform_k8s_deployment:
+    dimensions:
+      - deployment_name: snorlax-app
+  elb:
+    dimensions:
+      - load_balancer_name: po-retail
+  django:
+    dimensions:
+      - job: po-django-metrics
+  couchdb:
+    dimensions:
+      - job_name: po-couchdb-metrics
   promtail:
     dimensions:
       - pod_name: promtail
@@ -45,6 +77,9 @@ components:
   celery:
     dimensions:
       - job_name: po-celery-metrics
-  platform_k8s_deployment:
+  consul:
     dimensions:
-      - deployment_name: snorlax-app
+      - region: ap-southeast-1
+  haproxy:
+    dimensions:
+      - backend: consul_prod

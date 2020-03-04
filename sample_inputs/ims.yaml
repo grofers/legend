@@ -52,7 +52,7 @@ components:
               db_name: ims
             - host: perconamaster5-mysql-metrics
               db_name: ims
-  systemcore_ec2:
+  platform_ec2:
     dimensions:
       - host: .*ims.*
   s3:

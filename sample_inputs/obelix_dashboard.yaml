@@ -18,7 +18,7 @@ components:
   elb:
     dimensions:
     - load_balancer_name: prod-lastmile-obelix
-  systemcore_ec2:
+  platform_ec2:
     dimensions:
     - host: obelix.*.lastmile.
   mysql_56_rds:
