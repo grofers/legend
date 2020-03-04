@@ -6,9 +6,9 @@ alert_channels: ["Infrastructure-opsgenie"]
 environment: Prod
 description: Service Discovery and KV Store
 references:
-- deployment: https://github.com/grofers/ansible/tree/master/roles/consul
-- documentation: https://www.consul.io/docs/index.html
-- metrics_definition: https://www.consul.io/docs/agent/telemetry.html
+  deployment: https://github.com/grofers/ansible/tree/master/roles/consul
+  documentation: https://www.consul.io/docs/index.html
+  metrics_definition: https://www.consul.io/docs/agent/telemetry.html
 tags:
 - prod
 - infra

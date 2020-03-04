@@ -1,6 +1,7 @@
 import os
 
 LEGEND_HOME_NAME = ".legend"
+LEGEND_DEFAULT_CONFIG = "legend.cfg"
 
 LEGEND_HOME = os.environ.get(
     "LEGEND_HOME", os.path.join(

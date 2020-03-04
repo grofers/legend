@@ -25,7 +25,8 @@ from .helpers.utilities import (
 from . import (
     LEGEND_HOME,
     GRAFONNET_REPO_URL,
-    GRAFONNET_REPO_NAME
+    GRAFONNET_REPO_NAME,
+    LEGEND_DEFAULT_CONFIG
 )
 
 make_abs_path = lambda d: os.path.join(
@@ -86,8 +87,9 @@ def load_legend_config(config_file=None):
 
 
     # Load config from LEGEND_HOME
-    elif os.path.exists(os.path.join(LEGEND_HOME, '.legend.cfg')):
-        configuration = config.read(os.path.join(LEGEND_HOME, '.legend.cfg'))
+    elif os.path.exists(os.path.join(LEGEND_HOME, LEGEND_DEFAULT_CONFIG)):
+        configuration = config.read(os.path.join(
+            LEGEND_HOME, LEGEND_DEFAULT_CONFIG))
         legend_config.update(grafana_api_key=config.get('grafana', 'api_key'))
         legend_config.update(grafana_host=config.get('grafana', 'host'))
         legend_config.update(grafana_protocol=config.get('grafana', 'protocol'))

@@ -6,9 +6,9 @@ grafana_folder: TestRELegend
 environment: Prod
 description: Dashboard for monitoring all the components used in Obelix service
 references:
-  - deployment: http://internal-jenkins-lastmile.grofer.io/job/obelix-deploy-prod/
-  - documentation: https://github.com/grofers/obelix
-  - metrics_definition:
+  deployment: http://internal-jenkins-lastmile.grofer.io/job/obelix-deploy-prod/
+  documentation: https://github.com/grofers/obelix
+  metrics_definition: https://github.com/grofers/obelix
 tags:
   - prod
   - obelix

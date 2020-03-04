@@ -6,8 +6,7 @@ import json
 import click
 
 from .legend import (
-
-    load_legend_config, 
+    load_legend_config,
     generate_jsonnet,
     generate_dashboard_from_jsonnet,
     create_or_update_grafana_dashboard
@@ -15,7 +14,10 @@ from .legend import (
 from .helpers.utilities import (
     check_if_file_exists,
     input_yaml_to_json
+
 )
+
+from .metrics_library import schema
 
 
 def publish_main():
@@ -34,7 +36,7 @@ def cli_main():
 def build(input_file, config_file, silent, output_file):
     check_if_file_exists(input_file)
     legend_config = load_legend_config(config_file=config_file)
-    input_spec = input_yaml_to_json(input_file)
+    input_spec = input_yaml_to_json(schema, input_file)
     jsonnet_file = generate_jsonnet(input_spec, legend_config)
     dashboard_json = generate_dashboard_from_jsonnet(jsonnet_file)
     if not silent:
@@ -68,7 +70,7 @@ def publish(input_json, grafana_folder, config_file):
 def apply(input_file, config_file):
     check_if_file_exists(input_file)
     legend_config = load_legend_config(config_file=config_file)
-    input_spec = input_yaml_to_json(input_file)
+    input_spec = input_yaml_to_json(schema, input_file)
     jsonnet_file = generate_jsonnet(input_spec, legend_config)
     dashboard_json = generate_dashboard_from_jsonnet(jsonnet_file)
     resp = create_or_update_grafana_dashboard(

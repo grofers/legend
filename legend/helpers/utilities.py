@@ -5,15 +5,19 @@ import os
 import re
 from jinja2 import Environment, FileSystemLoader
 
+from .validations import (
+    validate_input
+)
+
 
 def convert_to_alnum(st):
     return re.sub(r'\W+', '', st)
 
 
-def input_yaml_to_json(input_file):
+def input_yaml_to_json(schema, input_file):
     with open(input_file, 'r') as stream:
         try:
-            return yaml.safe_load(stream)
+            return validate_input(schema, yaml.safe_load(stream))
         except yaml.YAMLError as exc:
             raise Exception(exc)
 

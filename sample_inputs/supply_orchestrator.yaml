@@ -6,9 +6,9 @@ service: Supply Orchestrator
 environment: Prod
 description: Capacity service for Planning
 references:
-  - deployment: http://jenkins.grofer.io/job/supply-orchestrator/
-  - documentation: https://github.com/grofers/supply-orchestrator/blob/master/README.md
-  - metrics_definition: https://github.com/grofers/kube-infra/tree/master/manifests/loki
+  deployment: http://jenkins.grofer.io/job/supply-orchestrator/
+  documentation: https://github.com/grofers/supply-orchestrator/blob/master/README.md
+  metrics_definition: https://github.com/grofers/kube-infra/tree/master/manifests/loki
 tags:
   - prod
   - supply-orchestrator

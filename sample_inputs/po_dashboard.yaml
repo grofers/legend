@@ -6,9 +6,9 @@ service: PO
 environment: Prod
 description: Purchase order management system
 references:
-- deployment: https://github.com/grofers/ansible-retail/tree/master/roles/purchase_order
-- documentation: https://github.com/grofers/retail_purchase_order
-
+  deployment: https://github.com/grofers/ansible-retail/tree/master/roles/purchase_order
+  documentation: https://github.com/grofers/retail_purchase_order
+  metrics_definition: https://github.com/grofers/retail_purchase_order
 tags:
 - prod
 
