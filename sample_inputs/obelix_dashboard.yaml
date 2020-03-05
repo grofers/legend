@@ -1,5 +1,6 @@
 ---
 title: LM-Obelix
+grafana_folder: TestRELegend
 alert_channels: ["LM-Opsgenie"]
 service: Obelix
 grafana_folder: TestRELegend
