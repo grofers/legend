@@ -1,14 +1,15 @@
 ---
-title: PO-Dashboard
+title: VMS-Dashboard
 alert_channels: ["PO-opsgenie"]
 grafana_folder: TestRELegend
-service: PO
+service: VMS
 environment: Prod
-description: Purchase order management system
+description: Vendor management system
 references:
-  deployment: https://github.com/grofers/ansible-retail/tree/master/roles/purchase_order
-  documentation: https://github.com/grofers/retail_purchase_order
-  metrics_definition: https://github.com/grofers/retail_purchase_order
+ deployment: https://github.com/grofers/ansible-retail/tree/master/roles/vms
+ documentation: https://github.com/grofers/retail_vms
+ metrics_definition: https://github.com/retail_vms
+
 tags:
 - prod
 
@@ -22,19 +23,16 @@ components:
       filter_id: EntireBucket
   django:
     dimensions:
-      - job: po-django-metrics
+      - job: vms-django-metrics
   systemcore_ec2:
     dimensions:
-    - host: purchaseorder
+    - host: vms
   redis:
     dimensions:
       - job_name: po-redis-metrics
   celery:
     dimensions:
-      - job_name: po-celery-metrics
-  couchdb:
-    dimensions:
-      - job_name: po-couchdb-metrics
+      - job_name: vms-celery-metrics
   mysql_ec2:
     dimensions:
       ec2:
@@ -42,9 +40,9 @@ components:
       db:
         - masters:
             - host: vmsmysqlmaster1-mysql-metrics
-              db_name: po
+              db_name: vms
           slaves:
             - host: perconamaster1-mysql-metrics
-              db_name: po
+              db_name: vms
             - host: perconamaster5-mysql-metrics
-              db_name: po
+              db_name: vms
