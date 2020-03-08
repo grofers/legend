@@ -1,5 +1,6 @@
 component: haproxy
 data_source: Prometheus
+metrics_source: https://github.com/prometheus/haproxy_exporter
 reference: https://www.haproxy.com/blog/haproxy-exposes-a-prometheus-metrics-endpoint
 description: High Availability Load Balancer and Proxy Server
 panels:

@@ -1,5 +1,6 @@
 component: django
 data_source: Prometheus
+metrics_source: https://github.com/grofers/django-prometheus/tree/v1.0.16 
 reference: https://docs.djangoproject.com/en/3.0/
 description: Django is a high-level Python Web framework that encourages rapid development and clean, pragmatic design.
 panels:

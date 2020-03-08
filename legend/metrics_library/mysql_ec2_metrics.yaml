@@ -1,5 +1,6 @@
 component: mysql_ec2
 data_source: Prometheus
+metrics_source: built-in (via percona)
 reference: https://www.percona.com/doc/percona-monitoring-and-management/index.metrics-monitor.dashboard.html#pmm-dashboard-mysql-list
 description: Percona Monitored MySQL EC2 Instances
 panels_in_row: 2

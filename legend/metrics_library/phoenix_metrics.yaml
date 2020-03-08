@@ -1,5 +1,6 @@
 component: phoenix
 data_source: Prometheus
+metrics_source: <phoenix prometheus exporter name>
 reference: https://hexdocs.pm/phoenix/overview.html
 description: Phoenix is a web development framework written in Elixir which implements the server-side Model View Controller (MVC) pattern.
 panels:

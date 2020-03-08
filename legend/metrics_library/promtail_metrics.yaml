@@ -1,5 +1,6 @@
 component: promtail
 data_source: Prometheus
+metrics_source: built-in
 reference: https://github.com/grafana/loki/tree/master/docs/clients/promtail
 description: Scrapes logs from pods and pushes them to loki, deployed as daemonset across all nodes
 identifier_keys:

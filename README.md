@@ -1,119 +1,122 @@
+![Legend](http://www.desigifs.com/sites/default/files/2013/BalaKrj2.gif)
+
 # Legend
+> The legendary tool to build and manage grafana dashboards for your applications
 
-<p align="center">
-  <img src="http://www.desigifs.com/sites/default/files/2013/BalaKrj2.gif" alt="Legend"/>
-</p>
+Build and publish Grafana dashboards for your services with prefilled metrics and alerts
+for your services
 
-Tool to generate grafana dashboard with pre filled metrics 
+## Table of contents
+* [Features](#features)
+* [Getting started](#getting-started)
+  * [Pre-requisites](#pre-requisites)
+  * [Using Legend](using-legend)
+* [Contribution](#contribution)
+* [Legend internals](#legend-internals)
 
-### Directory Structure
+## Features
 
-* The input file should represent a "Service"
-* Every service has multiple "Components"
-* The component needs to have a matching file in `metrics_library`. The spec is defined <>
+* Build dashboards for your services with prefilled metrics 
+* Customizable alerts and panels
+* Automatic setup of basic alerts with priority and service mapping
+* Beautiful outlay of the dashabord to enable uniformity
 
-Refer to docs in <docs>
+## Getting started
 
-### Install Dependencies
+This section describes on how to get started with using Legend.
 
-This project is built with python3. Make sure you have python3 installed on your system.
+### Pre-requisites
 
-Install Jsonnet with brew
+* For each component of your service, there has to be a respective metric files in 
+`legend/metrics_library` which containes the metrics to be plotted for that component. If you are adding a new component(and a new metric library file) please refer to [contributing-to-metric-library](docs/contributing-to-metric-library.md)
+
+* The metrics collection has to be enabled for each component of the service. Please refere to the [confluence doc](https://grofers.atlassian.net/wiki/spaces/IN/pages/1491140622/Exposing+metrics+on+services) to how to enable metrics for the components
+
+### Using Legend
+
+You can use `legend` in one of the two ways: 
+  * [Use legend from kubernetes (CRD)](#use-legend-from-kubernetes-(crd))
+  * [Legend CLI](#legend-cli)
+
+You need to create an input file describing the components of your service [writing-input-file](docs/writing-input-file.md)
+
+#### Use legend from kubernetes (CRD)
+
+Legend runs a custom resource of kind `GrafanaDashboard` in both production and stage kubernetes 
+clusters. To use legend, create a spec file in the following format 
+
+```yaml
+apiVersion: grofers.io/v1
+kind: GrafanaDashboard
+metadata:
+  name: # Name of the object internally
+  labels:
+    app: # Add name for reference
+spec: # Spec of legend. The same format in which it was mentioned earlier
 ```
+
+Set the appropriate context. 
+> The prod-sgp context creates the dashboard in production grafana (grafana.grofers.com) and the stage
+> context create the dashboard in stage grafana (grafa-stage.grofer.io). It is recommended to try and
+> test your dashboards in stage before applying in production
+
+To create/update/delete the dashboard, run:
+
+```shell
+kubectl apply -f <input-file.yaml>
+kubectl delete -f <input-file.yaml>
+```
+
+#### Use Legend CLI
+
+Legend can also be installed as a CLI and used to create dashboards. 
+> At the current stage, Legeng can only create dashboards but not delete them becuase it doesn not 
+> record the state of dashboards it created anywhere
+
+*Installation*
+Legend requires python3. It is recommended to install legend in a virtual env
+```shell
 brew install jsonnet
+mkvirtualenv -p `which python3` legend
+pip install -e https://github.com/grofers/legend
 ```
 
-### Generate Dashboards
+*Configuration*
+`LEGEND_HOME` represents the home directory of Legend, by default it is the home directory of the user.
+You can override by setting the `LEGEND_HOME` env variable while running legend
 
-Clone this repository to your local
-```
-git clone git@github.com:grofers/legend.git
-```
-Legend Home
-Legend is dependent upon grafonnet-lib, which is clones in the `LEGEND_HOME`
-The default `LEGEND_HOME` is the `~/.legend` for user, you can alter it by setting it as environment variable
-If you want to use an other version of grafonnet-lib, you can set that folder to be in the path of `LEGEND_HOME`
+Legend needs a configuration file to talk to Grafana, by default it searches for it in `LEGEND_HOME/.legend/legend.cfg`, you can over-ride this with passing `-c` option while runing the commands.
 
-Create a python3 virtualenv
-```
-mkvirtualenv -p /usr/local/bin/python3 legend
-```
+The format for legend.cfg:
+> This is pre-requisite to run legend as a CLI. Contact infra team to get the creds
 
-Install requirements from requirements.txt
-```
-pip install -e .
+```shell
+[grafana]
+api_key = # Grafana key with write permission if you are using Legend to create a dashboard, if not read permissions to get the alerting id 
+protocol = [https|http] # ex: https 
+host = # Grafana host url (ex: grafana-stage.grofer.io)
 ```
 
-Set the grafana configurations in `legend.cfg`
-```
+*Running legend*
+```shell
 legend [OPTIONS] COMMAND [ARGS]
 ```
 
-OR
- 
-Run the following command with a dashboard template to generate the dashboard JSON -
+## Contribution
+You can conribute to legend in two ways:
 
-```
-GRAFANA_API_KEY=<your-grafana-key> GRAFANA_HOST=grafana.grofers.com GRAFANA_PROTOCOL=https legend -f sample_input.yaml
-```
+*Developing/improving legend's functionality*
+* You can pick up the existing issues in the github repo of legend and work on the fixes
+* Follow the guide [developing on legend](docs/developing-on-legend.md)
 
-### To run your tests locally
+*Improve the metrics legend creates for a service*
+* This is one of the biggest offerings of Legend - pre configured metrics for a wide variety of
+components.
+* If you are contibuting to the existing metrics or writing new ones please follow the giude [contributing-to-metric-library](docs/contributing-to-metric-library.md)
+* Run tests locally using `tests.sh` (you'll need to setup local config file)
+* Raise a PR 
 
-Export grafana settings to your local environment
-```
-export GRAFANA_API_KEY=<YOUR_GRAFANA_API_KEY>
-export GRAFANA_HOST=grafana-stage.grofer.io
-export GRAFANA_PROTOCOL=https
-```
 
-Run the test script
-```
-./tests.sh
-```
+## Legend internals
 
-### Generate Dashboards via Kubernetes
-
-legend exposes itself as a CRD.
-
-#### Deploying via CRD
-
-Set the appropraite context 
-`kubectl apply -f <>`
-
-#### Minikube Setup
-
-You can set it up in your minikube for trying out and development:
-
-Start minikube:
-
-```
-minikube start
-```
-
-Start a proxy to minikube in a terminal and leave it open:
-
-```
-kubectl proxy
-```
-
-Setup the development environment:
-
-```
-mkvirtualenv legend
-pip install -e .
-pip install -r kubernetes/requirements.txt
-```
-
-Setup the CRD and start the operator:
-
-```
-cd kubernetes
-kubectl apply -f crd.yaml
-GRAFANA_API_KEY=<> GRAFANA_HOST=grafana.grofers.com GRAFANA_PROTOCOL=https LEGEND_HOME=<> DEV=true LOG_LEVEL=DEBUG kopf run handler.py
-```
-
-Create your dashboard:
-
-```
-kubectl apply -f test/obj.yaml
-```
+[Legend internals](docs/legend-internals.md)

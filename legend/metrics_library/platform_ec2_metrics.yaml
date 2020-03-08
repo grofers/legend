@@ -1,5 +1,6 @@
 component: platform_ec2
 data_source: InfluxDB
+metrics_source: https://collectd.org/
 reference: https://www.slideshare.net/OpsStack/how-to-monitoring-the-sre-golden-signals-ebook/
 description: System core metrics
 panels:

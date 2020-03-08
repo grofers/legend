@@ -1,5 +1,6 @@
 component: celery
 data_source: Prometheus
+metrics_source: https://github.com/zerok/celery-prometheus-exporter
 reference: http://www.celeryproject.org/
 description: Celery is an asynchronous task queue/job queue based on distributed message passing
 

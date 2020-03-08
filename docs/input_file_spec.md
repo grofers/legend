@@ -1,1 +1,0 @@
-# Spec for writing an input file

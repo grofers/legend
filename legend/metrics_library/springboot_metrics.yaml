@@ -1,5 +1,6 @@
 component: springboot
 data_source: Prometheus
+metrics_source: built-in (using actuator)
 reference: https://spring.io/projects/spring-boot
 description: Spring Boot is an open source Java-based framework used to create a micro Service.
 panels:
