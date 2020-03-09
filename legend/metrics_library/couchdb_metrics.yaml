@@ -4,45 +4,42 @@ reference: https://couchdb.apache.org/
 description: A CouchDB server hosts named databases, which store documents. Each document is uniquely named in the database, and CouchDB provides a RESTful HTTP API for reading and updating (add, edit, delete) database documents.
 
 panels:
-  - title: (U) Memory consumed by documents
+  - title: (U) Disk space consumed by documents
     type: Graph
-    description: Displays the total memory used by documents
+    description: Displays total disk space consumed by documents
     targets:
       {% for dimension in data %}
-      - metric: couchdb_database_data_size{job="{{ dimension.job_name }}"}
-        legend: documents size
       - metric: couch_database_disk_size{job="{{ dimension.job_name }}"}
-        legend: database size
+        legend: total database size
+        ref_no: 1
+      - metric: sum(couchdb_database_data_size{job="{{ dimension.job_name }}"}) by (instance) * 100 / sum(couchdb_database_disk_size{job="{{ dimension.job_name }}"}) by (instance)
+        legend: disk space utilisation
+        ref_no: 2
       {% endfor %}
-
-  - title: (U) Total documents on server
-    type: Graph
-    description: Total number of documents currently residing on server
-    targets:
-      {% for dimension in data %}
-      - metric: couchdb_database_doc_count{job="{{ dimension.job_name }}"}
-      {% endfor %}
+    decimals: 0
+    alert_config:
+      priority: P2
+      message: '(U) High disk space utilisation'
+      rule:
+        for_duration: 5m
+        evaluate_every: 10s
+      condition_query:
+        - OR,avg,2,now,5m,gt,75
 
   - title: (U) Database overhead
     type: Graph
-    description: The number of allocated but unused bytes
+    description: percentage of unused bytes
+    decimals: 0
     targets:
       {% for dimension in data %}
-      - metric: couchdb_database_overhead{job="{{ dimension.job_name }}"}
+      - metric: sum(couchdb_database_overhead{job="{{ dimension.job_name }}"}) by (instance) *100 / sum(couchdb_database_disk_size{job="{{ dimension.job_name }}"}) by (instance)
+        legend: database overhead %
       {% endfor %}
-
-  - title: (R) Database reads
+  - title: (R) Database reads and writes
     type: Graph
-    description: The number of database reads
+    description: The rate of database reads and writes
     targets:
       {% for dimension in data %}
-      - metric: couchdb_httpd_database_reads{job="{{ dimension.job_name }}"}
-      {% endfor %}
-
-  - title: (R) Database wrties
-    type: Graph
-    description: The number of database reads
-    targets:
-      {% for dimension in data %}
-      - metric: couchdb_httpd_database_writes{job="{{ dimension.job_name }}"}
+      - metric: deriv(couchdb_httpd_database_reads{job="{{ dimension.job_name }}"}[5m])
+      - metric: deriv(couchdb_httpd_database_writes{job="{{ dimension.job_name }}"}[5m])
       {% endfor %}

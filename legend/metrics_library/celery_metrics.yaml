@@ -34,15 +34,34 @@ panels:
     targets:
       {% for dimension in data %}
       - metric: rate(celery_tasks_runtime_seconds_sum{job="{{ dimension.job_name }}"}[5m]) / rate(celery_tasks_runtime_seconds_count{job="{{ dimension.job_name }}"}[5m])
+        ref_no: 1
       {% endfor %}
+    formatY1: s
+    alert_config:
+      priority: P2
+      message: '(R) Task execution latency is HIGH'
+      rule:
+        for_duration: 5m
+        evaluate_every: 10s
+      condition_query:
+        - OR,avg,1,now,5m,gt,40
 
   - title: (E) Rate of failed tasks
     type: Graph
     description: Numbers of tasks in failed state
     targets:
       {% for dimension in data %}
-      - metric: rate(celery_tasks{job="{{ dimension.job_name }}", state="FAILURE"}[5m])
+      - metric: rate(celery_tasks{job="{{ dimension.job_name }}", state="FAILURE"}[5m])*100 / rate(celery_tasks{job="{{ dimension.job_name }}", state=~"FAILURE|PENDING|STARTED|SUCCESS|REVOKED|RECEIVED"}[5m])
       {% endfor %}
+        ref_no: 1
+    alert_config:
+      priority: P3
+      message: '(E) Percentage of task failures is HIGH'
+      rule:
+        for_duration: 5m
+        evaluate_every: 10s
+      condition_query:
+        - OR,avg,1,now,5m,gt,35
 
   - title: (D) Celery Latency
     type: Graph
@@ -50,4 +69,15 @@ panels:
     targets:
       {% for dimension in data %}
       - metric: rate(celery_task_latency_sum{job="{{ dimension.job_name }}"}[5m]) / rate(celery_task_latency_count{job="{{ dimension.job_name }}"}[5m])
+        ref_no: 1
       {% endfor %}
+    formatY1: s
+    alert_config:
+      priority: P3
+      message: '(E) Celery latency is high'
+      rule:
+        for_duration: 5m
+        evaluate_every: 10s
+      condition_query:
+        - OR,avg,1,now,5m,gt,35
+
