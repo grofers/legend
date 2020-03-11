@@ -40,7 +40,7 @@ def build(input_file, config_file, silent, output_file):
     jsonnet_file = generate_jsonnet(input_spec, legend_config)
     dashboard_json = generate_dashboard_from_jsonnet(jsonnet_file)
     if not silent:
-        click.echo("%s"  % dashboard_json)
+        click.echo("%s"  % json.dumps(dashboard_json))
     if output_file is not None:
         with open(output_file, 'w') as f:
             f.write(json.dumps(dashboard_json))
