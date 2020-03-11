@@ -3,6 +3,7 @@ local grafana = import 'grafonnet/grafana.libsonnet';
 local dashboard = grafana.dashboard;
 local template = grafana.template;
 local text = grafana.text;
+local alertlist = grafana.alertlist;
 local row = grafana.row;
 local singlestat = grafana.singlestat;
 local graphPanel = grafana.graphPanel;
@@ -74,6 +75,19 @@ local sdp =
     )
 ;
 
+local alert_list =
+    alertlist.new(
+        title='Alert List',
+        span=null,
+        show='current',
+        limit=20,
+        onlyAlertsOnDashboard=true,
+        datasource=null,
+        description=null,
+        transparent=null,
+    )
+;
+
 
 dashboard.new(
 '{{ data.title }} - {{ data.environment }}',
@@ -84,7 +98,7 @@ time_from='now-1h',
 refresh='1m',
 )
 
-.addPanels([ sdp { gridPos: { h: 10, w: 15, x: 0, y: 0 },},])
+.addPanels([ sdp { gridPos: { h: 10, w: 15, x: 0, y: 0 },}, alert_list { gridPos: { h: 10, w: 9, x: 15, y: 0 },},])
 
 .addPanels(
   [
