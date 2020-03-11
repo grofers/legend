@@ -1,0 +1,88 @@
+component: airflow
+data_source: Prometheus
+metrics_source: https://github.com/grofers/airflow-prometheus-exporter
+reference: http://airflow.apache.org/
+description: Airflow is a platform created by community to programmatically author, schedule and monitor workflows.
+panels:
+  - title: (U) Dag run duration (canary_dag)
+    type: Graph
+    description: Dag run duration for canary_dag
+    targets:
+    {% for dimension in data %}
+      - metric: airflow_dag_run_duration{cluster=~"{{ dimension.cluster }}", namespace=~"{{ dimension.namespace }}", dag_id=~"{{ dimension.dag_id }}"}
+        legend: '{{ dimension.namespace }} - {{ dimension.dag_id }}'
+        ref_no: 1
+    {% endfor %}
+    formatY1: s
+    labelY1: seconds
+    alert_config:
+      priority: P1
+      message: High dag duration on Airflow
+      rule:
+        for_duration: 5m
+        evaluate_every: 10s
+      condition_query:
+      - OR,avg,1,now,10m,gt,600
+
+  - title: (U) Schedule delay (canary_dag)
+    type: Graph
+    description: Schedule delay for canary_dag
+    targets:
+    {% for dimension in data %}
+      - metric: airflow_dag_schedule_delay{cluster=~"{{ dimension.cluster }}", namespace=~"{{ dimension.namespace }}", dag_id=~"{{ dimension.dag_id }}"}
+        legend: '{{ dimension.namespace }} - {{ dimension.dag_id }}'
+        ref_no: 1
+    {% endfor %}
+    formatY1: s
+    labelY1: seconds
+    alert_config:
+      priority: P1
+      message: High schedule delay on Airflow
+      rule:
+        for_duration: 5m
+        evaluate_every: 10s
+      condition_query:
+      - OR,avg,1,now,10m,gt,600
+
+  - title: (E) Successful dag runs (current hour)
+    type: Graph
+    description: Successful dag runs (current hour)
+    targets:
+    {% for dimension in data %}
+      - metric: sum(airflow_dag_status{cluster=~"{{ dimension.cluster }}", namespace=~"{{ dimension.namespace }}", status="success"} or vector(0))
+        legend:
+        ref_no: 1
+    {% endfor %}
+    alert_config:
+
+  - title: (E) Failed dag runs (current hour)
+    type: Graph
+    description: Failed dag runs (current hour)
+    targets:
+    {% for dimension in data %}
+      - metric: sum(airflow_dag_status{cluster=~"{{ dimension.cluster }}", namespace=~"{{ dimension.namespace }}", status="failed"} or vector(0))
+        legend:
+        ref_no: 1
+    {% endfor %}
+    alert_config:
+
+  - title: (E) Percentage of failed dag runs (current hour)
+    type: Graph
+    description: Percentage of failed dag runs (current hour)
+    targets:
+    {% for dimension in data %}
+      - metric: sum(airflow_dag_status{cluster=~"{{ dimension.cluster }}", namespace=~"{{ dimension.namespace }}", status="failed"}) / sum(airflow_dag_status{cluster=~"{{ dimension.cluster }}", namespace=~"{{ dimension.namespace }}"}) * 100 or vector(0)
+        legend:
+        ref_no: 1
+    {% endfor %}
+    formatY1: percent
+    labelY1: percent
+    alert_config:
+      alert_config:
+      priority: P1
+      message: High schedule delay on Airflow
+      rule:
+        for_duration: 5m
+        evaluate_every: 10s
+      condition_query:
+      - OR,avg,1,now,10m,gt,5

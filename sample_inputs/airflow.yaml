@@ -1,0 +1,40 @@
+---
+title: Airflow
+alert_channels: ['Pagerduty Data']
+grafana_folder: TestRELegend
+service: Airflow
+environment: Prod
+description: Platform to programmatically author, schedule and monitor workflows
+references:
+  deployment: https://webserver-airflow.prod-sgp-k8s.grofer.io
+  documentation: https://grofers.atlassian.net/wiki/spaces/DE/pages/1560248344/Documentation
+  metrics_definition: https://github.com/grofers/airflow-prometheus-exporter
+tags:
+  - data
+  - dse
+  - airflow
+
+components:
+  airflow:
+    dimensions:
+      - cluster: prod-sgp
+        namespace: airflow
+        dag_id: canary_dag
+
+  elb:
+    dimensions:
+      - load_balancer_name: ae332d46e3c7211ea9cc002c6bdcba9b
+
+  platform_k8s_deployment:
+    dimensions:
+      - deployment_name: webserver
+      - deployment_name: scheduler
+
+  s3:
+    dimensions:
+      - bucket_name: grofers-prod-dse-sgp
+        filter_id: EntireBucket
+
+  pgsql_rds:
+    dimensions:
+      - db_instance_identifier: prod-dse-tools

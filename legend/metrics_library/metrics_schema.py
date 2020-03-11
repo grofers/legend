@@ -1,3 +1,10 @@
+airflow_schema = {
+    'dimensions': {'type': 'list', 'schema': {'type': 'dict', 'schema': {
+        'cluster': {'type': 'string', 'required': True},
+        'namespace': {'type': 'string', 'required': True},
+        'dag_id': {'type': 'string', 'required': True},
+    }}}}
+
 pgsql_rds_schema = {
     'dimensions': {'type': 'list', 'schema': {'type': 'dict', 'schema': {
         'db_instance_identifier': {'type': 'string', 'required': True},
@@ -109,7 +116,7 @@ s3_schema = {
 mysql_ec2_schema = {
     'dimensions': {'type': 'dict', 'schema': {
         'ec2': {'required': True, 'type': 'list', 'schema': {'type': 'dict', 'schema': {'host': {'type': 'string', 'required': True}}}},
-        'db': {'required': True, 'type': 'list', 'schema': {'type': 'dict', 
+        'db': {'required': True, 'type': 'list', 'schema': {'type': 'dict',
                 'schema': {
                     'masters': {'required': False, 'type': 'list', 'schema': {'type': 'dict',
                                 'schema': {'host': {'type': 'string', 'required': True},

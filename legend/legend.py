@@ -99,7 +99,7 @@ def load_legend_config(config_file=None):
         legend_config.update(grafana_host=os.environ['GRAFANA_HOST'])
     if os.environ.get("GRAFANA_PROTOCOL") is not None:
         legend_config.update(grafana_protocol=os.environ['GRAFANA_PROTOCOL'])
-   
+
     if None not in legend_config.values():
         return legend_config
     else:
@@ -163,7 +163,7 @@ def generate_jsonnet(input_spec, legend_config):
                     target['render'] = render
                 panel['alertrender'] = ''
 
-                if panel.get('alert_config'):
+                if panel.get('alert_config') is not None:
                     panel['alert_config']['rule']['name'] = panel['title']
                     panel['alert_config']['alert_ids'] = json.dumps(alert_ids)
                     panel['alert_config']['alert_service'] = alert_service

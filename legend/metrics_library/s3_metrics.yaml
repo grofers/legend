@@ -34,7 +34,7 @@ panels:
       alias: '{{ '{{BucketName}}_{{metric}}_{{stat}}' }}'
       ref_no: 4
       {% endfor %}
-    
+
   - title: (E) Client Errors - 4xx
     type: Graph
     description: The number of HTTP 4xx client error status code requests made to an Amazon S3 bucket

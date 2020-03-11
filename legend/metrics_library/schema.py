@@ -1,5 +1,6 @@
 import collections
 from .metrics_schema import (
+    airflow_schema,
     mysql_ec2_schema,
     pgsql_rds_schema,
     mysql_56_rds_schema,
@@ -42,7 +43,7 @@ additional_panels_schema = {
         'formatY1': {'type': 'string', 'required': False},
         'labelY1': {'type': 'string', 'required': False},
         'type': {'type': 'string', 'required': False, 'allowed': ['Graph']},
-        'description': {'type': 'string', 'required': False}, 
+        'description': {'type': 'string', 'required': False},
         'targets': {'type': 'list', 'schema': {'type': 'dict', 'schema': {
             'metric': {'type': 'string', 'required': False},
             'legend': {'type': 'string', 'required': False},
@@ -89,6 +90,7 @@ schema = {
         'type': 'dict',
         'required': False,
         'schema': {
+            'airflow': {'type': 'dict', 'schema':  md(default_panels_schema, airflow_schema), 'required': False},
             'celery': {'type': 'dict', 'schema':  md(default_panels_schema, celery_schema), 'required': False},
             'promtail': {'type': 'dict', 'schema':  md(default_panels_schema, promtail_schema), 'required': False},
             'platform_k8s_deployment': {'type': 'dict', 'schema': md(default_panels_schema, platform_k8s_deployment_schema), 'required': False},
