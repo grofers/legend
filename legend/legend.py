@@ -205,6 +205,7 @@ def generate_jsonnet(input_spec, legend_config):
 
     with open(jsonnet_tmp_path, 'w') as f:
         f.write(output)
+        print("tempfile : ", jsonnet_tmp_path)
 
     return jsonnet_tmp_path
 

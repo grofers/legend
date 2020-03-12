@@ -12,7 +12,7 @@ panels:
     description: Heap utilized percentage for each instance
     targets:
       {% for dimension in data %}
-      - metric: sum by (instance,service) ((jvm_memory_bytes_used{job=~"{{ dimension.job }}",area="heap",service=~"{{ dimension.service }}"})*100)/(sum by (instance,service) (jvm_memory_bytes_max{job=~"{{ dimension.job }}",area="heap",service=~"{{ dimension.service }}"}))
+      - metric: sum by (instance,service) ((jvm_memory_bytes_used{job=~"{{ dimension.job }}",area="heap"{{(",service=~\"" + dimension.service + "\"") if dimension.service else "" }}})*100)/(sum by (instance,service) (jvm_memory_bytes_max{job=~"{{ dimension.job }}",area="heap"{{(",service=~\"" + dimension.service + "\"") if dimension.service else "" }}}))
         legend: '{{ '{{instance}}_{{service}}' }}'
         ref_no: 1
       {% endfor %}
@@ -32,7 +32,7 @@ panels:
     description: Total Memory Utilization percentage for each instance
     targets:
       {% for dimension in data %}
-      - metric: sum by (instance,service) ((jvm_memory_bytes_used{job=~"{{ dimension.job }}",service=~"{{ dimension.service }}"})*100)/(sum by (instance,service) (java_lang_OperatingSystem_TotalPhysicalMemorySize{job=~"{{ dimension.job }}",service=~"{{ dimension.service }}"}))
+      - metric: sum by (instance,service) ((jvm_memory_bytes_used{job=~"{{ dimension.job }}"{{(",service=~\"" + dimension.service + "\"") if dimension.service else "" }}})*100)/(sum by (instance,service) (java_lang_OperatingSystem_TotalPhysicalMemorySize{job=~"{{ dimension.job }}"{{(",service=~\"" + dimension.service + "\"") if dimension.service else "" }}}))
         legend: '{{ '{{instance}}_{{service}}' }}'
         ref_no: 1
       {% endfor %}
@@ -52,9 +52,9 @@ panels:
     description: (current - daemon) = user threads, MAX(peak count of active threads in the system from JVM start)
     targets:
       {% for dimension in data %}
-      - metric: max(jvm_threads_peak{job="{{ dimension.job }}",service=~"{{ dimension.service }}"})
+      - metric: max(jvm_threads_peak{job="{{ dimension.job }}"{{(",service=~\"" + dimension.service + "\"") if dimension.service else "" }}})
         legend: MAX_PEAK
-      - metric: jvm_threads_current{job="{{ dimension.job }}",service=~"{{ dimension.service }}"} - jvm_threads_daemon{job="{{ dimension.job }}",service=~"{{ dimension.service }}"}
+      - metric: jvm_threads_current{job="{{ dimension.job }}"{{(",service=~\"" + dimension.service + "\"") if dimension.service else "" }}} - jvm_threads_daemon{job="{{ dimension.job }}"{{(",service=~\"" + dimension.service + "\"") if dimension.service else "" }}}
         legend: '{{ '{{instance}}_{{service}}' }}'
       {% endfor %}
 
@@ -63,7 +63,7 @@ panels:
     description: Threads that are running in the background like GC etc..
     targets:
       {% for dimension in data %}
-      - metric: jvm_threads_daemon{job="{{ dimension.job }}",service=~"{{ dimension.service }}"}
+      - metric: jvm_threads_daemon{job="{{ dimension.job }}"{{(",service=~\"" + dimension.service + "\"") if dimension.service else "" }}}
         legend: '{{ '{{instance}}_{{service}}' }}'
       {% endfor %}
 
@@ -72,9 +72,9 @@ panels:
     description: Maximum number of open file descriptors and Number of open file descriptors. https://docs.gigaspaces.com/latest/production/production-file-descriptors.html https://github.com/netdata/netdata/issues/1272
     targets:
       {% for dimension in data %}
-      - metric: min(process_max_fds{job="{{ dimension.job }}",service=~"{{ dimension.service }}"})
+      - metric: min(process_max_fds{job="{{ dimension.job }}"{{(",service=~\"" + dimension.service + "\"") if dimension.service else "" }}})
         legend: Max_File_descriptors
-      - metric: process_open_fds{job="{{ dimension.job }}",service=~"{{ dimension.service }}"}
+      - metric: process_open_fds{job="{{ dimension.job }}"{{(",service=~\"" + dimension.service + "\"") if dimension.service else "" }}}
         legend: '{{ '{{instance}}_{{service}}' }}'
       {% endfor %}
 
@@ -84,7 +84,7 @@ panels:
     description: open file descriptors Percentage
     targets:
       {% for dimension in data %}
-      - metric: sum by (instance,service) ((process_open_fds{job="{{ dimension.job }}",service=~"{{ dimension.service }}"})*100)/(sum by (instance,service) (process_max_fds{job="{{ dimension.job }}",service=~"{{ dimension.service }}"}))
+      - metric: sum by (instance,service) ((process_open_fds{job="{{ dimension.job }}"{{(",service=~\"" + dimension.service + "\"") if dimension.service else "" }}})*100)/(sum by (instance,service) (process_max_fds{job="{{ dimension.job }}"{{(",service=~\"" + dimension.service + "\"") if dimension.service else "" }}}))
         legend: '{{ '{{instance}}_{{service}}' }}'
         ref_no: 1
       {% endfor %}
@@ -104,6 +104,6 @@ panels:
     description:
     targets:
       {% for dimension in data %}
-      - metric: jvm_threads_deadlocked{job="{{ dimension.job }}",service=~"{{ dimension.service }}"}
+      - metric: jvm_threads_deadlocked{job="{{ dimension.job }}"{{(",service=~\"" + dimension.service + "\"") if dimension.service else "" }}}
         legend: '{{ '{{instance}}_{{service}}' }}'
       {% endfor %}

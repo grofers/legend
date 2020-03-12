@@ -45,12 +45,12 @@ components:
         - host: perconamaster*
       db:
         - masters:
-            - host: perconamaster4-mysql-metrics
+            - host: prod-retail-perconamaster-4
               db_name: ims
           slaves:
-            - host: perconamaster1-mysql-metrics
+            - host: pprod-retail-perconamaster-1
               db_name: ims
-            - host: perconamaster5-mysql-metrics
+            - host: prod-retail-perconamaster-5
               db_name: ims
   platform_ec2:
     dimensions:

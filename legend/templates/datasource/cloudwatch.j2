@@ -1,10 +1,6 @@
 .addTarget(
     cloudwatch.target(
-    {% if data.region is not none %}
-        '{{data.region}}',
-    {% else %}
-        'default',
-    {%endif%}
+    '{{data.region or 'default'}}',
     '{{data.namespace}}',
     '{{data.metric}}',
     datasource=null,
