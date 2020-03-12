@@ -19,7 +19,8 @@ from .metrics_schema import (
     platform_k8s_deployment_schema,
     redis_schema,
     platform_ec2_schema,
-    s3_schema
+    s3_schema,
+    playframework_schema
 )
 
 
@@ -108,6 +109,7 @@ schema = {
             'mysql_56_rds': {'type': 'dict', 'schema':  md(default_panels_schema, mysql_56_rds_schema), 'required': False},
             'mysql_ec2': {'type': 'dict', 'schema':  md(default_panels_schema, mysql_ec2_schema), 'required': False},
             'pgsql_rds': {'type': 'dict', 'schema':  md(default_panels_schema, pgsql_rds_schema), 'required': False},
+            'playframework': {'type': 'dict', 'schema':  md(default_panels_schema, playframework_schema), 'required': False},
             }
       }
 }

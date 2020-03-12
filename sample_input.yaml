@@ -13,6 +13,9 @@ tags:
 - stage
 - infra
 components:
+  playframework:
+    dimensions:
+      - service: phoenixappban1
   s3:
     dimensions:
       - bucket_name: grofers-loki-prod

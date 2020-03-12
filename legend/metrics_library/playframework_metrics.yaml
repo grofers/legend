@@ -1,0 +1,127 @@
+component: playframework
+data_source: Prometheus
+metrics_source: https://github.com/grofers/play-prometheus-filters/tree/0.2.3
+reference: https://www.playframework.com/documentation/2.5.x/Home
+description: Play Framework is an open source Scala-based framework (JVM based) used to create a micro Service in Java and Scala.
+panels:
+  - title: (R) Rate of requests (qps) - aggregated over all methods
+    type: Graph
+    description: qps
+    targets:
+    {% for dimension in data %}
+      - metric: sum(increase(requests_latency_seconds_count{service=~"{{ dimension.service }}"}[1m]))
+        legend: Aggregate
+      - metric: sum(increase(requests_latency_seconds_count{service=~"{{ dimension.service }}"}[1m])) by (instance_name)
+        legend: '{{ '{{instance_name}}' }}'
+    {% endfor %}
+
+  - title: (R) Rate of requests per API
+    type: Graph
+    description: qps per API
+    targets:
+    {% for dimension in data %}
+      - metric: sum(increase(requests_latency_seconds_count{service=~"{{ dimension.service }}"}[1m])) by (RouteActionController,RouteActionMethod)
+        legend: '{{ '{{RouteActionController}}.{{RouteActionMethod}}' }}'
+    {% endfor %}
+
+  - title: (E) Error rate - aggregated over all methods (4xx)
+    type: Graph
+    description: 4xx Error rate at service level. Client side errors
+    targets:
+    {% for dimension in data %}
+      - metric: sum(increase(requests_latency_seconds_count{service=~"{{ dimension.service }}",status =~ "4.."}[1m]))
+        legend: Aggregate
+      - metric: sum(increase(requests_latency_seconds_count{service=~"{{ dimension.service }}",status =~ "4.."}[1m])) by (instance_name)
+        legend: '{{ '{{instance_name}}' }}'
+    {% endfor %}
+
+  - title: (E) Error rate - per API (4xx)
+    type: Graph
+    description: error per API. Client side errors
+    targets:
+    {% for dimension in data %}
+      - metric: sum(increase(requests_latency_seconds_count{service=~"{{ dimension.service }}",status =~ "4.."}[1m])) by (RouteActionController,RouteActionMethod)
+        legend: '{{ '{{RouteActionController}}.{{RouteActionMethod}}' }}'
+    {% endfor %}
+
+  - title: (E) Error rate - aggregated over all methods (5xx)
+    type: Graph
+    description: 5xx Error rate at service level. Server side errors
+    targets:
+    {% for dimension in data %}
+      - metric: sum(increase(requests_latency_seconds_count{service=~"{{ dimension.service }}",status =~ "5.."}[1m]))
+        legend: Aggregate
+        ref_no: 1
+      - metric: sum(increase(requests_latency_seconds_count{service=~"{{ dimension.service }}",status =~ "5.."}[1m])) by (instance_name)
+        legend: '{{ '{{instance_name}}' }}'
+        ref_no: 2
+    {% endfor %}
+    alert_config:
+      priority: P3
+      message: 'High error rate (5xx)'
+      rule:
+        for_duration: 5m
+        evaluate_every: 10s
+      condition_query:
+        - OR,avg,1,now,5m,gt,20
+        - OR,avg,2,now,5m,gt,30
+
+  - title: (E) Error rate - per API (5xx)
+    type: Graph
+    description: error per API. Server side errors
+    targets:
+    {% for dimension in data %}
+      - metric: sum(increase(requests_latency_seconds_count{service=~"{{ dimension.service }}",status =~ "5.."}[1m])) by (RouteActionController,RouteActionMethod)
+        legend: '{{ '{{RouteActionController}}.{{RouteActionMethod}}' }}'
+        ref_no: 1
+    {% endfor %}
+    alert_config:
+      priority: P3
+      message: 'High error rate - per API (5xx)'
+      rule:
+        for_duration: 5m
+        evaluate_every: 10s
+      condition_query:
+        - OR,avg,1,now,5m,gt,5
+
+  - title: (D) Latency over all methods (99th percentile)
+    type: Graph
+    description: overall latency
+    formatY1: s
+    targets:
+    {% for dimension in data %}
+      - metric: histogram_quantile(0.99, sum(rate(requests_latency_seconds_bucket{service=~"{{ dimension.service }}"}[5m])) by (le))
+        legend: Aggregate
+        ref_no: 1
+      - metric: histogram_quantile(0.99, sum(rate(requests_latency_seconds_bucket{service=~"{{ dimension.service }}"}[5m])) by (instance_name,le))
+        legend: '{{ '{{instance_name}}' }}'
+        ref_no: 2
+    {% endfor %}
+    alert_config:
+      priority: P3
+      message: 'High latency'
+      rule:
+        for_duration: 5m
+        evaluate_every: 10s
+      condition_query:
+        - OR,avg,1,now,5m,gt,5
+        - OR,avg,2,now,5m,gt,10
+
+  - title: (D) Latency per API (99th percentile)
+    type: Graph
+    description: API level latency
+    formatY1: s
+    targets:
+    {% for dimension in data %}
+      - metric: histogram_quantile(0.99, sum(rate(requests_latency_seconds_bucket{service=~"{{ dimension.service }}"}[5m])) by (RouteActionController,RouteActionMethod,le))
+        legend: '{{ '{{RouteActionController}}.{{RouteActionMethod}}' }}'
+        ref_no: 1
+    {% endfor %}
+    alert_config:
+      priority: P3
+      message: 'High latency - per API'
+      rule:
+        for_duration: 5m
+        evaluate_every: 10s
+      condition_query:
+        - OR,avg,1,now,5m,gt,10

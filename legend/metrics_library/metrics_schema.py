@@ -59,6 +59,11 @@ django_schema = {
         'job': {'type': 'string', 'required': True},
     }}}}
 
+playframework_schema = {
+    'dimensions': {'type': 'list', 'schema': {'type': 'dict', 'schema': {
+        'service': {'type': 'string', 'required': True},
+    }}}}
+
 couchdb_schema = {
     'dimensions': {'type': 'list', 'schema': {'type': 'dict', 'schema': {
         'job_name': {'type': 'string', 'required': True},
