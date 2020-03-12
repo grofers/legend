@@ -21,7 +21,8 @@ from .metrics_schema import (
     redis_schema,
     platform_ec2_schema,
     s3_schema,
-    playframework_schema
+    playframework_schema,
+    starlette_schema,
 )
 
 
@@ -91,6 +92,7 @@ schema = {
         'required': False,
         'schema': {
             'airflow': {'type': 'dict', 'schema':  md(default_panels_schema, airflow_schema), 'required': False},
+            'starlette': {'type': 'dict', 'schema':  md(default_panels_schema, starlette_schema), 'required': False},
             'celery': {'type': 'dict', 'schema':  md(default_panels_schema, celery_schema), 'required': False},
             'promtail': {'type': 'dict', 'schema':  md(default_panels_schema, promtail_schema), 'required': False},
             'platform_k8s_deployment': {'type': 'dict', 'schema': md(default_panels_schema, platform_k8s_deployment_schema), 'required': False},
@@ -112,6 +114,7 @@ schema = {
             'mysql_ec2': {'type': 'dict', 'schema':  md(default_panels_schema, mysql_ec2_schema), 'required': False},
             'pgsql_rds': {'type': 'dict', 'schema':  md(default_panels_schema, pgsql_rds_schema), 'required': False},
             'playframework': {'type': 'dict', 'schema':  md(default_panels_schema, playframework_schema), 'required': False},
+            'starlette': {'type': 'dict', 'schema':  md(default_panels_schema, starlette_schema), 'required': False},
             }
       }
 }

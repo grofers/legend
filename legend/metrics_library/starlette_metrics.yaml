@@ -1,0 +1,115 @@
+component: starlette
+data_source: Prometheus
+metrics_source: https://github.com/perdy/starlette-prometheus/
+reference: https://www.starlette.io/
+description: Starlette is a lightweight ASGI framework/toolkit, which is ideal for building high performance asyncio services.
+panels:
+  - title: (U) Requests in progress
+    type: Graph
+    description: Requests in progress
+    targets:
+    {% for dimension in data %}
+      - metric: sum(starlette_requests_in_progress{job=~"{{ dimension.job }}", path=~"{{ dimension.path }}"})
+    {% endfor %}
+    alert_config:
+
+  - title: (R) Rate of requests
+    type: Graph
+    description: Rate of requests
+    targets:
+    {% for dimension in data %}
+      - metric: sum(irate(starlette_requests_total{job=~"{{ dimension.job }}", path=~"{{ dimension.path }}"}[5m]))
+    {% endfor %}
+    alert_config:
+
+  - title: (E) Request error rate (4xx)
+    type: Graph
+    description: Request error rate (4xx)
+    targets:
+    {% for dimension in data %}
+      - metric: sum(irate(starlette_responses_total{job=~"{{ dimension.job }}", path=~"{{ dimension.path }}", status_code=~"4.."}[5m]) or vector(0))
+        ref_no: {{ loop.index }}
+    {% endfor %}
+    alert_config:
+      priority: P1
+      message: High request error rate (4xx)
+      rule:
+        for_duration: 5m
+        evaluate_every: 10s
+      condition_query:
+      - OR,avg,1,now,5m,gt,20
+
+  - title: (E) Request error rate (5xx)
+    type: Graph
+    description: Request error rate (5xx)
+    targets:
+    {% for dimension in data %}
+      - metric: sum(irate(starlette_responses_total{job=~"{{ dimension.job }}", path=~"{{ dimension.path }}", status_code=~"5.."}[5m]) or vector(0))
+        ref_no: {{ loop.index }}
+    {% endfor %}
+    alert_config:
+      priority: P1
+      message: High request error rate (5xx)
+      rule:
+        for_duration: 5m
+        evaluate_every: 10s
+      condition_query:
+      - OR,avg,1,now,5m,gt,20
+
+  - title: (D) Average latency
+    type: Graph
+    description: Average latency
+    formatY1: s
+    labelY1: seconds
+    targets:
+    {% for dimension in data %}
+      - metric: sum(rate(starlette_requests_processing_time_seconds_sum{job=~"{{ dimension.job }}", path=~"{{ dimension.path }}"}[5m])) / sum(rate(starlette_requests_processing_time_seconds_count{job=~"{{ dimension.job }}", path=~"{{ dimension.path }}"}[5m]))
+        ref_no: {{ loop.index }}
+    {% endfor %}
+    alert_config:
+      priority: P1
+      message: High average latency
+      rule:
+        for_duration: 5m
+        evaluate_every: 10s
+      condition_query:
+      - OR,avg,1,now,5m,gt,20
+
+  - title: (D) Overall latency (95th percentile)
+    type: Graph
+    description: Overall latency (95th percentile)
+    formatY1: s
+    labelY1: seconds
+    targets:
+    {% for dimension in data %}
+      - metric: histogram_quantile(0.95, sum(rate(starlette_requests_processing_time_seconds_bucket{job=~"{{ dimension.job }}"}[5m])) by (le))
+        ref_no: {{ loop.index }}
+    {% endfor %}
+    alert_config:
+      priority: P1
+      message: High overall latency
+      rule:
+        for_duration: 5m
+        evaluate_every: 10s
+      condition_query:
+      - OR,avg,1,now,5m,gt,20
+
+  - title: (D) Latency per route (95th percentile)
+    type: Graph
+    description: Latency per route (95th percentile)
+    formatY1: s
+    labelY1: seconds
+    targets:
+    {% for dimension in data %}
+      - metric: histogram_quantile(0.95, sum(rate(starlette_requests_processing_time_seconds_bucket{job=~"{{ dimension.job }}"}[5m])) by (path, method, le))
+        legend: '{{ '{{ method }} - {{ path }}' }}'
+        ref_no: {{ loop.index }}
+    {% endfor %}
+    alert_config:
+      priority: P1
+      message: High latency on some routes
+      rule:
+        for_duration: 5m
+        evaluate_every: 10s
+      condition_query:
+      - OR,avg,1,now,5m,gt,20

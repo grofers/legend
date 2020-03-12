@@ -5,6 +5,12 @@ airflow_schema = {
         'dag_id': {'type': 'string', 'required': True},
     }}}}
 
+starlette_schema = {
+    'dimensions': {'type': 'list', 'schema': {'type': 'dict', 'schema': {
+        'job': {'type': 'string', 'required': True},
+        'path': {'type': 'string', 'required': True},
+    }}}}
+
 pgsql_rds_schema = {
     'dimensions': {'type': 'list', 'schema': {'type': 'dict', 'schema': {
         'db_instance_identifier': {'type': 'string', 'required': True},
