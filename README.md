@@ -78,7 +78,7 @@ Legend requires python3. It is recommended to install legend in a virtual env
 ```shell
 brew install jsonnet
 mkvirtualenv -p `which python3` legend
-pip install -e git+https://github.com/grofers/legend
+pip install -e git+https://github.com/grofers/legend#egg=legend
 ```
 
 *Configuration*

@@ -34,6 +34,7 @@ rabbitmq_schema = {
 jmx_schema = {
     'dimensions': {'type': 'list', 'schema': {'type': 'dict', 'schema': {
         'job': {'type': 'string', 'required': True},
+        'service': {'type': 'string', 'required': False},
     }}}}
 
 haproxy_schema = {
@@ -44,6 +45,13 @@ haproxy_schema = {
 elb_schema = {
     'dimensions': {'type': 'list', 'schema': {'type': 'dict', 'schema': {
         'load_balancer_name': {'type': 'string', 'required': True},
+    }}}}
+
+alb_schema = {
+    'dimensions': {'type': 'list', 'schema': {'type': 'dict', 'schema': {
+        'load_balancer_id': {'type': 'string', 'required': True},
+        'target_group_id': {'type': 'string', 'required': True},
+        'region': {'type': 'string', 'required': False},
     }}}}
 
 django_schema = {

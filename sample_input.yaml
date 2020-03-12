@@ -49,7 +49,10 @@ components:
     - job: lastmile/ec2-obelix-springboot
   jmx:
     dimensions:
-    - job: lastmile/ec2-obelix-jmx
+      - job: wh/ec2-phoenix-jmx-app
+        service: phoenixappban1
+      - job: wh/ec2-phoenix-jmx-sync
+        service: phoenixappban1
   pgsql_rds:
     dimensions:
       - db_instance_identifier: prod-supply-orchestrator
@@ -62,6 +65,14 @@ components:
   elb:
     dimensions:
       - load_balancer_name: po-retail
+  alb:
+    dimensions:
+      - load_balancer_id: app/prod-retail-phoenix/83291326c0038ad8
+        region: ap-south-1
+        target_group_id: targetgroup/prod-retail-phoenix-ban1-public/9f759c4e6a26a4d9
+      - load_balancer_id: app/prod-retail-phoenix-private/e92c1fee75ff1350
+        region: ap-south-1
+        target_group_id: targetgroup/prod-retail-phoenix-ban1/b8b1fd9bcffd01b9
   django:
     dimensions:
       - job: po-django-metrics
