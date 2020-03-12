@@ -38,12 +38,20 @@ panels_in_row_schema = {
 additional_panels_schema = {
     'panels': {'type': 'list', 'schema': {'type': 'dict', 'schema': {
         'title': {'type': 'string', 'required': True},
+        'formatY1': {'type': 'string', 'required': False},
+        'labelY1': {'type': 'string', 'required': False},
         'type': {'type': 'string', 'required': False, 'allowed': ['Graph']},
         'description': {'type': 'string', 'required': False}, 
         'targets': {'type': 'list', 'schema': {'type': 'dict', 'schema': {
-            'metric': {'type': 'string', 'required': True},
+            'metric': {'type': 'string', 'required': False},
             'legend': {'type': 'string', 'required': False},
             'ref_no': {'type': 'integer', 'coerce': int, 'required': False},
+            'dimensions': {'type': 'dict', 'keysrules': {'type': 'string'}, 'required': False},
+            'namespace': {'type': 'string', 'required': False},
+            'statistic': {'type': 'string', 'required': False},
+            'alias': {'type': 'string', 'required': False},
+            'query': {'type': 'string', 'required': False},
+            'alias_by': {'type': 'string', 'required': False},
         }}},
         'alert_config': {'type': 'dict', 'required': False, 'schema':{
             'priority': {'type': 'string', 'required': True, 'allowed': ['P1','P2','P3','P4','P5']},

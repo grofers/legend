@@ -13,6 +13,14 @@ from legend.legend import (
     create_or_update_grafana_dashboard
 )
 
+from legend.helpers.validations import (
+    validate_input
+)
+
+from legend.metrics_library import (
+    schema
+)
+
 LOG_LEVEL = os.environ.get('LOG_LEVEL', 'INFO')
 DEV = os.environ.get('DEV', False)
 
@@ -35,13 +43,15 @@ def create_or_update_handler(spec, name, **kwargs):
     dashboard_id = str(spec['grafana_folder'])
     # While  trying to update the dashboard, checking if it was successful in
     # the previous run
-    if status in body['status']:
+    if 'Status' in body.keys():
+        status = body['status']
         try:
             dashboard_id = int(status['create_handler']['id'])
         except KeyError:
             dashboard_id = int(status['update_handler']['id'])
 
     legend_config = load_legend_config()
+    validate_input(schema, spec)
     jsonnet_file = generate_jsonnet(spec, legend_config)
     dashboard_json = generate_dashboard_from_jsonnet(jsonnet_file)
     resp = create_or_update_grafana_dashboard(

@@ -51,8 +51,6 @@ def set_global_vars():
 def install_grafonnet_lib():
     legend_path = os.path.join(LEGEND_HOME)
     mkdir(legend_path)
-    grafonnet_repo = os.path.join(
-        LEGEND_HOME, GRAFONNET_REPO_NAME)
     grafonnet_path = os.path.join(
         LEGEND_HOME, GRAFONNET_REPO_NAME)
     if not os.path.isdir(grafonnet_path):
