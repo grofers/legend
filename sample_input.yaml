@@ -100,3 +100,12 @@ components:
   vault:
     dimensions:
       - environment: prod
+  airflow:
+    dimensions:
+      - cluster: prod-sgp
+        namespace: airflow
+        dag_id: canary_dag
+  starlette:
+    dimensions:
+      - job: dse-gis-api-service
+        path: /layers/actions/tag
