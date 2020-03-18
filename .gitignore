@@ -17,6 +17,8 @@ output.jsonnet
 
 dashboard.json
 
+.build/
+
 x.txt
 
 .vscode/

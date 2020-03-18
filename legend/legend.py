@@ -3,8 +3,6 @@
 import json
 import os
 import subprocess
-import configparser
-from git import Repo
 
 from uuid import uuid4
 
@@ -22,9 +20,11 @@ from .helpers.utilities import (
     mkdir,
 )
 
+from .configure import (
+    set_global_vars
+)
 from . import (
     LEGEND_HOME,
-    GRAFONNET_REPO_URL,
     GRAFONNET_REPO_NAME,
     LEGEND_DEFAULT_CONFIG,
 )
@@ -33,74 +33,6 @@ make_abs_path = lambda d: os.path.join(os.path.dirname(os.path.abspath(__file__)
 
 global LEGEND_HOME
 global GRAFONNET_REPO_NAME
-global GRAFONNET_REPO_URL
-
-
-def set_global_vars():
-    if os.environ.get("LEGEND_HOME") is not None:
-        LEGEND_HOME = os.environ.get("LEGEND_HOME")
-
-    if os.environ.get("GRAFONNET_REPO_NAME") is not None:
-        GRAFONNET_REPO_NAME = os.environ.get("GRAFONNET_REPO_NAME")
-
-    if os.environ.get("GRAFONNET_REPO_URL") is not None:
-        GRAFONNET_REPO_URL = os.environ.get("GRAFONNET_REPO_URL")
-
-
-def install_grafonnet_lib():
-    legend_path = os.path.join(LEGEND_HOME)
-    mkdir(legend_path)
-    grafonnet_path = os.path.join(LEGEND_HOME, GRAFONNET_REPO_NAME)
-    if not os.path.isdir(grafonnet_path):
-        try:
-            repo = Repo.clone_from(GRAFONNET_REPO_URL, grafonnet_path)
-        except Exception:
-            raise ValueError("Error cloning grafonnet-lib folder from GitHub")
-    else:
-        try:
-            # Update from master
-            repo = Repo(grafonnet_path)
-            repo.heads.master.checkout()
-            repo.git.pull("origin", "master")
-        except Exception:
-            raise ValueError("Not a valid git repo/unable to pull master")
-    return ()
-
-
-def load_legend_config(config_file=None):
-    set_global_vars()
-    install_grafonnet_lib()
-    config = configparser.SafeConfigParser()
-
-    # Load config from provided input file
-    legend_config = {}
-    if config_file is not None:
-        configuration = config.read(config_file)
-        legend_config.update(grafana_api_key=config.get("grafana", "api_key"))
-        legend_config.update(grafana_host=config.get("grafana", "host"))
-        legend_config.update(grafana_protocol=config.get("grafana", "protocol"))
-
-    # Load config from LEGEND_HOME
-    elif os.path.exists(os.path.join(LEGEND_HOME, LEGEND_DEFAULT_CONFIG)):
-        configuration = config.read(os.path.join(LEGEND_HOME, LEGEND_DEFAULT_CONFIG))
-        legend_config.update(grafana_api_key=config.get("grafana", "api_key"))
-        legend_config.update(grafana_host=config.get("grafana", "host"))
-        legend_config.update(grafana_protocol=config.get("grafana", "protocol"))
-
-    # Override with environment variables if any
-    if os.environ.get("GRAFANA_API_KEY") is not None:
-        legend_config.update(grafana_api_key=os.environ["GRAFANA_API_KEY"])
-    if os.environ.get("GRAFANA_HOST") is not None:
-        legend_config.update(grafana_host=os.environ["GRAFANA_HOST"])
-    if os.environ.get("GRAFANA_PROTOCOL") is not None:
-        legend_config.update(grafana_protocol=os.environ["GRAFANA_PROTOCOL"])
-
-    if None not in legend_config.values():
-        return legend_config
-    else:
-        raise Exception(
-            "Incomplete legend config, please update the legend config file or set env values"
-        )
 
 
 def generate_jsonnet(input_spec, legend_config):
@@ -211,6 +143,7 @@ def generate_jsonnet(input_spec, legend_config):
 
 
 def generate_dashboard_from_jsonnet(jsonnet_file_path):
+    set_global_vars()
     cmd_env_vars = dict(os.environ)
     grafonnet_lib = os.path.join(LEGEND_HOME, GRAFONNET_REPO_NAME)
     exec_command = "jsonnet -J %s %s" % (grafonnet_lib, jsonnet_file_path)

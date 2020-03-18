@@ -6,9 +6,10 @@ export LEGEND_HOME=/tmp/.legend
 
 # Run tests
 
+legend configure 
 # legend build
 echo "Running legend build test"
-legend build sample_input.yaml -o sample_output.json -s
+legend build ../sample_input.yaml -o sample_output.json -s
 
 # legend apply (also tests the folder creation flow)
 echo "Running legend publish test"

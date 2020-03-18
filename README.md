@@ -78,7 +78,8 @@ Legend requires python3. It is recommended to install legend in a virtual env
 ```shell
 brew install jsonnet
 mkvirtualenv -p `which python3` legend
-pip install -e git+https://github.com/grofers/legend#egg=legend
+pip install git+https://github.com/grofers/legend
+legend configure
 ```
 
 *Configuration*
@@ -97,9 +98,22 @@ protocol = [https|http] # ex: https
 host = # Grafana host url (ex: grafana-stage.grofer.io)
 ```
 
+To configure legend
+```shell
+legend configure
+```
 *Running legend*
 ```shell
-legend [OPTIONS] COMMAND [ARGS]
+Usage: legend [OPTIONS] COMMAND [ARGS]...
+
+Options:
+  --help  Show this message and exit.
+
+Commands:
+  apply
+  build
+  configure
+  publish
 ```
 
 ## Contribution

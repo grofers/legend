@@ -6,10 +6,14 @@ import json
 import click
 
 from .legend import (
-    load_legend_config,
     generate_jsonnet,
     generate_dashboard_from_jsonnet,
     create_or_update_grafana_dashboard,
+)
+
+from .configure import (
+    install_grafonnet_lib,
+    load_legend_config
 )
 from .helpers.utilities import check_if_file_exists, input_yaml_to_json
 
@@ -22,14 +26,32 @@ def publish_main():
 
 @click.group()
 def cli_main():
+
+    """
+    Build and publish Grafana dashboards for your services with prefilled
+    metrics and alerts for your services
+
+    You need a valid API key for Grafana for the tool to work.
+    """
     pass
 
 
 @cli_main.command()
+@click.option("-c", "--config_file", help="confoguration file for legend")
+def configure(config_file):
+    if config_file is not None:
+        check_if_file_exists(config_file)
+    install_grafonnet_lib()
+    legend_config = load_legend_config(config_file=config_file)
+
+
+@cli_main.command()
 @click.argument("input_file", required=True, type=click.Path())
-@click.option("-c", "--config_file")
-@click.option("-s", "--silent", is_flag=True)
-@click.option("-o", "--output_file")
+@click.option("-c", "--config_file", help="configuration file for legend")
+@click.option("-s", "--silent", is_flag=True,
+              help="do not print the generated dashboard to stdout")
+@click.option("-o", "--output_file",
+              help="output file to store generated json")
 def build(input_file, config_file, silent, output_file):
     check_if_file_exists(input_file)
     legend_config = load_legend_config(config_file=config_file)
@@ -45,8 +67,10 @@ def build(input_file, config_file, silent, output_file):
 
 @cli_main.command()
 @click.argument("input_json", required=True, type=click.Path())
-@click.option("-f", "--grafana_folder", required=True)
-@click.option("-c", "--config_file")
+@click.option("-f", "--grafana_folder", required=True,
+              help="folder in grafana to publish the dashboard"
+              )
+@click.option("-c", "--config_file", help="configuration file for legend")
 def publish(input_json, grafana_folder, config_file):
     check_if_file_exists(input_json)
     legend_config = load_legend_config(config_file=config_file)
@@ -68,6 +92,7 @@ def publish(input_json, grafana_folder, config_file):
 @click.argument("input_file", type=click.Path())
 @click.option(
     "-c", "--config_file",
+    help="configuration file for legend"
 )
 def apply(input_file, config_file):
     check_if_file_exists(input_file)

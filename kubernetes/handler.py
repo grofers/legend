@@ -8,13 +8,17 @@ from urllib.parse import urljoin
 from legend.legend import (
     delete_dashboard,
     generate_jsonnet,
-    load_legend_config,
     generate_dashboard_from_jsonnet,
     create_or_update_grafana_dashboard
 )
 
 from legend.helpers.validations import (
     validate_input
+)
+
+from legend.configure import (
+    load_legend_config,
+    install_grafonnet_lib
 )
 
 from legend.metrics_library import (
@@ -35,6 +39,8 @@ if DEV:
     logger.info('Startin DEV mode')
     from dev import login_handler
 
+# Installing grafonnetlib for crd
+install_grafonnet_lib()
 
 def create_or_update_handler(spec, name, **kwargs):
     body = kwargs['body']

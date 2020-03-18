@@ -23,6 +23,7 @@ pipeline {
 
           withVault([configuration: configuration, vaultSecrets: secrets]) {
                   sh '''
+                    cd tests
                     chmod u+x tests.sh 
                     ./tests.sh
                   '''
