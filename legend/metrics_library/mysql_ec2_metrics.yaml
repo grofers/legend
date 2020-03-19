@@ -36,12 +36,12 @@ panels:
     targets:
       {% for dimension in data.db %}
         {% for master in dimension.masters %}
-      - metric: (max((max_over_time(mysql_global_status_threads_connected{instance_name=~"{{ master.host }}"}[5m]) or mysql_global_status_threads_connected{instance_name=~"{{ master.host }}"})*100/mysql_global_variables_max_connections{instance_name=~"{{ master.host }}"} ) by (instance_name))
+      - metric: (max((max_over_time(mysql_global_status_threads_connected{instance_name=~"{{ master.host }}"}[5m]) or mysql_global_status_threads_connected{instance_name=~"{{ master.host }}"})*100 / ignoring(job) mysql_global_variables_max_connections{instance_name=~"{{ master.host }}"} ) by (instance_name))
         legend: '{{ '{{instance_name}}' }}'
         ref_no: 1
         {% endfor %}
         {% for slave in dimension.slaves %}
-      - metric: (max((max_over_time(mysql_global_status_threads_connected{instance_name=~"{{ slave.host }}"}[5m]) or mysql_global_status_threads_connected{instance_name=~"{{ slave.host }}"})*100/mysql_global_variables_max_connections{instance_name=~"{{ slave.host }}"} ) by (instance_name))
+      - metric: (max((max_over_time(mysql_global_status_threads_connected{instance_name=~"{{ slave.host }}"}[5m]) or mysql_global_status_threads_connected{instance_name=~"{{ slave.host }}"})*100 / ignoring(job) mysql_global_variables_max_connections{instance_name=~"{{ slave.host }}"} ) by (instance_name))
         legend: '{{ '{{instance_name}}' }}'
         ref_no: 2
         {% endfor %}
@@ -241,6 +241,71 @@ panels:
         condition_query:
         - OR,avg,1,now,15m,gt,2700
 
+  - title: (D) MySQL Up
+    type: Graph
+    description: MySQL Up
+    targets:
+      {% for dimension in data.db %}
+        {% for master in dimension.masters %}
+      - metric: up{instance_name=~"{{ master.host }}"}
+        legend:  '{{ '{{instance_name}}' }}'
+        ref_no: 1
+        {% endfor %}
+        {% for slave in dimension.slaves %}
+      - metric: up{instance_name=~"{{ slave.host }}"}
+        legend: '{{ '{{instance_name}}' }}'
+        ref_no: 2
+        {% endfor %}
+      {% endfor %}
+    alert_config:
+        priority: P1
+        message: 'MySQL is Down'
+        rule:
+          for_duration: 1m
+          evaluate_every: 60s
+        condition_query:
+        - OR,max,1,now,1m,lt,1
+        - OR,max,2,now,1m,lt,1
+
+  - title: (D) Slave IO Thread Running
+    type: Graph
+    description: Displays whether the IO Thread is in the running state or not. Applies only to a Slave host. The IO Thread connects to the Master host and reads binary log events, and then copies them locally to a file called the relay log.
+    targets:
+      {% for dimension in data.db %}
+        {% for slave in dimension.slaves %}
+      - metric: mysql_slave_status_slave_io_running{instance_name=~"{{ slave.host }}"}
+        legend: '{{ '{{instance_name}}' }}'
+        ref_no: 1
+        {% endfor %}
+      {% endfor %}
+    alert_config:
+        priority: P1
+        message: 'Slave IO Thread Running alert'
+        rule:
+          for_duration: 1m
+          evaluate_every: 60s
+        condition_query:
+        - OR,max,1,now,1m,lt,1
+
+  - title: (D) Slave SQL Thread Running
+    type: Graph
+    description: Displays whether the SQL Thread is in the running state or not. Applies only to a Slave host. The SQL Thread reads the events from the local relay log file and applies them to the Slave host.  Depending on the format of the binary log it can read query statements (STATEMENT format) and re-executes them, or by reading row changes (ROW format) and applying only the changes.
+    targets:
+      {% for dimension in data.db %}
+        {% for slave in dimension.slaves %}
+      - metric: mysql_slave_status_slave_sql_running{instance_name=~"{{ slave.host }}"}
+        legend: '{{ '{{instance_name}}' }}'
+        ref_no: 1
+        {% endfor %}
+      {% endfor %}
+    alert_config:
+        priority: P1
+        message: 'Slave SQL Thread not running'
+        rule:
+          for_duration: 1m
+          evaluate_every: 60s
+        condition_query:
+        - OR,max,1,now,1m,lt,1
 ---
 {% set data = data.ec2 %}
 {% include "platform_ec2_metrics.yaml" with context %}

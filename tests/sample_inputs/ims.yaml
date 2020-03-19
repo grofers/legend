@@ -48,7 +48,7 @@ components:
             - host: prod-retail-perconamaster-4
               db_name: ims
           slaves:
-            - host: pprod-retail-perconamaster-1
+            - host: prod-retail-perconamaster-1
               db_name: ims
             - host: prod-retail-perconamaster-5
               db_name: ims
