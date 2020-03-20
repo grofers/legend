@@ -47,14 +47,6 @@ def create_or_update_handler(spec, name, **kwargs):
     spec = body['spec']
 
     dashboard_id = str(spec['grafana_folder'])
-    # While  trying to update the dashboard, checking if it was successful in
-    # the previous run
-    if 'status' in body.keys():
-        status = body['status']
-        try:
-            dashboard_id = int(status['create_handler']['id'])
-        except KeyError:
-            dashboard_id = int(status['update_handler']['id'])
 
     legend_config = load_legend_config()
     validate_input(schema, spec)

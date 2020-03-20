@@ -163,15 +163,11 @@ def create_or_update_grafana_dashboard(
     grafana_api = GrafanaFace(auth=auth, host=host, protocol=protocol)
 
     # Create dashboard based on the folder, if a new dashboard
-    if isinstance(dashboard_id, str):
-
-        # Check if the folder exists
-        id = get_grafana_folder_id(dashboard_id, auth, grafana_url)
-        if id is None:
-            # Create folder if doesn't exist
-            id = create_grafana_folder(dashboard_id, auth, grafana_url)
-    else:
-        id = dashboard_id
+    # Check if the folder exists
+    id = get_grafana_folder_id(dashboard_id, auth, grafana_url)
+    if id is None:
+        # Create folder if doesn't exist
+        id = create_grafana_folder(dashboard_id, auth, grafana_url)
 
     dashboard_dict = {}
     dashboard_dict.update(dashboard=dashboard_json)
