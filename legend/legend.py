@@ -160,7 +160,8 @@ def create_or_update_grafana_dashboard(
     protocol = legend_config["grafana_protocol"]
     grafana_url = "%s://%s" % (protocol, host)
 
-    grafana_api = GrafanaFace(auth=auth, host=host, protocol=protocol)
+    grafana_api = GrafanaFace(auth=auth, host=host,
+                              protocol=protocol, timeout=30.0)
 
     # Create dashboard based on the folder, if a new dashboard
     # Check if the folder exists
@@ -184,6 +185,7 @@ def delete_dashboard(legend_config, uid):
     host = legend_config["grafana_host"]
     protocol = legend_config["grafana_protocol"]
 
-    grafana_api = GrafanaFace(auth=auth, host=host, protocol=protocol)
+    grafana_api = GrafanaFace(auth=auth, host=host,
+                              protocol=protocol, timeout=30.0)
 
     return grafana_api.dashboard.delete_dashboard(dashboard_uid=uid)
