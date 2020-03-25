@@ -1,6 +1,6 @@
 ---
 title: PO-Dashboard
-alert_channels: ["PO-opsgenie"]
+alert_channels: ["opsgenie-channel"]
 grafana_folder: TestRELegend
 service: PO
 environment: Prod
