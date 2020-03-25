@@ -10,7 +10,7 @@ references:
   documentation: https://github.com/grofers/retail_purchase_order
   metrics_definition: https://github.com/grofers/retail_purchase_order
 tags:
-- prod
+- prodgit 
 
 components:
   elb:

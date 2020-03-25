@@ -1,6 +1,6 @@
 ---
 title: DSE GIS API
-alert_channels: ["Pagerduty Data"]
+alert_channels: ["opsgenie-channel"]
 grafana_folder: TestRELegend
 service: DSE GIS API
 environment: Prod

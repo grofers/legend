@@ -1,7 +1,7 @@
 ---
 title: IMS-CUSTOM
 grafana_folder: TestRELegend
-alert_channels: ["WH-opsgenie"]
+alert_channels: ["opsgenie-channel"]
 service: IMS
 environment: Prod
 description: IMS service handles the inventory for retail outlets and business logic dependent on the inventory. It sends inventory and prices updates to CMS for inventory and offers.
