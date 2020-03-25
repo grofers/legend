@@ -237,9 +237,9 @@ panels:
         message: '(D) MySQL Replication Lag is HIGH'
         rule:
           for_duration: 15m
-          evaluate_every: 10s
+          evaluate_every: 60s
         condition_query:
-        - OR,last,1,now,15m,gt,2700
+        - OR,avg,1,now,15m,gt,2700
 
   - title: (D) MySQL Up
     type: Graph
@@ -261,7 +261,7 @@ panels:
         priority: P1
         message: 'MySQL is Down'
         rule:
-          for_duration: 1m
+          for_duration: 5m
           evaluate_every: 60s
         condition_query:
         - OR,last,1,now,1m,lt,1
@@ -282,7 +282,7 @@ panels:
         priority: P1
         message: 'Slave IO Thread Running alert'
         rule:
-          for_duration: 1m
+          for_duration: 5m
           evaluate_every: 60s
         condition_query:
         - OR,last,1,now,1m,lt,1
