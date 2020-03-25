@@ -239,7 +239,7 @@ panels:
           for_duration: 15m
           evaluate_every: 10s
         condition_query:
-        - OR,avg,1,now,15m,gt,2700
+        - OR,last,1,now,15m,gt,2700
 
   - title: (D) MySQL Up
     type: Graph
@@ -248,12 +248,12 @@ panels:
       {% for dimension in data.db %}
         {% for master in dimension.masters %}
       - metric: up{instance_name=~"{{ master.host }}"}
-        legend:  '{{ '{{instance_name}}' }}'
+        legend:  '{{ '{{instance_name}}_{{channel_name}}' }}'
         ref_no: 1
         {% endfor %}
         {% for slave in dimension.slaves %}
       - metric: up{instance_name=~"{{ slave.host }}"}
-        legend: '{{ '{{instance_name}}' }}'
+        legend: '{{ '{{instance_name}}_{{channel_name}}' }}'
         ref_no: 2
         {% endfor %}
       {% endfor %}
@@ -264,8 +264,8 @@ panels:
           for_duration: 1m
           evaluate_every: 60s
         condition_query:
-        - OR,max,1,now,1m,lt,1
-        - OR,max,2,now,1m,lt,1
+        - OR,last,1,now,1m,lt,1
+        - OR,last,2,now,1m,lt,1
 
   - title: (D) Slave IO Thread Running
     type: Graph
@@ -274,7 +274,7 @@ panels:
       {% for dimension in data.db %}
         {% for slave in dimension.slaves %}
       - metric: mysql_slave_status_slave_io_running{instance_name=~"{{ slave.host }}"}
-        legend: '{{ '{{instance_name}}' }}'
+        legend: '{{ '{{instance_name}}_{{channel_name}}' }}'
         ref_no: 1
         {% endfor %}
       {% endfor %}
@@ -285,7 +285,7 @@ panels:
           for_duration: 1m
           evaluate_every: 60s
         condition_query:
-        - OR,max,1,now,1m,lt,1
+        - OR,last,1,now,1m,lt,1
 
   - title: (D) Slave SQL Thread Running
     type: Graph
@@ -294,7 +294,7 @@ panels:
       {% for dimension in data.db %}
         {% for slave in dimension.slaves %}
       - metric: mysql_slave_status_slave_sql_running{instance_name=~"{{ slave.host }}"}
-        legend: '{{ '{{instance_name}}' }}'
+        legend: '{{ '{{instance_name}}_{{channel_name}}' }}'
         ref_no: 1
         {% endfor %}
       {% endfor %}
@@ -302,10 +302,10 @@ panels:
         priority: P1
         message: 'Slave SQL Thread not running'
         rule:
-          for_duration: 1m
+          for_duration: 5m
           evaluate_every: 60s
         condition_query:
-        - OR,max,1,now,1m,lt,1
+        - OR,last,1,now,1m,lt,1
 ---
 {% set data = data.ec2 %}
 {% include "platform_ec2_metrics.yaml" with context %}
