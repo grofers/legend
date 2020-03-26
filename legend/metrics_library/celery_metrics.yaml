@@ -43,7 +43,7 @@ panels:
       message: '(R) Task execution latency is HIGH'
       rule:
         for_duration: 5m
-        evaluate_every: 10s
+        evaluate_every: 1m
       condition_query:
         - OR,avg,1,now,5m,gt,40
 
@@ -60,7 +60,7 @@ panels:
       message: '(E) Percentage of task failures is HIGH'
       rule:
         for_duration: 5m
-        evaluate_every: 10s
+        evaluate_every: 1m
       condition_query:
         - OR,avg,1,now,5m,gt,35
 
@@ -78,7 +78,7 @@ panels:
       message: '(E) Celery latency is high'
       rule:
         for_duration: 5m
-        evaluate_every: 10s
+        evaluate_every: 1m
       condition_query:
         - OR,avg,1,now,5m,gt,35
 

@@ -51,7 +51,7 @@ panels:
         message: '(U) Database Connection Utilization (%) is HIGH'
         rule:
           for_duration: 5m
-          evaluate_every: 10s
+          evaluate_every: 1m
         condition_query:
         - OR,avg,1,now,5m,gt,85
         - OR,avg,2,now,5m,gt,85
@@ -78,7 +78,7 @@ panels:
         message: '(U) AutoIncrement Counter Utilization (%) is HIGH'
         rule:
           for_duration: 5m
-          evaluate_every: 10s
+          evaluate_every: 1m
         condition_query:
         - OR,avg,1,now,5m,gt,90
         - OR,avg,2,now,5m,gt,90
@@ -120,7 +120,7 @@ panels:
         message: '(E) Slow Query (%) with respect to Rate to Queries is HIGH'
         rule:
           for_duration: 5m
-          evaluate_every: 10s
+          evaluate_every: 1m
         condition_query:
         - OR,avg,1,now,5m,gt,5
         - OR,avg,2,now,5m,gt,5
@@ -146,7 +146,7 @@ panels:
         message: '(E) DeadLock Count is HIGH'
         rule:
           for_duration: 5m
-          evaluate_every: 10s
+          evaluate_every: 1m
         condition_query:
         - OR,avg,1,now,5m,gt,0
         - OR,avg,2,now,5m,gt,0

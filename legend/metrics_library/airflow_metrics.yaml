@@ -20,7 +20,7 @@ panels:
       message: High dag duration on Airflow
       rule:
         for_duration: 5m
-        evaluate_every: 10s
+        evaluate_every: 1m
       condition_query:
       - OR,avg,1,now,10m,gt,600
 
@@ -40,7 +40,7 @@ panels:
       message: High schedule delay on Airflow
       rule:
         for_duration: 5m
-        evaluate_every: 10s
+        evaluate_every: 1m
       condition_query:
       - OR,avg,1,now,10m,gt,600
 
@@ -83,6 +83,6 @@ panels:
       message: High schedule delay on Airflow
       rule:
         for_duration: 5m
-        evaluate_every: 10s
+        evaluate_every: 1m
       condition_query:
       - OR,avg,1,now,10m,gt,5

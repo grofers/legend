@@ -52,7 +52,7 @@ panels:
       message: 'Error rate for errors 4xx errors on S3'
       rule:
         for_duration: 5m
-        evaluate_every: 10s
+        evaluate_every: 1m
       condition_query:
       - OR,avg,1,now,5m,gt,60
 
@@ -73,7 +73,7 @@ panels:
       message: 'Server side errors for S3'
       rule:
         for_duration: 5m
-        evaluate_every: 10s
+        evaluate_every: 1m
       condition_query:
       - OR,avg,1,now,5m,gt,60
 
@@ -100,6 +100,6 @@ panels:
       message: 'Request FirstByteLatency for S3'
       rule:
         for_duration: 5m
-        evaluate_every: 10s
+        evaluate_every: 1m
       condition_query:
       - OR,avg,1,now,5m,gt,5

@@ -17,8 +17,8 @@ panels:
       priority: P1
       message: 'Missing pods take actions like this 1. 2.'
       rule:
-        for_duration: 2m
-        evaluate_every: 10s
+        for_duration: 5m
+        evaluate_every: 1m
       conditions:
         - evaluator_params: 2
           evaluator_type: gt

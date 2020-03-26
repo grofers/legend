@@ -42,7 +42,7 @@ panels:
       priority: P4
       message: Vault Cluster Unhealthy
       rule:
-        for_duration: 3m
+        for_duration: 5m
         evaluate_every: 1m
       condition_query:
         - OR,avg,1,now,5m,gt,0

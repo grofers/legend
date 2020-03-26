@@ -35,7 +35,7 @@ panels:
       message: High request error rate (4xx)
       rule:
         for_duration: 5m
-        evaluate_every: 10s
+        evaluate_every: 1m
       condition_query:
       - OR,avg,1,now,5m,gt,20
 
@@ -52,7 +52,7 @@ panels:
       message: High request error rate (5xx)
       rule:
         for_duration: 5m
-        evaluate_every: 10s
+        evaluate_every: 1m
       condition_query:
       - OR,avg,1,now,5m,gt,20
 
@@ -71,7 +71,7 @@ panels:
       message: High average latency
       rule:
         for_duration: 5m
-        evaluate_every: 10s
+        evaluate_every: 1m
       condition_query:
       - OR,avg,1,now,5m,gt,20
 
@@ -90,7 +90,7 @@ panels:
       message: High overall latency
       rule:
         for_duration: 5m
-        evaluate_every: 10s
+        evaluate_every: 1m
       condition_query:
       - OR,avg,1,now,5m,gt,20
 
@@ -110,6 +110,6 @@ panels:
       message: High latency on some routes
       rule:
         for_duration: 5m
-        evaluate_every: 10s
+        evaluate_every: 1m
       condition_query:
       - OR,avg,1,now,5m,gt,20

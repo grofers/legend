@@ -19,7 +19,7 @@ panels:
       message: 'CPU Utilisation is high'
       rule:
         for_duration: 20m
-        evaluate_every: 10s
+        evaluate_every: 1m
       condition_query:
       - OR,avg,1,now,30m,gt,90
 
@@ -38,7 +38,7 @@ panels:
       message: 'Memory Utilisation is high'
       rule:
         for_duration: 20m
-        evaluate_every: 10s
+        evaluate_every: 1m
       condition_query:
       - OR,avg,1,now,30m,gt,90
 
@@ -57,7 +57,7 @@ panels:
       message: 'Disk utilisation is high, running out of free space'
       rule:
         for_duration: 15m
-        evaluate_every: 10s
+        evaluate_every: 1m
       condition_query:
       - OR,avg,1,now,20m,gt,80
 

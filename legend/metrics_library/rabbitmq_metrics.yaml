@@ -31,7 +31,7 @@ panels:
       message: 'Open file descriptors utilisation high'
       rule:
         for_duration: 5m
-        evaluate_every: 10s
+        evaluate_every: 1m
       condition_query:
         - OR,avg,1,now,5m,gt,80
 
@@ -79,8 +79,8 @@ panels:
       priority: P2
       message: 'RabbitMQ - messages unroutable'
       rule:
-        for_duration: 2m
-        evaluate_every: 10s
+        for_duration: 5m
+        evaluate_every: 1m
       condition_query:
         - OR,avg,1,now,5m,gt,1
 
@@ -102,6 +102,6 @@ panels:
       message: 'RabbitMQ - dead queue depth increasing'
       rule:
         for_duration: 10m
-        evaluate_every: 10s
+        evaluate_every: 1m
       condition_query:
         - OR,avg,1,now,5m,gt,10

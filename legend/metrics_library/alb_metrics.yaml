@@ -28,7 +28,7 @@ panels:
       message: 'Unhealthy hosts for more than 15min'
       rule:
         for_duration: 15m
-        evaluate_every: 10s
+        evaluate_every: 1m
       condition_query:
       - OR,avg,1,now,20m,gt,0
 

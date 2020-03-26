@@ -23,7 +23,7 @@ panels:
       message: '(U) High disk space utilisation'
       rule:
         for_duration: 5m
-        evaluate_every: 10s
+        evaluate_every: 1m
       condition_query:
         - OR,avg,2,now,5m,gt,75
 

@@ -61,7 +61,7 @@ panels:
       message: 'High error rate (5xx)'
       rule:
         for_duration: 5m
-        evaluate_every: 10s
+        evaluate_every: 1m
       condition_query:
         - OR,avg,1,now,5m,gt,20
         - OR,avg,2,now,5m,gt,30
@@ -80,7 +80,7 @@ panels:
       message: 'High error rate - per API (5xx)'
       rule:
         for_duration: 5m
-        evaluate_every: 10s
+        evaluate_every: 1m
       condition_query:
         - OR,avg,1,now,5m,gt,5
 
@@ -102,7 +102,7 @@ panels:
       message: 'High latency'
       rule:
         for_duration: 5m
-        evaluate_every: 10s
+        evaluate_every: 1m
       condition_query:
         - OR,avg,1,now,5m,gt,5
         - OR,avg,2,now,5m,gt,10
@@ -122,6 +122,6 @@ panels:
       message: 'High latency - per API'
       rule:
         for_duration: 5m
-        evaluate_every: 10s
+        evaluate_every: 1m
       condition_query:
         - OR,avg,1,now,5m,gt,10

@@ -26,7 +26,7 @@ panels:
       message: 'Unhealthy hosts for more than 15min'
       rule:
         for_duration: 15m
-        evaluate_every: 10s
+        evaluate_every: 1m
       condition_query:
       - OR,avg,1,now,20m,gt,0
 
@@ -47,7 +47,7 @@ panels:
       message: 'Number of pending requests high. Max allowed is 1024'
       rule:
         for_duration: 5m
-        evaluate_every: 10s
+        evaluate_every: 1m
       condition_query:
       - OR,avg,1,now,5m,gt,100
 
@@ -97,7 +97,7 @@ panels:
       message: 'High rate of backend errors (5xx)'
       rule:
         for_duration: 5m
-        evaluate_every: 10s
+        evaluate_every: 1m
       condition_query:
       - OR,avg,1,now,5m,gt,100
 
