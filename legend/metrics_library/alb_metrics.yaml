@@ -15,13 +15,14 @@ panels:
         region: {{ dimension.region }}
         statistic: Maximum
         alias: '{{ '{{LoadBalancer}}_{{TargetGroup}}_{{metric}}_{{stat}}' }}'
+        ref_no: 1
       - dimensions: {"LoadBalancer": {{ dimension.load_balancer_id }}, "TargetGroup": {{ dimension.target_group_id }} }
         metric: UnHealthyHostCount
         namespace: AWS/ApplicationELB
         region: {{ dimension.region }}
         statistic: Maximum
         alias: '{{ '{{LoadBalancer}}_{{TargetGroup}}_{{metric}}_{{stat}}' }}'
-        ref_no: 1
+        ref_no: 2
       {% endfor %}
     alert_config:
       priority: P3
@@ -30,7 +31,7 @@ panels:
         for_duration: 15m
         evaluate_every: 1m
       condition_query:
-      - OR,avg,1,now,20m,gt,0
+      - OR,avg,2,now,20m,gt,0
 
   - title: (E) Rejected Connections Count
     type: Graph
