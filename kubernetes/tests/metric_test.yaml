@@ -1,0 +1,118 @@
+apiVersion: grofers.io/v1
+kind: GrafanaDashboard
+metadata:
+  name: sample-title-9
+  labels:
+    app: sample-title
+spec:
+  title: SampleTitle
+  service: SampleService
+  grafana_folder: SampleFolder
+  alert_channels:
+  - service-opsgenie
+  environment: Prod
+  description: Logging tool for everything deployed on kubernetes
+  references:
+    deployment: https://github.com/grofers/kube-infra/tree/master/manifests/loki
+    documentation: https://github.com/grafana/loki/tree/master/docs
+    metrics_definition: https://github.com/grofers/kube-infra/tree/master/manifests/loki
+  tags:
+  - stage
+  - infra
+  components:
+    playframework:
+      dimensions:
+      - service: phoenixappban1
+    s3:
+      dimensions:
+      - bucket_name: grofers-loki-prod
+        filter_id: EntireBucket
+      - bucket_name: retail-bulk-upload
+        filter_id: EntireBucket
+    mysql_ec2:
+      dimensions:
+        ec2:
+        - host: perconamaster*
+        db:
+        - masters:
+          - host: perconamaster4-mysql-metrics
+            db_name: ims
+          slaves:
+          - host: perconamaster1-mysql-metrics
+            db_name: ims
+          - host: perconamaster5-mysql-metrics
+            db_name: ims
+    sqs:
+      dimensions:
+      - queue_name: pos_upstream_data_log
+        dead_queue_name: pos_upstream_data_log_dead
+    rabbitmq:
+      dimensions:
+      - queue_name: ims_task
+        job: pos-rabbitmq-metrics
+    mysql_56_rds:
+      dimensions:
+      - db_instance_identifier: prod-lastmile-db
+      - db_instance_identifier: prod-lastmile-db-read-replica-dse
+    springboot:
+      dimensions:
+      - job: lastmile/ec2-obelix-springboot
+    jmx:
+      dimensions:
+      - job: wh/ec2-phoenix-jmx-app
+        service: phoenixappban1
+      - job: wh/ec2-phoenix-jmx-sync
+        service: phoenixappban1
+    pgsql_rds:
+      dimensions:
+      - db_instance_identifier: prod-supply-orchestrator
+    platform_ec2:
+      dimensions:
+      - host: purchaseorder
+    platform_k8s_deployment:
+      dimensions:
+      - deployment_name: snorlax-app
+    elb:
+      dimensions:
+      - load_balancer_name: po-retail
+    alb:
+      dimensions:
+      - load_balancer_id: app/prod-retail-phoenix/83291326c0038ad8
+        region: ap-south-1
+        target_group_id: targetgroup/prod-retail-phoenix-ban1-public/9f759c4e6a26a4d9
+      - load_balancer_id: app/prod-retail-phoenix-private/e92c1fee75ff1350
+        region: ap-south-1
+        target_group_id: targetgroup/prod-retail-phoenix-ban1/b8b1fd9bcffd01b9
+    django:
+      dimensions:
+      - job: po-django-metrics
+    couchdb:
+      dimensions:
+      - job_name: po-couchdb-metrics
+    promtail:
+      dimensions:
+      - pod_name: promtail
+    redis:
+      dimensions:
+      - job_name: po-redis-metrics
+    celery:
+      dimensions:
+      - job_name: po-celery-metrics
+    consul:
+      dimensions:
+      - region: ap-southeast-1
+    haproxy:
+      dimensions:
+      - backend: consul_prod
+    vault:
+      dimensions:
+      - environment: prod
+    airflow:
+      dimensions:
+      - cluster: prod-sgp
+        namespace: airflow
+        dag_id: canary_dag
+    starlette:
+      dimensions:
+      - job: dse-gis-api-service
+        path: /layers/actions/tag

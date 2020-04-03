@@ -24,27 +24,12 @@ pipeline {
           withVault([configuration: configuration, vaultSecrets: secrets]) {
                   sh '''
                     cd tests
-                    chmod u+x tests.sh 
+                    chmod u+x tests.sh
                     ./tests.sh
                   '''
           }
         }
       }
     }
-    // stage("Running yaml linter"){
-    //   steps {
-    //     sh '''
-    //       yamllint  -d relaxed .
-    //       # All files added for yaml lint check
-    //       '''
-    //   }
-    // }
-    // stage("Running pylint"){
-    //   steps{
-    //     sh '''
-    //       pylint .
-    //     '''
-    //   }
-    // }
   }
 }
