@@ -57,7 +57,7 @@ spec: # Spec of legend. The same format in which it was mentioned earlier
 
 Set the appropriate context.
 > The prod-sgp context creates the dashboard in production grafana (grafana.grofers.com) and the stage
-> context create the dashboard in stage grafana (grafa-stage.grofer.io). It is recommended to try and
+> context create the dashboard in stage grafana (grafana-stage.grofer.io). It is recommended to try and
 > test your dashboards in stage before applying in production
 
 To create/update/delete the dashboard, run:
