@@ -45,7 +45,7 @@ panels:
         for_duration: 5m
         evaluate_every: 1m
       condition_query:
-        - OR,avg,1,now,5m,gt,40
+        - OR,avg,1,now,5m,gt,1020
 
   - title: (E) Rate of failed tasks
     type: Graph
@@ -80,5 +80,5 @@ panels:
         for_duration: 5m
         evaluate_every: 1m
       condition_query:
-        - OR,avg,1,now,5m,gt,35
+        - OR,avg,1,now,5m,gt,1020
 
