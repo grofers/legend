@@ -65,6 +65,11 @@ components:
   platform_k8s_deployment:
     dimensions:
       - deployment_name: snorlax-app
+  platform_k8s_ingress:
+    dimensions:
+      - namespace: mft-lastmile
+        service_name: obelix
+        service_type: public
   elb:
     dimensions:
       - load_balancer_name: po-retail

@@ -18,6 +18,7 @@ from .metrics_schema import (
     promtail_schema,
     celery_schema,
     platform_k8s_deployment_schema,
+    platform_k8s_ingress_schema,
     redis_schema,
     platform_ec2_schema,
     s3_schema,
@@ -164,6 +165,11 @@ schema = {
             "platform_k8s_deployment": {
                 "type": "dict",
                 "schema": md(default_panels_schema, platform_k8s_deployment_schema),
+                "required": False,
+            },
+            "platform_k8s_ingress": {
+                "type": "dict",
+                "schema": md(default_panels_schema, platform_k8s_ingress_schema),
                 "required": False,
             },
             "redis": {

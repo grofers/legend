@@ -45,6 +45,20 @@ platform_k8s_deployment_schema = {
     }
 }
 
+platform_k8s_ingress_schema = {
+    "dimensions": {
+        "type": "list",
+        "schema": {
+            "type": "dict",
+            "schema": {
+                "namespace": {"type": "string", "required": True},
+                "service_name": {"type": "string", "required": True},
+                "service_type": {"type": "string", "required": True},
+            },
+        },
+    }
+}
+
 mysql_56_rds_schema = {
     "dimensions": {
         "type": "list",
