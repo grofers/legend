@@ -62,7 +62,7 @@ labelY1:  # The label to put in the Y1 graph panel (sample : bytes/sec , bytes ,
 ## Adding metrics for new components
 
 * If you are addining metrics for a new component, please follow the spec as mentioned above. 
-* The variables and the component spec has to be added in the [metrics_schema](../metrics/metrics_schema.py) and import the configuration into the [schema](../metrics/schema.py) to ensure proper validation - this will enable input validation.
+* The variables and the component spec has to be added in the [metrics_schema](../legend/metrics_library/metrics_schema.py) and import the configuration into the [schema](../legend/metrics_library/schema.py) to ensure proper validation - this will enable input validation.
 * In the [sample_input.yaml](../sample_input.yaml) add the component with basic/sample confiugration - this will enable testing and ensure backward compatability also making adaptability easy
 * Reference in  confluence - [here](https://grofers.atlassian.net/wiki/spaces/IN/pages/1491140622/Exposing+metrics+on+services),  on how to enale the metrics along with the exporters which it is using (where required)
 * Please refer to proper documentation the component for creating appropriate metrics

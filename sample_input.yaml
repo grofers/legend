@@ -114,3 +114,9 @@ components:
     dimensions:
       - job: dse-gis-api-service
         path: /layers/actions/tag
+  nodejs:
+    dimensions:
+      - job: po-nodejs-metrics
+  go:
+    dimensions:
+      - job: po-go-metrics

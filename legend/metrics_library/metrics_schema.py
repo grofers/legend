@@ -309,3 +309,23 @@ mysql_ec2_schema = {
         },
     }
 }
+
+nodejs_schema = {
+    "dimensions": {
+        "type": "list",
+        "schema": {
+            "type": "dict",
+            "schema": {"job": {"type": "string", "required": True},},
+        },
+    }
+}
+
+go_schema = {
+    "dimensions": {
+        "type": "list",
+        "schema": {
+            "type": "dict",
+            "schema": {"job": {"type": "string", "required": True},},
+        },
+    }
+}

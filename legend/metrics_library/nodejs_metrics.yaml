@@ -1,0 +1,138 @@
+component: nodejs
+data_source: Prometheus
+metrics_source: https://github.com/siimon/prom-client
+reference: https://nodejs.org/en/docs/
+description: Node.js is a platform built on Chromes JavaScript runtime for easily building fast and scalable network applications.
+panels: 
+  - title: (R) Request per minute (rpm) - aggregated over all methods
+    type: Graph
+    description: rpm
+    targets:
+    {% for dimension in data %} 
+      - metric: sum(rate(http_request_duration_ms_count{job=~"{{ dimension.job }}"}[5m])) by (service, route, method, code)  * 60
+        legend: Aggregate
+      - metric: sum(rate(http_request_duration_ms_count{job=~"{{ dimension.job }}"}[5m])) by (instance, service, route, method, code)  * 60
+        legend: '{{ '{{instance}}' }}'
+    {% endfor %}
+
+  - title: (R) Average response time
+    type: Graph
+    description: Average response time
+    targets:
+    {% for dimension in data %}
+    - metric: avg(rate(http_request_duration_ms_sum{job=~"{{ dimension.job }}"}[5m]) / rate(http_request_duration_ms_count[5m])) by (service, route, method, code)
+      legend: '{{ '{{method}} - {{code}}' }}'
+    {% endfor %}
+
+  - title: (E) Error rate - aggregated over all methods (4xx)
+    type: Graph
+    description: 4xx Error rate at service level. Client side errors
+    targets:
+    {% for dimension in data %}
+      - metric: sum(increase(http_request_duration_ms_sum{job=~"{{ dimension.job }}", code=~"^4..$"}[5m])) /  sum(increase(http_request_duration_ms_sum[5m]))
+        legend: Aggregate
+        ref_no: 1
+      - metric: sum(increase(http_request_duration_ms_sum{job=~"{{ dimension.job }}", code=~"^4..$"}[5m])) /  sum(increase(http_request_duration_ms_sum[5m])) by (instance)
+        legend: '{{ '{{instance}}' }}'
+        ref_no: 2
+    {% endfor %}
+    alert_config:
+      priority: P3
+      message: 'High error rate (4xx)'
+      rule:
+        for_duration: 5m
+        evaluate_every: 1m
+      condition_query:
+      - OR,avg,1,now,5m,gt,20
+      - OR,avg,2,now,5m,gt,30
+
+  - title: (E) Error rate - per API (4xx)
+    type: Graph
+    description: error per API. Client side errors
+    targets:
+    {% for dimension in data %}
+      - metric: sum(increase(http_request_duration_ms_count{job=~"{{ dimension.job }}", code=~"^4..$"}[5m])) /  sum(increase(http_request_duration_ms_count[5m]))
+        legend: '{{ '{{method}} - {{view}}' }}'
+        ref_no: 1
+    {% endfor %}
+    alert_config:
+      priority: P3
+      message: 'High error rate - per API (4xx)'
+      rule:
+        for_duration: 5m
+        evaluate_every: 1m
+      condition_query:
+      - OR,avg,1,now,5m,gt,20
+
+  - title: (E) Error rate - aggregated over all methods (5xx)
+    type: Graph
+    description: 5xx Error rate at service level. Client side errors
+    targets:
+    {% for dimension in data %}
+      - metric: sum(increase(http_request_duration_ms_sum{job=~"{{ dimension.job }}", code=~"^5..$"}[5m])) /  sum(increase(http_request_duration_ms_sum[5m]))
+        legend: Aggregate
+        ref_no: 1
+      - metric: sum(increase(http_request_duration_ms_sum{job=~"{{ dimension.job }}", code=~"^5..$"}[5m])) /  sum(increase(http_request_duration_ms_sum[5m])) by (instance)
+        legend: '{{ '{{instance}}' }}'
+        ref_no: 2
+    {% endfor %}
+    alert_config:
+      priority: P3
+      message: 'High error rate (5xx)'
+      rule:
+        for_duration: 5m
+        evaluate_every: 1m
+      condition_query:
+      - OR,avg,1,now,5m,gt,20
+      - OR,avg,2,now,5m,gt,30
+
+  - title: (E) Error rate - per API (5xx)
+    type: Graph
+    description: error per API. Client side errors
+    targets:
+    {% for dimension in data %}
+      - metric: sum(increase(http_request_duration_ms_count{job=~"{{ dimension.job }}", code=~"^5..$"}[5m])) /  sum(increase(http_request_duration_ms_count[5m]))
+        legend: '{{ '{{method}} - {{view}}' }}'
+        ref_no: 1
+    {% endfor %}
+    alert_config:
+      priority: P3
+      message: 'High error rate - per API (5xx)'
+      rule:
+        for_duration: 5m
+        evaluate_every: 1m
+      condition_query:
+      - OR,avg,1,now,5m,gt,20
+
+  - title: Application Performance Index
+    type: Graph
+    description: Apdex
+    targets:
+    {% for dimension in data %}
+      - metric: (sum(rate(http_request_duration_ms_bucket{job=~"{{ dimension.job }}", le="100"}[5m])) by (service) + sum(rate(http_request_duration_ms_bucket{le="300"}[5m])) by (service)) / 2 / sum(rate(http_request_duration_ms_count[5m])) by (service)
+        legend: Performance Index
+    {% endfor %}
+
+  - title: (D) Latency over all methods (99th percentile)
+    type: Graph
+    description: overall latency
+    formatY1: s
+    targets:
+    {% for dimension in data %}
+      - metric: histogram_quantile(0.99, sum(rate(http_request_duration_ms_bucket{job=~"{{ dimension.job }}"}[5m])) by (le, service, route, method))
+        legend: Aggregate
+        ref_no: 1
+      - metric: histogram_quantile(0.99, sum(rate(http_request_duration_ms_bucket{job=~"{{ dimension.job }}"}[5m])) by (instance, le, service, route, method))
+        legend: '{{ '{{instance}}' }}'
+        ref_no: 2
+    {% endfor %}
+    alert_config:
+      priority: P3
+      message: 'High latency'
+      rule:
+        for_duration: 5m
+        evaluate_every: 5m
+      condition_query:
+      - OR,avg,1,now,5m,gt,20
+      - OR,avg,2,now,5m,gt,25
+    

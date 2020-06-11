@@ -24,6 +24,8 @@ from .metrics_schema import (
     s3_schema,
     playframework_schema,
     starlette_schema,
+    nodejs_schema,
+    go_schema,
 )
 
 
@@ -265,6 +267,16 @@ schema = {
             "starlette": {
                 "type": "dict",
                 "schema": md(default_panels_schema, starlette_schema),
+                "required": False,
+            },
+            "nodejs": {
+                "type": "dict",
+                "schema": md(default_panels_schema, nodejs_schema),
+                "required": False,
+            },
+            "go": {
+                "type": "dict",
+                "schema": md(default_panels_schema, go_schema),
                 "required": False,
             },
         },
