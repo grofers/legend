@@ -131,11 +131,11 @@ def delete_handler(spec, name, body, **kwargs):
 
         try:
             legend_config = load_legend_config()
-            delete_dashboard(legend_config, uid)
+            status = delete_dashboard(legend_config, uid)
             kopf.info(spec, reason='DeletedDashboard',
                     message='Finished deleting dashboard:  %s.' % name)
             logger.info('Finished deleting Grafana dashboard: %s', name)
-            return {'status': 'Deleted'}
+            return {'status': status}
         except Exception as e:
             logger.error(('Failed to delete dashboard due to the following '
                         'exception: %s'), e)

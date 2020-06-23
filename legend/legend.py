@@ -6,6 +6,7 @@ import subprocess
 
 from uuid import uuid4
 
+from grafana_api.grafana_api import GrafanaClientError
 from grafana_api.grafana_face import GrafanaFace
 
 from .helpers.utilities import (
@@ -188,4 +189,11 @@ def delete_dashboard(legend_config, uid):
     grafana_api = GrafanaFace(auth=auth, host=host,
                               protocol=protocol, timeout=30.0)
 
-    return grafana_api.dashboard.delete_dashboard(dashboard_uid=uid)
+    try:
+        grafana_api.dashboard.delete_dashboard(dashboard_uid=uid)
+        return "Dashboard deleted"
+    except GrafanaClientError as e:
+        if e.message == "Client Error 404: Dashboard not found":
+            return "Client Error 404: Dashboard not found"
+        else:
+            raise (e)
