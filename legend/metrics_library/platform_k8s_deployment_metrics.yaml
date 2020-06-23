@@ -114,3 +114,34 @@ panels:
         evaluate_every: 1m
       condition_query:
         - OR,avg,1,now,5m,gt,60
+
+  - title: (E) Running replicas
+    type: Graph
+    description: Running replicas
+    targets:
+      {% for dimension in data %}
+      - metric: kube_deployment_status_replicas_available{deployment=~"^{{ dimension.deployment_name }}.*" , namespace="{{ dimension.namespace }}"}
+        legend: '{{ '{{deployment}}_{{namespace}}' }}'
+        ref_no: 1
+      {% endfor %}
+
+  - title: (U) CPU Utilisation(Request)
+    type: Graph
+    description: current cpu utilisation per container from the request
+    targets:
+      {% for dimension in data %}
+      - metric: round(((sum(rate(container_cpu_usage_seconds_total{container!~"POD", pod=~"^{{ dimension.deployment_name }}.*"}[5m])) by (container_name) / sum(label_join(kube_pod_container_resource_requests_cpu_cores{pod=~"^{{ dimension.deployment_name }}.*"}, "container_name", "", "container")) by (container_name)) * 100), 0.1)
+        legend: '{{ '{{container_name}}' }}'
+        ref_no: 1
+      {% endfor %}
+    formatY1: percent
+
+  - title: (S) Memory Saturation(Request)
+    type: Graph
+    description: Amount of available memory from the request
+    targets:
+      {% for dimension in data %}
+      - metric: (sum(container_memory_working_set_bytes{pod=~"^{{ dimension.deployment_name }}.*"}) by (container_name) / sum(label_join(kube_pod_container_resource_requests_memory_bytes{pod=~"^{{ dimension.deployment_name }}.*"}, "container_name", "", "container")) by (container_name))
+        legend: '{{ '{{container_name}}' }}'
+      {% endfor %}
+    formatY1: bytes
