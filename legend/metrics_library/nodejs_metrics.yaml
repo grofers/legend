@@ -21,7 +21,7 @@ panels:
     targets:
     {% for dimension in data %}
     - metric: avg(rate(http_request_duration_ms_sum{job=~"{{ dimension.job }}"}[5m]) / rate(http_request_duration_ms_count[5m])) by (service, route, method, code)
-      legend: '{{ '{{method}} - {{code}}' }}'
+      legend: '{{ '{{method}} - {{route}}' }}'
     {% endfor %}
 
   - title: (E) Error rate - aggregated over all methods (4xx)
@@ -52,7 +52,7 @@ panels:
     targets:
     {% for dimension in data %}
       - metric: sum(increase(http_request_duration_ms_count{job=~"{{ dimension.job }}", code=~"^4..$"}[5m])) /  sum(increase(http_request_duration_ms_count[5m]))
-        legend: '{{ '{{method}} - {{view}}' }}'
+        legend: '{{ '{{method}} - {{route}}' }}'
         ref_no: 1
     {% endfor %}
     alert_config:
@@ -92,7 +92,7 @@ panels:
     targets:
     {% for dimension in data %}
       - metric: sum(increase(http_request_duration_ms_count{job=~"{{ dimension.job }}", code=~"^5..$"}[5m])) /  sum(increase(http_request_duration_ms_count[5m]))
-        legend: '{{ '{{method}} - {{view}}' }}'
+        legend: '{{ '{{method}} - {{route}}' }}'
         ref_no: 1
     {% endfor %}
     alert_config:
