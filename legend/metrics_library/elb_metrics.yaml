@@ -130,9 +130,9 @@ panels:
         alias: '{{ '{{LoadBalancerName}}_{{metric}}_{{stat}}' }}'
       {% endfor %}
 
-  - title: (D) Request Latency (seconds)
+  - title: (D) Request Latency max (seconds)
     type: Graph
-    description: Request Latency in seconds
+    description: Request Latency max in seconds
     formatY1: s
     targets:
       {% for dimension in data %}
@@ -142,3 +142,17 @@ panels:
       statistic: Maximum
       alias: '{{ '{{LoadBalancerName}}_{{metric}}_{{stat}}' }}'
       {% endfor %}
+
+  - title: (D) Request Latency avg (seconds)
+    type: Graph
+    description: Request Latency avg in seconds
+    formatY1: s
+    targets:
+      {% for dimension in data %}
+      - dimensions: {"LoadBalancerName": {{ dimension.load_balancer_name }} }
+        metric: Latency
+        namespace: AWS/ELB
+        statistic: Average
+        alias: '{{ '{{LoadBalancerName}}_{{metric}}_{{stat}}' }}'
+        {% endfor %}
+

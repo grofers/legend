@@ -52,7 +52,7 @@ panels:
     description: Numbers of tasks in failed state
     targets:
       {% for dimension in data %}
-      - metric: rate(celery_tasks{job="{{ dimension.job_name }}", state="FAILURE"}[5m])*100 / rate(celery_tasks{job="{{ dimension.job_name }}", state=~"FAILURE|PENDING|STARTED|SUCCESS|REVOKED|RECEIVED"}[5m])
+      - metric: rate(celery_tasks{job="{{ dimension.job_name }}", state="FAILURE"}[5m])*100 / rate(celery_tasks{job="{{ dimension.job_name }}", state=~"RECEIVED"}[5m])
       {% endfor %}
         ref_no: 1
     alert_config:
@@ -69,7 +69,7 @@ panels:
     description: Time taken for a task to be picked by a celery worker
     targets:
       {% for dimension in data %}
-      - metric: rate(celery_task_latency_sum{job="{{ dimension.job_name }}"}[5m]) / rate(celery_task_latency_count{job="{{ dimension.job_name }}"}[5m])
+      - metric: histogram_quantile(0.99, rate(celery_task_latency_bucket{job="{{ dimension.job_name }}"}[5m]))
         ref_no: 1
       {% endfor %}
     formatY1: s

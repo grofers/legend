@@ -120,8 +120,8 @@ panels:
     description: Running replicas
     targets:
       {% for dimension in data %}
-      - metric: kube_deployment_status_replicas_available{deployment=~"^{{ dimension.deployment_name }}.*" , namespace="{{ dimension.namespace }}"}
-        legend: '{{ '{{deployment}}_{{namespace}}' }}'
+      - metric: kube_deployment_status_replicas_available{deployment=~"^{{ dimension.deployment_name }}.*"}
+        legend: '{{ '{{deployment}}' }}'
         ref_no: 1
       {% endfor %}
 
@@ -145,3 +145,14 @@ panels:
         legend: '{{ '{{container_name}}' }}'
       {% endfor %}
     formatY1: bytes
+
+  - title: (U) Memory Utilisation(Request)
+    type: Graph
+    description: Current memory usage per container
+    targets:
+      {% for dimension in data %}
+      - metric: round(((sum(container_memory_working_set_bytes{container!~"POD", pod=~"^{{ dimension.deployment_name }}.*"}) by (container_name) / sum(label_join(kube_pod_container_resource_requests_memory_bytes{pod=~"^{{ dimension.deployment_name }}.*"}, "container_name", "", "container")) by (container_name)) * 100), 0.1)
+        legend: '{{ '{{container_name}}' }}'
+        ref_no: 1
+      {% endfor %}
+    formatY1: percent
