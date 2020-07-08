@@ -9,9 +9,9 @@ panels:
     description: rpm
     targets:
     {% for dimension in data %} 
-      - metric: sum(rate(http_request_duration_ms_count{job=~"{{ dimension.job }}"}[5m])) by (service, route, method, code)  * 60
+      - metric: sum(rate(http_request_duration_ms_count{job=~"{{ dimension.job }}"}[5m]))
         legend: Aggregate
-      - metric: sum(rate(http_request_duration_ms_count{job=~"{{ dimension.job }}"}[5m])) by (instance, service, route, method, code)  * 60
+      - metric: sum(rate(http_request_duration_ms_count{job=~"{{ dimension.job }}"}[5m])) by (instance)
         legend: '{{ '{{instance}}' }}'
     {% endfor %}
 
@@ -51,7 +51,7 @@ panels:
     description: error per API. Client side errors
     targets:
     {% for dimension in data %}
-      - metric: sum(increase(http_request_duration_ms_count{job=~"{{ dimension.job }}", code=~"^4..$"}[5m])) /  sum(increase(http_request_duration_ms_count[5m]))
+      - metric: sum(rate(http_request_duration_ms_count{job=~"{{ dimension.job }}", code=~"^4..$"}[5m])) by (method,route)
         legend: '{{ '{{method}} - {{route}}' }}'
         ref_no: 1
     {% endfor %}
@@ -91,7 +91,7 @@ panels:
     description: error per API. Client side errors
     targets:
     {% for dimension in data %}
-      - metric: sum(increase(http_request_duration_ms_count{job=~"{{ dimension.job }}", code=~"^5..$"}[5m])) /  sum(increase(http_request_duration_ms_count[5m]))
+      - metric: sum(rate(http_request_duration_ms_count{job=~"{{ dimension.job }}", code=~"^5..$"}[5m])) by (method, route)
         legend: '{{ '{{method}} - {{route}}' }}'
         ref_no: 1
     {% endfor %}

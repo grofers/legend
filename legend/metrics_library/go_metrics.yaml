@@ -9,9 +9,9 @@ panels:
     description: bytes/s of memory app consumes
     targets:
     {% for dimension in data %} 
-      - metric: rate(go_memstats_alloc_bytes_total{job=~"{{ dimension.job }}"}[5m])
+      - metric: sum(rate(go_memstats_alloc_bytes_total{job=~"{{ dimension.job }}"}[5m])) 
         legend: Aggregate
-      - metric: rate(go_memstats_alloc_bytes_total{job=~"{{ dimension.job }}"}[5m]) by (instance)
+      - metric: rate(go_memstats_alloc_bytes_total{job=~"{{ dimension.job }}"}[5m])
         legend: '{{ '{{instance}}' }}'
     {% endfor %}
 
