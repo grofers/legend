@@ -45,6 +45,19 @@ platform_k8s_deployment_schema = {
     }
 }
 
+platform_k8s_cronjob_schema = {
+    "dimensions": {
+        "type": "list",
+        "schema": {
+            "type": "dict",
+            "schema": {
+                "namespace": {"type": "string", "required": True},
+                "cronjob_name": {"type": "string", "required": True},
+            },
+        },
+    }
+}
+
 platform_k8s_ingress_schema = {
     "dimensions": {
         "type": "list",

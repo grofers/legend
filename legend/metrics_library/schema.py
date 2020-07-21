@@ -26,6 +26,7 @@ from .metrics_schema import (
     starlette_schema,
     nodejs_schema,
     go_schema,
+    platform_k8s_cronjob_schema
 )
 
 
@@ -162,6 +163,11 @@ schema = {
             "promtail": {
                 "type": "dict",
                 "schema": md(default_panels_schema, promtail_schema),
+                "required": False,
+            },
+            "platform_k8s_cronjob": {
+                "type": "dict",
+                "schema": md(default_panels_schema, platform_k8s_cronjob_schema),
                 "required": False,
             },
             "platform_k8s_deployment": {
