@@ -104,25 +104,16 @@ panels:
       condition_query:
       - OR,avg,1,now,5m,gt,20
 
-  - title: Application Performance Index
-    type: Graph
-    description: Apdex
-    targets:
-    {% for dimension in data %}
-      - metric: (sum(rate(http_request_duration_ms_bucket{job=~"{{ dimension.job }}", le="100"}[5m])) by (service) + sum(rate(http_request_duration_ms_bucket{le="300"}[5m])) by (service)) / 2 / sum(rate(http_request_duration_ms_count[5m])) by (service)
-        legend: Performance Index
-    {% endfor %}
-
   - title: (D) Latency over all methods (99th percentile)
     type: Graph
     description: overall latency
     formatY1: s
     targets:
     {% for dimension in data %}
-      - metric: histogram_quantile(0.99, sum(rate(http_request_duration_ms_bucket{job=~"{{ dimension.job }}"}[5m])) by (le, service, route, method))
+      - metric: histogram_quantile(0.99, sum(rate(http_request_duration_ms_bucket{job=~"{{ dimension.job }}"}[5m])) by (le))
         legend: Aggregate
         ref_no: 1
-      - metric: histogram_quantile(0.99, sum(rate(http_request_duration_ms_bucket{job=~"{{ dimension.job }}"}[5m])) by (instance, le, service, route, method))
+      - metric: histogram_quantile(0.99, sum(rate(http_request_duration_ms_bucket{job=~"{{ dimension.job }}"}[5m])) by (instance,le))
         legend: '{{ '{{instance}}' }}'
         ref_no: 2
     {% endfor %}
@@ -131,8 +122,27 @@ panels:
       message: 'High latency'
       rule:
         for_duration: 5m
-        evaluate_every: 5m
+        evaluate_every: 1m
       condition_query:
       - OR,avg,1,now,5m,gt,20
       - OR,avg,2,now,5m,gt,25
+
+  - title: (D) Latency per API (99th percentile)
+    type: Graph
+    description: overall latency
+    formatY1: s
+    targets:
+    {% for dimension in data %}
+      - metric: histogram_quantile(0.99, sum(rate(http_request_duration_ms_bucket{job=~"{{ dimension.job }}"}[5m])) by (route, method, le))
+        legend: '{{ '{{method}} - {{route}}' }}'
+        ref_no: 1
+    {% endfor %}
+    alert_config:
+      priority: P3
+      message: 'High latency'
+      rule:
+        for_duration: 5m
+        evaluate_every: 1m
+      condition_query:
+      - OR,avg,1,now,5m,gt,20
     
