@@ -124,3 +124,7 @@ components:
     dimensions:
       - namespace: mft-warehouse
         cronjob_name: retail-pos-cron
+  platform_k8s_hpa:
+    dimensions:
+      - deployment_name: retail-pos-app
+        hpa_name: retail-pos-app

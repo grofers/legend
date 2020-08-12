@@ -26,7 +26,8 @@ from .metrics_schema import (
     starlette_schema,
     nodejs_schema,
     go_schema,
-    platform_k8s_cronjob_schema
+    platform_k8s_cronjob_schema,
+    platform_k8s_hpa_schema
 )
 
 
@@ -173,6 +174,11 @@ schema = {
             "platform_k8s_deployment": {
                 "type": "dict",
                 "schema": md(default_panels_schema, platform_k8s_deployment_schema),
+                "required": False,
+            },
+            "platform_k8s_hpa": {
+                "type": "dict",
+                "schema": md(default_panels_schema, platform_k8s_hpa_schema),
                 "required": False,
             },
             "platform_k8s_ingress": {

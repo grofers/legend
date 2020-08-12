@@ -58,6 +58,19 @@ platform_k8s_cronjob_schema = {
     }
 }
 
+platform_k8s_hpa_schema = {
+    "dimensions": {
+        "type": "list",
+        "schema": {
+            "type": "dict",
+            "schema": {
+                "deployment_name": {"type": "string", "required": True},
+                "hpa_name": {"type": "string", "required": True},
+            },
+        },
+    }
+}
+
 platform_k8s_ingress_schema = {
     "dimensions": {
         "type": "list",
