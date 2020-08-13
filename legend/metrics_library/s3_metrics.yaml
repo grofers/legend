@@ -80,7 +80,7 @@ panels:
   - title: (D) Request Latency - 99th percentile
     type: Graph
     description: The elapsed per-request time from the first byte received to the last byte sent to an Amazon S3 bucket. This includes the time taken to receive the request body and send the response body, which is not included in FirstByteLatency.
-    formatY1: s
+    formatY1: ms
     targets:
       {% for dimension in data %}
     - dimensions: {"BucketName": {{ dimension.bucket_name }} ,"FilterId": {{ dimension.filter_id }}}
@@ -102,4 +102,4 @@ panels:
         for_duration: 5m
         evaluate_every: 1m
       condition_query:
-      - OR,avg,1,now,5m,gt,5
+      - OR,avg,1,now,5m,gt,1000
