@@ -90,8 +90,7 @@ def create_handler(spec, name, **kwargs):
         kopf.exception(spec, reason='APIError',
                        message=('Failed to create dashboard due to API '
                                 'error: %s' % e))
-        raise e
-
+        raise kopf.PermanentError("Failed creating the dashboard")
 
 @kopf.on.update('grofers.io', 'v1', 'grafana-dashboards')
 def update_handler(spec, name, **kwargs):
@@ -112,8 +111,7 @@ def update_handler(spec, name, **kwargs):
         kopf.exception(spec, reason='APIError',
                        message=('Failed to update dashboard due to API '
                                 'error: %s' % e))
-        raise e
-
+        raise kopf.PermanentError("Failed creating the dashboard")
 
 @kopf.on.delete('grofers.io', 'v1', 'grafana-dashboards')
 def delete_handler(spec, name, body, **kwargs):
@@ -142,4 +140,4 @@ def delete_handler(spec, name, body, **kwargs):
             kopf.exception(spec, reason='APIError',
                         message=('Failed to delete dashboard due to API '
                                     'error: %s' % e))
-            raise e
+            raise kopf.PermanentError("Failed deleting the dashboard")
