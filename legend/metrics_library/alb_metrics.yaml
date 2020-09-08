@@ -109,4 +109,5 @@ panels:
         region: {{ dimension.region }}
         statistic: p95
         alias: '{{ '{{LoadBalancer}}_{{TargetGroup}}_{{metric}}_{{stat}}' }}'
+        ref_no: 1
       {% endfor %}
