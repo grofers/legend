@@ -12,7 +12,7 @@ panels:
       - metric: kube_cronjob_status_active{namespace="{{dimension.namespace}}", cronjob="{{dimension.cronjob_name}}"}
         legend: Active
         ref_no: 1
-      - metric: kube_job_status_failed{namespace="{{dimension.namespace}}", job_name=~"{{dimension.cronjob_name}}.*"}
+      - metric: sum(increase(kube_job_status_failed{namespace="{{dimension.namespace}}", job_name=~"{{dimension.cronjob_name}}.*"}[10m]))
         legend: Failed
         ref_no: 2
     alert_config:
