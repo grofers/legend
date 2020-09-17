@@ -1,4 +1,9 @@
 import os
+import sentry_sdk
+
+sentry_sdk.init(
+    traces_sample_rate=1.0
+)
 
 LEGEND_HOME_NAME = ".legend"
 LEGEND_DEFAULT_CONFIG = "legend.cfg"
