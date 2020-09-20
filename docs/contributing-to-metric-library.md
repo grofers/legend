@@ -14,7 +14,7 @@ The input file has to be written based on the data source of the metrics.
 Each component is seperate with a `row` panel in grafana, and the panels within each of these
 consists of one or more `targets`. These are the actual graphs which are plotted in Grafana. 
 
-Legend uses [grafonnet-lib](https://github.com/grofers/grafonnet-lib.git) internally to generat the
+Legend uses [grafonnet-lib](https://github.com/grafana/grafonnet-lib/tree/v0.1.0) internally to generat the
 dashboard's json and apply it to Grafana. 
 
 ### Basic spec

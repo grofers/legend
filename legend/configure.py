@@ -13,6 +13,7 @@ from . import (
     GRAFONNET_REPO_URL,
     GRAFONNET_REPO_NAME,
     LEGEND_DEFAULT_CONFIG,
+    GRAFONNET_REPO_RELEASE_TAG,
 )
 
 
@@ -25,7 +26,9 @@ def set_global_vars():
 
     if os.environ.get("GRAFONNET_REPO_URL") is not None:
         GRAFONNET_REPO_URL = os.environ.get("GRAFONNET_REPO_URL")
-
+    
+    if os.environ.get("GRAFONNET_REPO_RELEASE_TAG") is not None:
+        GRAFONNET_REPO_RELEASE_TAG = os.environ.get("GRAFONNET_REPO_RELEASE_TAG")
 
 def install_grafonnet_lib():
     set_global_vars()
@@ -35,16 +38,17 @@ def install_grafonnet_lib():
     if not os.path.isdir(grafonnet_path):
         try:
             repo = Repo.clone_from(GRAFONNET_REPO_URL, grafonnet_path)
+            repo.git.checkout(GRAFONNET_REPO_RELEASE_TAG)
         except Exception:
             raise ValueError("Error cloning grafonnet-lib folder from GitHub")
     else:
         try:
-            # Update from master
+            # Update from the chosen release
             repo = Repo(grafonnet_path)
-            repo.heads.master.checkout()
-            repo.git.pull("origin", "master")
+            repo.git.checkout(GRAFONNET_REPO_RELEASE_TAG)
+            repo.git.pull("origin", GRAFONNET_REPO_RELEASE_TAG)
         except Exception:
-            raise ValueError("Not a valid git repo/unable to pull master")
+            raise ValueError("Not a valid git repo/unable to pull {release_tag}".format(release_tag=GRAFONNET_REPO_RELEASE_TAG))
     return ()
 
 

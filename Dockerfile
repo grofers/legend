@@ -4,8 +4,9 @@ RUN echo "`which jsonnet`"
 FROM python:3.7
 
 ENV LEGEND_HOME="/src"
-ENV GRAFONNET_REPO_URL="https://github.com/grofers/grafonnet-lib"
+ENV GRAFONNET_REPO_URL="https://github.com/grafana/grafonnet-lib"
 ENV GRAFONNET_REPO_NAME="grafonnet-lib"
+ENV GRAFONNET_REPO_RELEASE_TAG="v0.1.0"
 
 WORKDIR /src
 
