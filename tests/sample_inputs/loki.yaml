@@ -1,0 +1,28 @@
+---
+    title: Loki-metrics
+    service: Sample-API
+    grafana_folder: SampleFolder
+    alert_channels: ["opsgenie-channel"]
+    environment: Prod
+    description: An API which exposes some logs
+    references:
+      deployment: https://github.com/grofers/ansible/tree/master/roles/consul
+      documentation: https://www.consul.io/docs/index.html
+      metrics_definition: https://www.consul.io/docs/agent/telemetry.html
+    tags:
+    - prod
+    - infra
+    components:
+      loki:
+        dimensions:
+          - namespace: nyala
+            grofers.io/service: nyala
+          - namespace: monitoring
+      platform_ec2:
+        dimensions:
+          - host: consulserver.*.ap-southeast-1.*
+          - host: privateproxy
+      haproxy:
+        dimensions:
+          - backend: consul_prod
+    

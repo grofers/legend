@@ -1,4 +1,3 @@
-
 local grafana = import 'grafonnet/grafana.libsonnet';
 local dashboard = grafana.dashboard;
 local template = grafana.template;
@@ -11,53 +10,60 @@ local prometheus = grafana.prometheus;
 local cloudwatch = grafana.cloudwatch;
 local influxdb = grafana.influxdb;
 local alertCondition = grafana.alertCondition;
+local logPanel = grafana.logPanel;
+local loki = grafana.loki;
 
 {% for component, values in data.components.items() %}
-{% set comp = 'R_' ~ loop.index %}
-local {{ comp }} =
-    row.new(title='{{ component }}',
-    {% if values.metric[0].get('hide') is not none %}
-        collapse=true,
-    {%endif%}
-    );
+    {% set comp = 'R_' ~ loop.index %}
+    local {{ comp }} =
+        row.new(
+            title='{{ component }}',
+            {% if values.metric[0].get('hide') is not none %}
+                collapse=true,
+            {%endif%}
+        );
     {% for metric in values.metric %}
         {% set comp1 = comp ~ "_" ~ loop.index %}
-    {% for panel_value in metric.panels %}
-
-local {{ comp1 }}_P_{{loop.index}} =
-    graphPanel.new(
-        title='{{ panel_value.title }}',
-        datasource='{{ metric.data_source }} ({{ data.environment }})',
-        shared_tooltip='true',
-        legend_values='true',
-        legend_min='true',
-        legend_max='true',
-        legend_current='true',
-        legend_avg='true',
-        legend_alignAsTable='true',
-        nullPointMode='connected',
-        description='{{ panel_value.description }}',
-        {% if panel_value.formatY1 %}
-            formatY1='{{ panel_value.formatY1 }}',
-        {%endif%}
-        {% if panel_value.labelY1 %}
-            labelY1='{{ panel_value.labelY1 }}',
-        {%endif%}
-        {% if panel_value.decimals %}
-            decimals='{{ panel_value.decimals }}',
-        {%endif%}
-    )
-
-        {% for target in panel_value.targets %}
-{{ target.render }}
+        {% for panel_value in metric.panels %}
+            local {{ comp1 }}_P_{{loop.index}} =
+                {% if panel_value.type.lower() == "log" %}
+                    logPanel.new(
+                        title='{{ panel_value.title }}',
+                        datasource='{{ metric.data_source }} ({{ data.environment }})',
+                        showLabels='true',
+                        showTime='true',
+                        sortOrder='{{ (panel_value.sort_order or "descending").capitalize() }}'
+                    )
+                {% elif panel_value.type.lower() == "graph" %}
+                    graphPanel.new(
+                        title='{{ panel_value.title }}',
+                        datasource='{{ metric.data_source }} ({{ data.environment }})',
+                        shared_tooltip='true',
+                        legend_values='true',
+                        legend_min='true',
+                        legend_max='true',
+                        legend_current='true',
+                        legend_avg='true',
+                        legend_alignAsTable='true',
+                        nullPointMode='connected',
+                        description='{{ panel_value.description }}',
+                        {% if panel_value.formatY1 %}
+                            formatY1='{{ panel_value.formatY1 }}',
+                        {%endif%}
+                        {% if panel_value.labelY1 %}
+                            labelY1='{{ panel_value.labelY1 }}',
+                        {%endif%}
+                        {% if panel_value.decimals %}
+                            decimals='{{ panel_value.decimals }}',
+                        {%endif%}
+                    )
+                {% endif %}
+                {% for target in panel_value.targets %}
+                    {{ target.render }}
+                {% endfor %}
+                {{ panel_value.alertrender }};
         {% endfor %}
-    {{ panel_value.alertrender }}
-
-;
-    {% endfor %}
   {% endfor %}
-
-
 {% endfor %}
 
 

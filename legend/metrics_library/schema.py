@@ -27,7 +27,8 @@ from .metrics_schema import (
     nodejs_schema,
     go_schema,
     platform_k8s_cronjob_schema,
-    platform_k8s_hpa_schema
+    platform_k8s_hpa_schema,
+    loki_schema
 )
 
 
@@ -50,8 +51,9 @@ additional_panels_schema = {
                 "title": {"type": "string", "required": True},
                 "formatY1": {"type": "string", "required": False},
                 "labelY1": {"type": "string", "required": False},
-                "type": {"type": "string", "required": False, "allowed": ["Graph"]},
+                "type": {"type": "string", "required": False, "allowed": ["Graph", "Log"]},
                 "description": {"type": "string", "required": False},
+                "sort_order": {"type": "string", "required": False, "allowed": ["Ascending", "Descending"]},
                 "targets": {
                     "type": "list",
                     "schema": {
@@ -74,6 +76,7 @@ additional_panels_schema = {
                             "alias": {"type": "string", "required": False},
                             "query": {"type": "string", "required": False},
                             "alias_by": {"type": "string", "required": False},
+                            "expr": {"type": "string", "required": False},
                         },
                     },
                 },
@@ -291,6 +294,11 @@ schema = {
                 "schema": md(default_panels_schema, go_schema),
                 "required": False,
             },
+            "loki": {
+                "type": "dict",
+                "schema": md(default_panels_schema, loki_schema),
+                "required": False,
+            }
         },
     },
 }

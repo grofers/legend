@@ -128,3 +128,7 @@ components:
     dimensions:
       - deployment_name: retail-pos-app
         hpa_name: retail-pos-app
+  loki:
+    dimensions:
+      - namespace: nyala
+        grofers.io/service: nyala

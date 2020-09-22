@@ -1,0 +1,37 @@
+component: loki
+data_source: Loki
+metrics_source: https://grafana.com/docs/loki/latest/logql/
+reference: https://grafana.com/docs/loki/latest/
+description: Prometheus, but for logs. Loki is an efficient log aggregator which indexes only the labels associated with the logs instead of indexing the entire logs.
+panels:
+    - title: All Logs
+      type: Log
+      sort_order: descending
+      description: Logs with respect to the provided service key (default no such filter)
+      targets:
+        {% for dimension in data %}
+          - expr: '{namespace=~"{{ dimension.get("namespace") }}", grofers_io_service=~"{{ dimension.get("grofers.io/service") }}", grofers_io_component=~"{{ dimension.get("grofers.io/component") }}", grofers_io_component_role=~"{{ dimension.get("grofers.io/component-role") }}", grofers_io_business_service=~"{{ dimension.get("grofers.io/business-service") }}", grofers_io_team=~"{{ dimension.get("grofers.io/team") }}", grofers_io_tribe=~"{{ dimension.get("grofers.io/tribe") }}", grofers_io_owner=~"{{ dimension.get("grofers.io/owner") }}"}'
+        {% endfor %}
+    - title: Error Logs
+      type: Log
+      sort_order: descending
+      description: All the logs associated with any error
+      targets:
+        {% for dimension in data %}
+          - expr: '{namespace=~"{{ dimension.get("namespace") }}", grofers_io_service=~"{{ dimension.get("grofers.io/service") }}", grofers_io_component=~"{{ dimension.get("grofers.io/component") }}", grofers_io_component_role=~"{{ dimension.get("grofers.io/component-role") }}", grofers_io_business_service=~"{{ dimension.get("grofers.io/business-service") }}", grofers_io_team=~"{{ dimension.get("grofers.io/team") }}", grofers_io_tribe=~"{{ dimension.get("grofers.io/tribe") }}", grofers_io_owner=~"{{ dimension.get("grofers.io/owner") }}"} |~ "err"' ##  {namespace="nyala"} |~ "err"
+        {% endfor %}
+    - title: 4xx-status error logs
+      type: Log
+      sort_order: descending
+      targets:
+        {% for dimension in data %}
+          - expr: '{namespace=~"{{ dimension.get("namespace") }}", grofers_io_service=~"{{ dimension.get("grofers.io/service") }}", grofers_io_component=~"{{ dimension.get("grofers.io/component") }}", grofers_io_component_role=~"{{ dimension.get("grofers.io/component-role") }}", grofers_io_business_service=~"{{ dimension.get("grofers.io/business-service") }}", grofers_io_team=~"{{ dimension.get("grofers.io/team") }}", grofers_io_tribe=~"{{ dimension.get("grofers.io/tribe") }}", grofers_io_owner=~"{{ dimension.get("grofers.io/owner") }}"} |~ "[^0-9]4[0-9]{2}[^0-9]" |~ "GET|POST|PUT|DELETE|PATCH"' ##  {namespace="nyala"} |~ "HTTP GET /route 404 1.1"
+        {% endfor %}
+    - title: 5xx-status error logs
+      type: Log
+      sort_order: descending
+      targets:
+        {% for dimension in data %}
+          - expr: '{namespace=~"{{ dimension.get("namespace") }}", grofers_io_service=~"{{ dimension.get("grofers.io/service") }}", grofers_io_component=~"{{ dimension.get("grofers.io/component") }}", grofers_io_component_role=~"{{ dimension.get("grofers.io/component-role") }}", grofers_io_business_service=~"{{ dimension.get("grofers.io/business-service") }}", grofers_io_team=~"{{ dimension.get("grofers.io/team") }}", grofers_io_tribe=~"{{ dimension.get("grofers.io/tribe") }}", grofers_io_owner=~"{{ dimension.get("grofers.io/owner") }}"} |~ "[^0-9]5[0-9]{2}[^0-9]"  |~ "GET|POST|PUT|DELETE|PATCH"' ##  {namespace="nyala"} |~ "HTTP GET /route 500 1.1"
+        {% endfor %}
+
