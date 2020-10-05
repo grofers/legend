@@ -1,18 +1,18 @@
 
 # Client Libraries & Integration Guides
 
-> This guide is only about enabling the metrics in the respective components, but doesn't not guide on enabling scrapping of the merics where applicable (ex: prometheus). Internally we user promethues operator and service monitor concept - https://github.com/prometheus-operator/prometheus-operator/blob/master/Documentation/user-guides/getting-started.md 
+> This guide is only about enabling the metrics in the respective components, but doesn't not guide on enabling scrapping of the merics where applicable (ex: prometheus). Internally we user promethues operator and service monitor concept - [https://github.com/prometheus-operator/prometheus-operator/blob/master/Documentation/user-guides/getting-started.md](https://github.com/prometheus-operator/prometheus-operator/blob/master/Documentation/user-guides/getting-started.md )
 
 ## Table of contents
 
-- [Django](#django)
-- [Celery](#celery)
-- [MySql EC2](#mysql-ec2)
-- [Redis](#redis)
-- [Rabbitmq](#rabbitmq)
-- [Couchdb](#couchdb)
-- [Nodejs](#nodejs)
-- [Golang](#golang)
+* [Django](#django)
+* [Celery](#celery)
+* [MySql EC2](#mysql-ec2)
+* [Redis](#redis)
+* [Rabbitmq](#rabbitmq)
+* [Couchdb](#couchdb)
+* [Nodejs](#nodejs)
+* [Golang](#golang)
 
 ## Django
 

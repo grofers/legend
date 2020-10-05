@@ -9,19 +9,19 @@ for your services
 
 ## Table of contents
 
-- [Features](#features)
-- [Getting started](#getting-started)
-  - [Pre-requisites](#pre-requisites)
-  - [Using Legend](#using-legend)
-- [Contribution](#contribution)
-- [Legend internals](#legend-internals)
+* [Features](#features)
+* [Getting started](#getting-started)
+  * [Pre-requisites](#pre-requisites)
+  * [Using Legend](#using-legend)
+* [Contribution](#contribution)
+* [Legend internals](#legend-internals)
 
 ## Features
 
-*Build dashboards for your services with prefilled metrics
-*Customizable alerts and panels
-*Automatic setup of basic alerts with priority and service mapping
-*Beautiful outlay of the dashabord to enable uniformity
+* Build dashboards for your services with prefilled metrics
+* Customizable alerts and panels
+* Automatic setup of basic alerts with priority and service mapping
+* Beautiful outlay of the dashabord to enable uniformity
 
 ## Getting started
 
@@ -29,16 +29,17 @@ This section describes on how to get started with using Legend.
 
 ### Pre-requisites
 
-*For each component of your service, there has to be a respective metric files in
+* For each component of your service, there has to be a respective metric files in
 `legend/metrics_library/metrics/` which containes the metrics to be plotted for that component. If you are adding a new component(and a new metric library file) please refer to [contributing-to-metric-library](docs/contributing-to-metric-library.md)
 
-*Based on the component an additional step of enabling metrics for the component has to happen. The monitoring queries written are based on specific exporters userd to expose the metrics, mentioned in [enabling metrics](docs/contributing-to-metric-library.md). If other exporters are used, the queries might have to be changed.
+* Based on the component an additional step of enabling metrics for the component has to happen. The monitoring queries written are based on specific exporters userd to expose the metrics, mentioned in [enabling metrics](docs/contributing-to-metric-library.md). If other exporters are used, the queries might have to be changed.
 
 ### Using Legend
 
 You can use `legend` in one of the two ways:
-  *[Use legend from kubernetes (CRD)](#use-legend-from-kubernetes-(crd))
-  *[Legend CLI](#legend-cli)
+
+* [Use legend from kubernetes (CRD)](#use-legend-from-kubernetes-(crd))
+* [Legend CLI](#legend-cli)
 
 You need to create an input file describing the components of your service [writing-input-file](docs/writing-input-file.md)
 
@@ -56,11 +57,6 @@ metadata:
     app: # Add name for reference
 spec: # Spec of legend. The same format in which it was mentioned earlier
 ```
-
-Set the appropriate context.
-> The prod-sgp context creates the dashboard in production grafana (grafana.grofers.com) and the stage
-> context create the dashboard in stage grafana (grafana-stage.grofer.io). It is recommended to try and
-> test your dashboards in stage before applying in production
 
 To create/update/delete the dashboard, run:
 
@@ -127,15 +123,15 @@ Commands:
 You can conribute to legend in two ways:
 
 *Developing/improving legend's functionality*
-*You can pick up the existing issues in the github repo of legend and work on the fixes
-*Follow the guide [developing on legend](docs/developing-on-legend.md)
 
-*Improve the metrics legend creates for a service*
-*This is one of the biggest offerings of Legend - pre configured metrics for a wide variety of
+* You can pick up the existing issues in the github repo of legend and work on the fixes
+* Follow the guide [developing on legend](docs/developing-on-legend.md)
+* Improve the metrics legend creates for a service*
+* This is one of the biggest offerings of Legend - pre configured metrics for a wide variety of
 components.
-*If you are contibuting to the existing metrics or writing new ones please follow the giude [contributing-to-metric-library](docs/contributing-to-metric-library.md)
-*Run tests locally using `tests.sh` (you'll need to setup local config file)
-*Run tests for crd using pytest (you'll need to setup minikube to talk to handler)
+* If you are contibuting to the existing metrics or writing new ones please follow the giude [contributing-to-metric-library](docs/contributing-to-metric-library.md)
+* Run tests locally using `tests.sh` (you'll need to setup local config file)
+* Run tests for crd using pytest (you'll need to setup minikube to talk to handler)
 
 ```shell
 minikube start
@@ -143,7 +139,7 @@ kubectl proxy
 pytest  (In parallel to minikube)
 ```
 
-*Raise a PR
+* Raise a PR
 
 ## Legend internals
 
