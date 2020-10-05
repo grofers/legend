@@ -1,0 +1,113 @@
+component: alb
+metrics_source: built-in
+data_source: Cloudwatch
+reference: https://aws.amazon.com/elasticloadbalancing/
+description: Provide a reliable solution for AWS Application Load Balancer
+panels:
+  - title: (U) Healthy/Unhealthy Host Count
+    type: Graph
+    description: Number of Healthy and Unhealthy hosts
+    targets:
+      {% for dimension in data %}
+      - dimensions: {"LoadBalancer": {{ dimension.load_balancer_id }}, "TargetGroup": {{ dimension.target_group_id }} }
+        metric: HealthyHostCount
+        namespace: AWS/ApplicationELB
+        region: {{ dimension.region }}
+        statistic: Maximum
+        alias: '{{ '{{LoadBalancer}}_{{TargetGroup}}_{{metric}}_{{stat}}' }}'
+        ref_no: 1
+      - dimensions: {"LoadBalancer": {{ dimension.load_balancer_id }}, "TargetGroup": {{ dimension.target_group_id }} }
+        metric: UnHealthyHostCount
+        namespace: AWS/ApplicationELB
+        region: {{ dimension.region }}
+        statistic: Maximum
+        alias: '{{ '{{LoadBalancer}}_{{TargetGroup}}_{{metric}}_{{stat}}' }}'
+        ref_no: 2
+      {% endfor %}
+    alert_config:
+      priority: P3
+      message: 'Unhealthy hosts for more than 15min'
+      rule:
+        for_duration: 15m
+        evaluate_every: 1m
+      condition_query:
+      - OR,avg,2,now,20m,gt,0
+
+  - title: (E) Rejected Connections Count
+    type: Graph
+    description: The number of connections that were rejected because the load balancer had reached its maximum number of connections.
+    targets:
+      {% for dimension in data %}
+      - dimensions: {"LoadBalancer": {{ dimension.load_balancer_id }}, "TargetGroup": {{ dimension.target_group_id }} }
+        metric: RejectedConnectionCount
+        namespace: AWS/ApplicationELB
+        region: {{ dimension.region }}
+        statistic: Sum
+        alias: '{{ '{{LoadBalancer}}_{{TargetGroup}}_{{metric}}_{{stat}}' }}'
+      {% endfor %}
+
+  - title: (R) Request Count
+    type: Graph
+    description: Number of Requests completed during the specific interval
+    targets:
+      {% for dimension in data %}
+      - dimensions: {"LoadBalancer": {{ dimension.load_balancer_id }}, "TargetGroup": {{ dimension.target_group_id }} }
+        metric: RequestCount
+        namespace: AWS/ApplicationELB
+        region: {{ dimension.region }}
+        statistic: Sum
+        alias: '{{ '{{LoadBalancer}}_{{TargetGroup}}_{{metric}}_{{stat}}' }}'
+      {% endfor %}
+
+  - title: (E) Target 4XX/5XX Count
+    type: Graph
+    description: Number of 4xx and 5xx http responses from instances
+    targets:
+      {% for dimension in data %}
+      - dimensions: {"LoadBalancer": {{ dimension.load_balancer_id }}, "TargetGroup": {{ dimension.target_group_id }} }
+        metric: HTTPCode_Target_4XX_Count
+        namespace: AWS/ApplicationELB
+        region: {{ dimension.region }}
+        statistic: Sum
+        alias: '{{ '{{LoadBalancer}}_{{TargetGroup}}_{{metric}}_{{stat}}' }}'
+      - dimensions: {"LoadBalancer": {{ dimension.load_balancer_id }}, "TargetGroup": {{ dimension.target_group_id }} }
+        metric: HTTPCode_Target_5XX_Count
+        namespace: AWS/ApplicationELB
+        region: {{ dimension.region }}
+        statistic: Sum
+        alias: '{{ '{{LoadBalancer}}_{{TargetGroup}}_{{metric}}_{{stat}}' }}'
+      {% endfor %}
+
+  - title: (E) ELB 4XX/5XX Count
+    type: Graph
+    description: Number of 4xx and 5xx http responses from ELB
+    targets:
+      {% for dimension in data %}
+      - dimensions: {"LoadBalancer": {{ dimension.load_balancer_id }}, "TargetGroup": {{ dimension.target_group_id }} }
+        metric: HTTPCode_ELB_4XX_Count
+        namespace: AWS/ApplicationELB
+        region: {{ dimension.region }}
+        statistic: Sum
+        alias: '{{ '{{LoadBalancer}}_{{TargetGroup}}_{{metric}}_{{stat}}' }}'
+      - dimensions: {"LoadBalancer": {{ dimension.load_balancer_id }}, "TargetGroup": {{ dimension.target_group_id }} }
+        metric: HTTPCode_ELB_5XX_Count
+        namespace: AWS/ApplicationELB
+        region: {{ dimension.region }}
+        statistic: Sum
+        alias: '{{ '{{LoadBalancer}}_{{TargetGroup}}_{{metric}}_{{stat}}' }}'
+      {% endfor %}
+
+  - title: (D) Request Latency (s)
+    type: Graph
+    description: The time elapsed, in seconds, after the request leaves the load balancer until a response from the target is received.
+    formatY1: s
+    targets:
+      {% for dimension in data %}
+      - dimensions: {"LoadBalancer": {{ dimension.load_balancer_id }}, "TargetGroup": {{ dimension.target_group_id }} }
+        metric: TargetResponseTime
+        namespace: AWS/ApplicationELB
+        region: {{ dimension.region }}
+        statistic: p95
+        alias: '{{ '{{LoadBalancer}}_{{TargetGroup}}_{{metric}}_{{stat}}' }}'
+        ref_no: 1
+      {% endfor %}

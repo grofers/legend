@@ -1,0 +1,13 @@
+.addTarget(
+    cloudwatch.target(
+    '{{data.region or 'default'}}',
+    '{{data.namespace}}',
+    '{{data.metric}}',
+    datasource=null,
+    statistic='{{data.statistic}}',
+    alias='{{data.alias}}',
+    highResolution='false',
+    period='1m',
+    dimensions={{data.dimensions}}
+    )
+)

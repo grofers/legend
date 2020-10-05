@@ -1,0 +1,77 @@
+component: vault
+data_source: Prometheus
+metrics_source: built-in
+reference: https://www.vaultproject.io/docs/internals/telemetry/
+description: Secret management tool by Hashicorp
+panels:
+  - title: (R) Vault core Request Rate
+    type: Graph
+    description: Number of requests handled by the Vault core in an interval
+    targets:
+      {% for dimension in data %}
+      - metric: rate(vault_core_handle_request_count{instance_name=~"^{{ dimension.environment }}.*"}[5m])
+        legend: request_rate
+      {% endfor %}
+
+  - title: (R) Consul Request Rate
+    type: Graph
+    description: Number of vault requests handled by Consul in an interval
+    targets:
+      {% for dimension in data %}
+      - metric: rate(vault_consul_get_count{instance_name=~"^{{ dimension.environment }}.*"}[5m])
+        legend: GET
+      - metric: rate(vault_consul_put_count{instance_name=~"^{{ dimension.environment }}.*"}[5m])
+        legend: PUT
+      - metric: rate(vault_consul_list_count{instance_name=~"^{{ dimension.environment }}.*"}[5m])
+        legend: LIST
+      - metric: rate(vault_consul_delete_count{instance_name=~"^{{ dimension.environment }}.*"}[5m])
+        legend: DELETE
+      {% endfor %}
+
+  - title: (E) Vault Cluster Unhealthy
+    type: Graph
+    description: Total duration of cluster leadership losses in a highly-available cluster.
+    targets:
+      {% for dimension in data %}
+      - metric: rate(vault_core_leadership_lost{instance_name=~"^{{ dimension.environment }}.*"}[5m])
+        legend: duration
+        ref_no: 1
+      {% endfor %}
+    formatY1: ms
+    alert_config:
+      priority: P4
+      message: Vault Cluster Unhealthy
+      rule:
+        for_duration: 5m
+        evaluate_every: 1m
+      condition_query:
+        - OR,avg,1,now,5m,gt,0
+
+  - title: (E) Vault GC Time
+    type: Graph
+    description: Number of seconds consumed by gc(stop-the-world) pauses
+    targets:
+      {% for dimension in data %}
+      - metric: vault_runtime_gc_pause_ns{instance_name=~"^{{ dimension.environment }}.*", quantile="0.9"}/1000000000
+        legend: '{{ '{{instance}}' }}'
+      {% endfor %}
+    formatY1: s
+
+  - title: (D) Vault Request processing time
+    type: Graph
+    description: Duration of requests handled by the Vault core. This is the key measure of Vault\'s response time.
+    targets:
+      {% for dimension in data %}
+      - metric: rate(vault_core_handle_request{instance_name=~"^{{ dimension.environment }}.*", quantile="0.9"}[5m])
+        legend: '{{ '{{instance}}' }}'
+        ref_no: 1
+      {% endfor %}
+    formatY1: ms
+    alert_config:
+      priority: P3
+      message: High Vault request processing time
+      rule:
+        for_duration: 5m
+        evaluate_every: 1m
+      condition_query:
+        - OR,avg,1,now,5m,gt,10

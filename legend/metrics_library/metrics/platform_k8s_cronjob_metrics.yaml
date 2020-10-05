@@ -1,0 +1,26 @@
+component: platform_k8s_cronjob
+data_source: Prometheus
+metrics_source: https://github.com/kubernetes/kube-state-metrics
+reference: https://blog.freshtracks.io/a-deep-dive-into-kubernetes-metrics-part-3-container-resource-metrics-361c5ee46e66
+description: Kubernetes Cronjob
+panels:
+  {% for dimension in data %}
+  - title: Cron Job - {{dimension.cronjob_name}}
+    type: Graph
+    description: Checking Failure of Cron Job
+    targets:
+      - metric: kube_cronjob_status_active{namespace="{{dimension.namespace}}", cronjob="{{dimension.cronjob_name}}"}
+        legend: Active
+        ref_no: 1
+      - metric: sum(increase(kube_job_status_failed{namespace="{{dimension.namespace}}", job_name=~"{{dimension.cronjob_name}}.*"}[10m]))
+        legend: Failed
+        ref_no: 2
+    alert_config:
+      priority: P3
+      message: 'Cronjob Failure Alert'
+      rule:
+        for_duration: 5m
+        evaluate_every: 1m
+      condition_query:
+        - OR,max,2,now,5m,gt,0
+  {% endfor %}

@@ -1,0 +1,144 @@
+apiVersion: grofers.io/v1
+kind: GrafanaDashboard
+metadata:
+  name: sample-title-9
+  labels:
+    app: sample-title
+spec:
+  title: SampleTitle
+  service: SampleService
+  grafana_folder: SampleFolder
+  alert_channels: ["service-opsgenie"]
+  environment: Prod
+  description: Logging tool for everything deployed on kubernetes
+  references:
+    deployment: https://github.com/grofers/legend/tree/master/helm-chart/legend/Readme.md
+    documentation: https://github.com/grofers/legend/tree/master/docs
+    metrics_definition: https://github.com/grofers/legend
+  tags:
+  - prod
+  - infra
+  components:
+
+  # Application frameworks
+    playframework:
+      dimensions:
+        - service: sample-play-service
+    springboot:
+      dimensions:
+        - job: sample-sprintboot-service
+    jmx:
+      dimensions:
+        - job: sample-jmx-job
+          service: sample-jmx-service
+    django:
+      dimensions:
+        - job: sample-django-service
+    nodejs:
+      dimensions:
+        - job: sample-nodejs-service
+    go:
+      dimensions:
+        - job: sample-go-service
+
+  # Databases
+    mysql_ec2:
+      dimensions:
+        ec2:
+          - host: sample-ec2-host
+        db:
+          - masters:
+            - host: sample-mysql-host-master
+              db_name: sample-db
+            slaves:
+              - host: sample-mysql-host-slave
+                db_name: sample-db
+    mysql_56_rds:
+      dimensions:
+        - db_instance_identifier: sample-rds-mysql56
+    pgsql_rds:
+      dimensions:
+        - db_instance_identifier: sample-rds-psql
+    couchdb:
+      dimensions:
+        - job_name: sample-couch-service
+    redis:
+      dimensions:
+        - job_name: sample-redis-host
+
+  # Workers
+    celery:
+      dimensions:
+        - job_name: sample-celery-instances
+
+  # Queues
+    sqs:
+      dimensions:
+        - queue_name: sample-sqs-queue
+          dead_queue_name: sample-sqs-dead-queue
+    rabbitmq:
+      dimensions:
+        - queue_name: sample-rabbitmq-queue
+          job: sample-rabbitmq-queue
+
+  # Platforms
+    platform_ec2:
+      dimensions:
+        - host: sample-ec2-host
+    platform_k8s_deployment:
+      dimensions:
+        - deployment_name: sample-deployment-name
+    platform_k8s_ingress:
+      dimensions:
+        - namespace: sample-namespace
+          service_name: sample-ingress-name
+          service_type: sample-ingress-type
+    platform_k8s_cronjob:
+      dimensions:
+        - namespace: sample-namespace
+          cronjob_name: sample-cronjob-name
+    platform_k8s_hpa:
+      dimensions:
+        - deployment_name: sample-deployment-name
+          hpa_name: sample-hpa-name
+    elb:
+      dimensions:
+        - load_balancer_name: sample-elb-name
+    alb:
+      dimensions:
+        - load_balancer_id: sample-alb-id
+          region: sample-region
+          target_group_id: samepl-alb-targetgroup-id
+    s3:
+      dimensions:
+        - bucket_name: sample-s3-bucket
+          filter_id: EntireBucket
+
+  # Data science tools
+    airflow:
+      dimensions:
+        - cluster: sample-cluster
+          namespace: sample-namespace
+          dag_id: samepl-dag-id
+    starlette:
+      dimensions:
+        - job: sample-starlette-service
+          path: sample-starlette-path
+
+  # Applications 
+    consul:
+      dimensions:
+        - region: sample-aws-region
+    haproxy:
+      dimensions:
+        - backend: sample-haproxy-backend
+    vault:
+      dimensions:
+        - environment: sample-environment
+    promtail:
+      dimensions:
+        - pod_name: promtail
+    loki:
+      dimensions:
+        - namespace: nyala
+          grofers.io/service: nyala

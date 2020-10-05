@@ -1,0 +1,109 @@
+component: platform_ec2
+data_source: InfluxDB
+metrics_source: https://collectd.org/
+reference: https://www.slideshare.net/OpsStack/how-to-monitoring-the-sre-golden-signals-ebook/
+description: System core metrics
+panels:
+  - title: (U) CPU Utilisation
+    type: Graph
+    description: CPU utilisation. Utilisation % time that the resource was busy
+    formatY1: percent
+    targets:
+      {% for dimension in data %}
+      - query: SELECT 100 - mean(\"value\") FROM \"cpu_value\" WHERE (\"type\" = \'percent\' AND \"type_instance\" = \'idle\' AND \"host\" =~ /^{{ dimension.host }}/ AND \"type\" = \'percent\') AND $timeFilter GROUP BY time($interval), \"host\" fill(null)
+        alias_by: $tag_host
+        ref_no: 1
+      {% endfor %}
+    alert_config:
+      priority: P4
+      message: 'CPU Utilisation is high'
+      rule:
+        for_duration: 20m
+        evaluate_every: 1m
+      condition_query:
+      - OR,avg,1,now,30m,gt,90
+
+  - title: (U) Memory Utilisation
+    type: Graph
+    description: Memory utilisation. Utilisation % time that the resource was busy
+    formatY1: percent
+    targets:
+      {% for dimension in data %}
+      - query: SELECT mean(\"value\") FROM \"memory_value\" WHERE (\"type_instance\" = \'used\' AND \"host\" =~ /^{{ dimension.host }}/ AND \"type\" = \'percent\') AND $timeFilter GROUP BY time($interval), \"host\" fill(null)
+        alias_by: $tag_host
+        ref_no: 1
+      {% endfor %}
+    alert_config:
+      priority: P3
+      message: 'Memory Utilisation is high'
+      rule:
+        for_duration: 20m
+        evaluate_every: 1m
+      condition_query:
+      - OR,avg,1,now,30m,gt,90
+
+  - title: (U) Disk Utilisation
+    type: Graph
+    description: Disk utilisation. Utilisation % time that the resource was busy
+    formatY1: percent
+    targets:
+      {% for dimension in data %}
+      - query: SELECT mean(\"value\") FROM \"df_value\" WHERE (\"type_instance\" = \'used\' AND \"host\" =~ /^{{ dimension.host }}/ AND \"type\" = \'percent_bytes\') AND $timeFilter GROUP BY time($interval), \"host\" fill(null)
+        alias_by: $tag_host
+        ref_no: 1
+      {% endfor %}
+    alert_config:
+      priority: P4
+      message: 'Disk utilisation is high, running out of free space'
+      rule:
+        for_duration: 15m
+        evaluate_every: 1m
+      condition_query:
+      - OR,avg,1,now,20m,gt,80
+
+  - title: (U) Disk Read IOPS
+    type: Graph
+    description: Disk IO Read/Write Operations
+    targets:
+      {% for dimension in data %}
+      - query: SELECT non_negative_derivative(mean(\"value\"), 1m) FROM \"disk_read\" WHERE (\"type\" = \'disk_ops\' AND \"host\" =~ /^{{ dimension.host }}/) AND $timeFilter GROUP BY time($interval), \"host\" fill(null)
+        alias_by: $tag_host
+      {% endfor %}
+
+  - title: (U) Disk Write IOPS
+    type: Graph
+    description: Disk IO Read/Write Operations
+    targets:
+      {% for dimension in data %}
+      - query: SELECT non_negative_derivative(mean(\"value\"), 1m) FROM \"disk_write\" WHERE (\"type\" = \'disk_ops\' AND \"host\" =~ /^{{ dimension.host }}/) AND $timeFilter GROUP BY time($interval), \"host\" fill(null)
+        alias_by: $tag_host
+      {% endfor %}
+
+  - title: (U) Network In Bytes
+    type: Graph
+    description: Network In Bytes
+    formatY1: bytes
+    targets:
+      {% for dimension in data %}
+      - query: SELECT non_negative_derivative(mean(\"value\"), 1s) FROM \"interface_rx\" WHERE (\"type\" = \'if_octets\' AND \"host\" =~ /^{{ dimension.host }}/) AND $timeFilter GROUP BY time($interval), \"host\" fill(null)
+        alias_by: $tag_host
+      {% endfor %}
+
+  - title: (U) Network Out Bytes
+    type: Graph
+    description: Network Out Bytes
+    formatY1: bytes
+    targets:
+      {% for dimension in data %}
+      - query: SELECT non_negative_derivative(mean(\"value\"), 1s) FROM \"interface_tx\" WHERE (\"type\" = \'if_octets\' AND \"host\" =~ /^{{ dimension.host }}/) AND $timeFilter GROUP BY time($interval), \"host\" fill(null)
+        alias_by: $tag_host
+      {% endfor %}
+
+  - title: (S) CPU Load
+    type: Graph
+    description: CPU saturation. [https://scoutapm.com/blog/understanding-load-averages]
+    targets:
+      {% for dimension in data %}
+      - query: SELECT mean(\"value\") FROM \"load_longterm\" WHERE (\"type\" = \'load\' AND \"host\" =~ /^{{ dimension.host }}/) AND $timeFilter GROUP BY time($interval), \"host\" fill(null)
+        alias_by: $tag_host
+      {% endfor %}

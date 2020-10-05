@@ -1,0 +1,105 @@
+component: s3
+data_source: Cloudwatch
+metrics_source: https://docs.aws.amazon.com/AmazonS3/latest/dev/cloudwatch-monitoring.html
+reference: https://aws.amazon.com/s3/
+description: Provide a reliable solution for object level storage.
+panels:
+  - title: (R) Request Count - Read/Write
+    type: Graph
+    description: The number of HTTP GET requests made for objects in an Amazon S3 bucket. This doesn\'t include list operations. The number of HTTP PUT requests made for objects in an Amazon S3 bucket.
+    targets:
+      {% for dimension in data %}
+    - dimensions: {"BucketName": {{ dimension.bucket_name }} ,"FilterId": {{ dimension.filter_id }}}
+      metric: PutRequests
+      namespace: AWS/S3
+      statistic: Sum
+      alias: '{{ '{{BucketName}}_{{metric}}_{{stat}}' }}'
+      ref_no: 1
+    - dimensions: {"BucketName": {{ dimension.bucket_name }} ,"FilterId": {{ dimension.filter_id }}}
+      metric: PostRequests
+      namespace: AWS/S3
+      statistic: Sum
+      alias: '{{ '{{BucketName}}_{{metric}}_{{stat}}' }}'
+      ref_no: 2
+    - dimensions: {"BucketName": {{ dimension.bucket_name }} ,"FilterId": {{ dimension.filter_id }}}
+      metric: GetRequests
+      namespace: AWS/S3
+      statistic: Sum
+      alias: '{{ '{{BucketName}}_{{metric}}_{{stat}}' }}'
+      ref_no: 3
+    - dimensions: {"BucketName": {{ dimension.bucket_name }} ,"FilterId": {{ dimension.filter_id }}}
+      metric: AllRequests
+      namespace: AWS/S3
+      statistic: Sum
+      alias: '{{ '{{BucketName}}_{{metric}}_{{stat}}' }}'
+      ref_no: 4
+      {% endfor %}
+
+  - title: (E) Client Errors - 4xx
+    type: Graph
+    description: The number of HTTP 4xx client error status code requests made to an Amazon S3 bucket
+    targets:
+      {% for dimension in data %}
+    - dimensions: {"BucketName": {{ dimension.bucket_name }} ,"FilterId": {{ dimension.filter_id }}}
+      metric: 4xxErrors
+      namespace: AWS/S3
+      statistic: Sum
+      alias: '{{ '{{BucketName}}_{{metric}}_{{stat}}' }}'
+      ref_no: 1
+      {% endfor %}
+    alert_config:
+      priority: P4
+      message: 'Error rate for errors 4xx errors on S3'
+      rule:
+        for_duration: 5m
+        evaluate_every: 1m
+      condition_query:
+      - OR,avg,1,now,5m,gt,60
+
+  - title: (E) Server Errors - 5xx
+    type: Graph
+    description: The number of HTTP 5xx server error status code requests made to an Amazon S3 bucket
+    targets:
+      {% for dimension in data %}
+    - dimensions: {"BucketName": {{ dimension.bucket_name }} ,"FilterId": {{ dimension.filter_id }}}
+      metric: 5xxErrors
+      namespace: AWS/S3
+      statistic: Sum
+      alias: '{{ '{{BucketName}}_{{metric}}_{{stat}}' }}'
+      ref_no: 1
+      {% endfor %}
+    alert_config:
+      priority: P5
+      message: 'Server side errors for S3'
+      rule:
+        for_duration: 5m
+        evaluate_every: 1m
+      condition_query:
+      - OR,avg,1,now,5m,gt,60
+
+  - title: (D) Request Latency - 99th percentile
+    type: Graph
+    description: The elapsed per-request time from the first byte received to the last byte sent to an Amazon S3 bucket. This includes the time taken to receive the request body and send the response body, which is not included in FirstByteLatency.
+    formatY1: ms
+    targets:
+      {% for dimension in data %}
+    - dimensions: {"BucketName": {{ dimension.bucket_name }} ,"FilterId": {{ dimension.filter_id }}}
+      metric: TotalRequestLatency
+      namespace: AWS/S3
+      statistic: p99
+      alias: '{{ '{{BucketName}}_{{metric}}_{{stat}}' }}'
+    - dimensions: {"BucketName": {{ dimension.bucket_name }} ,"FilterId": {{ dimension.filter_id }}}
+      metric: FirstByteLatency
+      namespace: AWS/S3
+      statistic: p99
+      alias: '{{ '{{BucketName}}_{{metric}}_{{stat}}' }}'
+      ref_no: 1
+      {% endfor %}
+    alert_config:
+      priority: P4
+      message: 'Request FirstByteLatency for S3'
+      rule:
+        for_duration: 5m
+        evaluate_every: 1m
+      condition_query:
+      - OR,avg,1,now,5m,gt,1000

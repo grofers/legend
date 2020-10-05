@@ -1,0 +1,89 @@
+component: consul
+data_source: Prometheus
+metrics_source: built-in
+reference: https://www.consul.io/docs/agent/telemetry.html
+description: Provides service discovery and KV store
+panels:
+  - title: (S) Consul Raft Commit Latency
+    type: Graph
+    description: Time taken to commit a new entry to raft log on the leader
+    targets:
+      {% for dimension in data %}
+      - metric: rate(consul_raft_commitTime_sum{region="{{ dimension.region }}"}[5m])/rate(consul_raft_commitTime_count{region="{{ dimension.region }}"}[5m])
+        legend: raft_commit_latency
+        ref_no: 1
+      {% endfor %}
+    formatY1: ms
+    alert_config:
+      priority: P4
+      message: High Raft Commit Latency
+      rule:
+        for_duration: 5m
+        evaluate_every: 1m
+      condition_query:
+        - OR,avg,1,now,5m,gt,90
+
+  - title: (R) Consul HTTP Get Rate
+    type: Graph
+    description: Number of http get requests
+    targets:
+      {% for dimension in data %}
+      - metric: rate(consul_http_GET_v1_kv___count{region="{{ dimension.region }}"}[5m])
+        legend: '{{ '{{instance}}' }}'
+      {% endfor %}
+
+  - title: (R) Consul Raft Apply Rate
+    type: Graph
+    description: Number of raft transactions occurring over an interval
+    targets:
+      {% for dimension in data %}
+      - metric: rate(consul_raft_apply{region="{{ dimension.region }}"}[5m])
+        legend: raft_transactions_count
+      {% endfor %}
+
+  - title: (E) Consul Cluster Autopilot status
+    type: Graph
+    description: status of overrall health of cluster
+    targets:
+      {% for dimension in data %}
+      - metric: consul_autopilot_healthy{region="{{ dimension.region }}"}
+        legend: autopilot_status
+        ref_no: 1
+      {% endfor %}
+    alert_config:
+      priority: P4
+      message: Consul Cluster Unhealthy
+      rule:
+        for_duration: 5m
+        evaluate_every: 1m
+      condition_query:
+        - OR,avg,1,now,5m,lt,1
+
+  - title: (E) Consul GC Time
+    type: Graph
+    description: Number of seconds consumed by gc(stop-the-world) pauses
+    targets:
+      {% for dimension in data %}
+      - metric: consul_runtime_gc_pause_ns{region="{{ dimension.region }}",quantile="0.9"}/1000000000
+        legend: '{{ '{{instance}}' }}'
+      {% endfor %}
+    formatY1: s
+
+  - title: (D) Time to KV Apply
+    type: Graph
+    description: Time taken to complete an update to KV store
+    targets:
+      {% for dimension in data %}
+      - metric: rate(consul_kvs_apply_sum{region="{{ dimension.region }}"}[5m])/rate(consul_kvs_apply_count{region="{{ dimension.region }}"}[5m])
+        legend: kv_apply_time
+        ref_no: 1
+      {% endfor %}
+    formatY1: ms
+    alert_config:
+      priority: P3
+      message: High KV Apply Latency
+      rule:
+        for_duration: 5m
+        evaluate_every: 1m
+      condition_query:
+        - OR,avg,1,now,5m,gt,90

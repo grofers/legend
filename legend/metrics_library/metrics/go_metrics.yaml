@@ -1,0 +1,71 @@
+component: go
+data_source: Prometheus
+metrics_source: https://github.com/prometheus/client_golang
+reference: https://golang.org/doc/
+description: Go is a statically typed, compiled programming language designed at Google.
+panels: 
+  - title: (M) bytes/s of memory
+    type: Graph
+    description: bytes/s of memory app consumes
+    targets:
+    {% for dimension in data %} 
+      - metric: sum(rate(go_memstats_alloc_bytes_total{job=~"{{ dimension.job }}"}[5m])) 
+        legend: Aggregate
+      - metric: rate(go_memstats_alloc_bytes_total{job=~"{{ dimension.job }}"}[5m])
+        legend: '{{ '{{instance}}' }}'
+    {% endfor %}
+
+  - title: (R) Rate of requests (qps) - aggregated over all methods
+    type: Graph
+    description: requests
+    targets:
+    {% for dimension in data %} 
+      - metric: sum(rate(promhttp_metric_handler_requests_total{job=~"{{ dimension.job }}"}[5m]))
+        legend: Aggregate
+      - metric: sum(rate(promhttp_metric_handler_requests_total{job=~"{{ dimension.job }}"}[5m])) by (instance)
+        legend: '{{ '{{instance}}' }}'
+    {% endfor %}
+
+  - title: (E) Error rate - aggregated over all methods (4xx)
+    type: Graph
+    description: 4xx Error rate at service level. Client side errors
+    targets:
+    {% for dimension in data %}
+      - metric: sum(rate(promhttp_metric_handler_requests_total{job=~"{{ dimension.job }}",status =~ "4.."}[5m]))
+        legend: Aggregate
+        ref_no: 1
+      - metric: sum(rate(promhttp_metric_handler_requests_total{job=~"{{ dimension.job }}", status =~ "4.."}[5m])) by (instance)
+        legend: '{{ '{{instance}}' }}'
+        ref_no: 2
+    {% endfor %}
+    alert_config:
+      priority: P3
+      message: 'High error rate (4xx)'
+      rule:
+        for_duration: 5m
+        evaluate_every: 1m
+      condition_query:
+      - OR,avg,1,now,5m,gt,20
+      - OR,avg,2,now,5m,gt,30
+
+  - title: (E) Error rate - aggregated over all methods (5xx)
+    type: Graph
+    description: 5xx Error rate at service level. Client side errors
+    targets:
+    {% for dimension in data %}
+      - metric: sum(rate(promhttp_metric_handler_requests_total{job=~"{{ dimension.job }}",status =~ "5.."}[5m]))
+        legend: Aggregate
+        ref_no: 1
+      - metric: sum(rate(promhttp_metric_handler_requests_total{job=~"{{ dimension.job }}", status =~ "5.."}[5m])) by (instance)
+        legend: '{{ '{{instance}}' }}'
+        ref_no: 2
+    {% endfor %}
+    alert_config:
+      priority: P3
+      message: 'High error rate (5xx)'
+      rule:
+        for_duration: 5m
+        evaluate_every: 1m
+      condition_query:
+      - OR,avg,1,now,5m,gt,20
+      - OR,avg,2,now,5m,gt,30

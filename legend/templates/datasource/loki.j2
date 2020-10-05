@@ -1,0 +1,8 @@
+.addTarget(
+    loki.target(
+    '{{data.expr}}',
+    {% if data.get('hide') is not none %}
+        hide='hide',
+    {%endif%}
+    )
+)

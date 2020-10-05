@@ -1,0 +1,12 @@
+.addCondition(
+    alertCondition.new(
+        evaluatorParams=[{{data.evaluator_params}}],
+        evaluatorType='{{data.evaluator_type}}',
+        operatorType='{{data.operator_type}}',
+        queryRefId='{{data.query_ref_id}}',
+        queryTimeEnd='{{data.query_time_end}}',
+        queryTimeStart='{{data.query_time_start}}',
+        reducerParams={{data.reducer_params}},
+        reducerType='{{data.reducer_type}}',
+    )
+)

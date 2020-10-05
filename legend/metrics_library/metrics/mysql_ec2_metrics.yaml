@@ -1,0 +1,311 @@
+component: mysql_ec2
+data_source: Prometheus
+metrics_source: built-in (via percona)
+reference: https://www.percona.com/doc/percona-monitoring-and-management/index.metrics-monitor.dashboard.html#pmm-dashboard-mysql-list
+description: Percona Monitored MySQL EC2 Instances
+panels_in_row: 2
+panels:
+  - title: (U) Database Connections (Counts)
+    type: Graph
+    description: Number of database connections
+    targets:
+      {% for dimension in data.db %}
+        {% for master in dimension.masters %}
+      - metric: max(max_over_time(mysql_global_status_threads_connected{instance_name=~"{{ master.host }}"}[5m]) or mysql_global_status_threads_connected{instance_name=~"{{ master.host }}"} ) by (instance_name)
+        legend: '{{ 'CONNECTIONS_{{instance_name}}' }}'
+      - metric: mysql_global_status_max_used_connections{instance_name=~"{{ master.host }}"}
+        legend: '{{ 'MAX_USED_CONNECTIONS_{{instance_name}}' }}'
+      - metric: mysql_global_variables_max_connections{instance_name=~"{{ master.host }}"}
+        legend: '{{ 'MAX_GLOBAL_CONNECTIONS_{{instance_name}}' }}'
+        {% endfor %}
+        {% for slave in dimension.slaves %}
+      - metric: max(max_over_time(mysql_global_status_threads_connected{instance_name=~"{{ slave.host }}"}[5m]) or mysql_global_status_threads_connected{instance_name=~"{{ slave.host }}"} ) by (instance_name)
+        legend: '{{ 'CONNECTIONS_{{instance_name}}' }}'
+        hide: true
+      - metric: mysql_global_status_max_used_connections{instance_name=~"{{ slave.host }}"}
+        legend: '{{ 'MAX_USED_CONNECTIONS_{{instance_name}}' }}'
+      - metric: mysql_global_variables_max_connections{instance_name=~"{{ slave.host }}"}
+        legend: '{{ 'MAX_GLOBAL_CONNECTIONS_{{instance_name}}' }}'
+        {% endfor %}
+      {% endfor %}
+
+  - title: (U) Database Connection Utilization (%)
+    type: Graph
+    description: Percentage of DB connection utilization
+    formatY1: percent
+    targets:
+      {% for dimension in data.db %}
+        {% for master in dimension.masters %}
+      - metric: (max((max_over_time(mysql_global_status_threads_connected{instance_name=~"{{ master.host }}"}[5m]) or mysql_global_status_threads_connected{instance_name=~"{{ master.host }}"})*100 / ignoring(job) mysql_global_variables_max_connections{instance_name=~"{{ master.host }}"} ) by (instance_name))
+        legend: '{{ '{{instance_name}}' }}'
+        ref_no: 1
+        {% endfor %}
+        {% for slave in dimension.slaves %}
+      - metric: (max((max_over_time(mysql_global_status_threads_connected{instance_name=~"{{ slave.host }}"}[5m]) or mysql_global_status_threads_connected{instance_name=~"{{ slave.host }}"})*100 / ignoring(job) mysql_global_variables_max_connections{instance_name=~"{{ slave.host }}"} ) by (instance_name))
+        legend: '{{ '{{instance_name}}' }}'
+        ref_no: 2
+        {% endfor %}
+      {% endfor %}
+    alert_config:
+        priority: P2
+        message: '(U) Database Connection Utilization (%) is HIGH'
+        rule:
+          for_duration: 5m
+          evaluate_every: 1m
+        condition_query:
+        - OR,avg,1,now,5m,gt,85
+        - OR,avg,2,now,5m,gt,85
+
+  - title: (U) AutoIncrement Counter Utilization (%)
+    type: Graph
+    description: Percentage of autoincrement counter is consumed by each table in schema
+    formatY1: percent
+    targets:
+      {% for dimension in data.db %}
+        {% for master in dimension.masters %}
+      - metric: mysql_info_schema_auto_increment_column{instance_name=~"{{ master.host }}", schema=~"{{ master.db_name }}"}*100/mysql_info_schema_auto_increment_column_max{instance_name=~"{{ master.host }}", schema=~"{{ master.db_name }}"}
+        legend: '{{ '{{instance_name}}_{{schema}}_{{table}}' }}'
+        ref_no: 1
+        {% endfor %}
+        {% for slave in dimension.slaves %}
+      - metric: mysql_info_schema_auto_increment_column{instance_name=~"{{ slave.host }}", schema=~"{{ slave.db_name }}"}*100/mysql_info_schema_auto_increment_column_max{instance_name=~"{{ slave.host }}", schema=~"{{ slave.db_name }}"}
+        legend: '{{ '{{instance_name}}_{{schema}}_{{table}}' }}'
+        ref_no: 2
+        {% endfor %}
+      {% endfor %}
+    alert_config:
+        priority: P2
+        message: '(U) AutoIncrement Counter Utilization (%) is HIGH'
+        rule:
+          for_duration: 5m
+          evaluate_every: 1m
+        condition_query:
+        - OR,avg,1,now,5m,gt,90
+        - OR,avg,2,now,5m,gt,90
+
+  - title: (E) Slow Query Count
+    type: Graph
+    description: No. of Slow Queries
+    targets:
+      {% for dimension in data.db %}
+        {% for master in dimension.masters %}
+      - metric: rate(mysql_global_status_slow_queries{instance_name=~"{{ master.host }}"}[5m])
+        legend: '{{ '{{instance_name}}' }}'
+        {% endfor %}
+        {% for slave in dimension.slaves %}
+      - metric: rate(mysql_global_status_slow_queries{instance_name=~"{{ slave.host }}"}[5m])
+        legend: '{{ '{{instance_name}}' }}'
+        {% endfor %}
+      {% endfor %}
+
+  - title: (E) Slow Query (%)
+    type: Graph
+    description: Slow Queries (%)
+    formatY1: percent
+    targets:
+      {% for dimension in data.db %}
+        {% for master in dimension.masters %}
+      - metric: rate(mysql_global_status_slow_queries{instance_name=~"{{ master.host }}"}[5m])*100 / rate(mysql_global_status_queries{instance_name=~"{{ master.host }}"}[5m])
+        legend: '{{ '{{instance_name}}' }}'
+        ref_no: 1
+        {% endfor %}
+        {% for slave in dimension.slaves %}
+      - metric: rate(mysql_global_status_slow_queries{instance_name=~"{{ slave.host }}"}[5m])*100 / rate(mysql_global_status_queries{instance_name=~"{{ slave.host }}"}[5m])
+        legend: '{{ '{{instance_name}}' }}'
+        ref_no: 2
+        {% endfor %}
+      {% endfor %}
+    alert_config:
+        priority: P3
+        message: '(E) Slow Query (%) with respect to Rate to Queries is HIGH'
+        rule:
+          for_duration: 5m
+          evaluate_every: 1m
+        condition_query:
+        - OR,avg,1,now,5m,gt,5
+        - OR,avg,2,now,5m,gt,5
+
+  - title: (E) DeadLock Count
+    type: Graph
+    description: No. of deadlocks happend
+    targets:
+      {% for dimension in data.db %}
+        {% for master in dimension.masters %}
+      - metric: (rate(mysql_global_status_innodb_deadlocks{instance_name=~"{{ master.host }}"}[5m]) or rate(mysql_info_schema_innodb_metrics_lock_lock_deadlocks_total{instance_name=~"{{ master.host }}"}[5m]))
+        legend: '{{ '{{instance_name}}' }}'
+        ref_no: 1
+        {% endfor %}
+        {% for slave in dimension.slaves %}
+      - metric: (rate(mysql_global_status_innodb_deadlocks{instance_name=~"{{ slave.host }}"}[5m]) or rate(mysql_info_schema_innodb_metrics_lock_lock_deadlocks_total{instance_name=~"{{ slave.host }}"}[5m]))
+        legend: '{{ '{{instance_name}}' }}'
+        ref_no: 2
+        {% endfor %}
+      {% endfor %}
+    alert_config:
+        priority: P3
+        message: '(E) DeadLock Count is HIGH'
+        rule:
+          for_duration: 5m
+          evaluate_every: 1m
+        condition_query:
+        - OR,avg,1,now,5m,gt,0
+        - OR,avg,2,now,5m,gt,0
+
+  - title: (R) Rate of Queries
+    type: Graph
+    description: Rate of queries executed
+    targets:
+      {% for dimension in data.db %}
+        {% for master in dimension.masters %}
+      - metric: rate(mysql_global_status_queries{instance_name=~"{{ master.host }}"}[5m])
+        legend: '{{ '{{instance_name}}' }}'
+        {% endfor %}
+        {% for slave in dimension.slaves %}
+      - metric: rate(mysql_global_status_queries{instance_name=~"{{ slave.host }}"}[5m])
+        legend: '{{ '{{instance_name}}' }}'
+        {% endfor %}
+      {% endfor %}
+
+  - title: (R) Rate of MySQL Temporary Object
+    type: Graph
+    description: Rate of MySQL Temporary Object
+    targets:
+      {% for dimension in data.db %}
+        {% for master in dimension.masters %}
+      - metric: rate(mysql_global_status_created_tmp_tables{instance_name=~"{{ master.host }}"}[5m])
+        legend: '{{ 'Created_Tmp_Tables{{instance_name}}' }}'
+      - metric: rate(mysql_global_status_created_tmp_disk_tables{instance_name=~"{{ master.host }}"}[5m])
+        legend: '{{ 'Created_Tmp_Disk_Tables{{instance_name}}' }}'
+      - metric: rate(mysql_global_status_created_tmp_files{instance_name=~"{{ master.host }}"}[5m])
+        legend: '{{ 'Created_Tmp_Files{{instance_name}}' }}'
+        {% endfor %}
+        {% for slave in dimension.slaves %}
+      - metric: rate(mysql_global_status_created_tmp_tables{instance_name=~"{{ slave.host }}"}[5m])
+        legend: '{{ 'Created_Tmp_Tables{{instance_name}}' }}'
+      - metric: rate(mysql_global_status_created_tmp_disk_tables{instance_name=~"{{ slave.host }}"}[5m])
+        legend: '{{ 'Created_Tmp_Disk_Tables{{instance_name}}' }}'
+      - metric: rate(mysql_global_status_created_tmp_files{instance_name=~"{{ slave.host }}"}[5m])
+        legend: '{{ 'Created_Tmp_Files{{instance_name}}' }}'
+        {% endfor %}
+      {% endfor %}
+
+  - title: (U) MySQL Select Range
+    type: Graph
+    description: "MySQL Select Range - Ref: https://www.percona.com/doc/percona-monitoring-and-management/dashboard.mysql-overview.html#dashboard-mysql-overview-select-types"
+    targets:
+      {% for dimension in data.db %}
+        {% for master in dimension.masters %}
+      - metric: rate(mysql_global_status_select_full_join{instance_name=~"{{ master.host }}"}[5m])
+        legend: '{{ 'Select_Full_Join_{{instance_name}}' }}'
+      - metric: rate(mysql_global_status_select_full_range_join{instance_name=~"{{ master.host }}"}[5m])
+        legend: '{{ 'Select_Full_Range_Join_{{instance_name}}' }}'
+      - metric: rate(mysql_global_status_select_range{instance_name=~"{{ master.host }}"}[5m])
+        legend: '{{ 'Select_Range_{{instance_name}}' }}'
+      - metric: rate(mysql_global_status_select_range_check{instance_name=~"{{ master.host }}"}[5m])
+        legend: '{{ 'Select_Range_Check_{{instance_name}}' }}'
+      - metric: rate(mysql_global_status_select_range_check{instance_name=~"{{ master.host }}"}[5m])
+        legend: '{{ 'Select_Range_Check_{{instance_name}}' }}'
+        {% endfor %}
+        {% for slave in dimension.slaves %}
+      - metric: rate(mysql_global_status_select_full_join{instance_name=~"{{ slave.host }}"}[5m])
+        legend: '{{ 'Select_Full_Join_{{instance_name}}' }}'
+      - metric: rate(mysql_global_status_select_full_range_join{instance_name=~"{{ slave.host }}"}[5m])
+        legend: '{{ 'Select_Full_Range_Join_{{instance_name}}' }}'
+      - metric: rate(mysql_global_status_select_range{instance_name=~"{{ slave.host }}"}[5m])
+        legend: '{{ 'Select_Range_{{instance_name}}' }}'
+      - metric: rate(mysql_global_status_select_range_check{instance_name=~"{{ slave.host }}"}[5m])
+        legend: '{{ 'Select_Range_Check_{{instance_name}}' }}'
+      - metric: rate(mysql_global_status_select_range_check{instance_name=~"{{ slave.host }}"}[5m])
+        legend: '{{ 'Select_Range_Check_{{instance_name}}' }}'
+        {% endfor %}
+      {% endfor %}
+
+  - title: (D) MySQL Replication Lag
+    type: Graph
+    description: MySQL Replication in Seconds
+    formatY1: s
+    targets:
+      {% for dimension in data.db %}
+        {% for slave in dimension.slaves %}
+      - metric: mysql_slave_status_seconds_behind_master{instance_name=~"{{ slave.host }}"}
+        legend: '{{ '{{instance_name}}_{{channel_name}}' }}'
+        ref_no: 1
+        {% endfor %}
+      {% endfor %}
+    alert_config:
+        priority: P4
+        message: '(D) MySQL Replication Lag is HIGH'
+        rule:
+          for_duration: 15m
+          evaluate_every: 60s
+        condition_query:
+        - OR,avg,1,now,15m,gt,2700
+
+  - title: (D) MySQL Up
+    type: Graph
+    description: MySQL Up
+    targets:
+      {% for dimension in data.db %}
+        {% for master in dimension.masters %}
+      - metric: up{instance_name=~"{{ master.host }}"}
+        legend:  '{{ '{{instance_name}}_{{channel_name}}' }}'
+        ref_no: 1
+        {% endfor %}
+        {% for slave in dimension.slaves %}
+      - metric: up{instance_name=~"{{ slave.host }}"}
+        legend: '{{ '{{instance_name}}_{{channel_name}}' }}'
+        ref_no: 2
+        {% endfor %}
+      {% endfor %}
+    alert_config:
+        priority: P1
+        message: 'MySQL is Down'
+        rule:
+          for_duration: 5m
+          evaluate_every: 60s
+        condition_query:
+        - OR,last,1,now,1m,lt,1
+        - OR,last,2,now,1m,lt,1
+
+  - title: (D) Slave IO Thread Running
+    type: Graph
+    description: Displays whether the IO Thread is in the running state or not. Applies only to a Slave host. The IO Thread connects to the Master host and reads binary log events, and then copies them locally to a file called the relay log.
+    targets:
+      {% for dimension in data.db %}
+        {% for slave in dimension.slaves %}
+      - metric: mysql_slave_status_slave_io_running{instance_name=~"{{ slave.host }}"}
+        legend: '{{ '{{instance_name}}_{{channel_name}}' }}'
+        ref_no: 1
+        {% endfor %}
+      {% endfor %}
+    alert_config:
+        priority: P1
+        message: 'Slave IO Thread Running alert'
+        rule:
+          for_duration: 5m
+          evaluate_every: 60s
+        condition_query:
+        - OR,last,1,now,1m,lt,1
+
+  - title: (D) Slave SQL Thread Running
+    type: Graph
+    description: Displays whether the SQL Thread is in the running state or not. Applies only to a Slave host. The SQL Thread reads the events from the local relay log file and applies them to the Slave host.  Depending on the format of the binary log it can read query statements (STATEMENT format) and re-executes them, or by reading row changes (ROW format) and applying only the changes.
+    targets:
+      {% for dimension in data.db %}
+        {% for slave in dimension.slaves %}
+      - metric: mysql_slave_status_slave_sql_running{instance_name=~"{{ slave.host }}"}
+        legend: '{{ '{{instance_name}}_{{channel_name}}' }}'
+        ref_no: 1
+        {% endfor %}
+      {% endfor %}
+    alert_config:
+        priority: P1
+        message: 'Slave SQL Thread not running'
+        rule:
+          for_duration: 5m
+          evaluate_every: 60s
+        condition_query:
+        - OR,last,1,now,1m,lt,1
+---
+{% set data = data.ec2 %}
+{% include "platform_ec2_metrics.yaml" with context %}

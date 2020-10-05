@@ -1,0 +1,114 @@
+local grafana = import 'grafonnet/grafana.libsonnet';
+local dashboard = grafana.dashboard;
+local template = grafana.template;
+local text = grafana.text;
+local alertlist = grafana.alertlist;
+local row = grafana.row;
+local singlestat = grafana.singlestat;
+local graphPanel = grafana.graphPanel;
+local prometheus = grafana.prometheus;
+local cloudwatch = grafana.cloudwatch;
+local influxdb = grafana.influxdb;
+local alertCondition = grafana.alertCondition;
+local logPanel = grafana.logPanel;
+local loki = grafana.loki;
+
+{% for component, values in data.components.items() %}
+    {% set comp = 'R_' ~ loop.index %}
+    local {{ comp }} =
+        row.new(
+            title='{{ component }}',
+            {% if values.metric[0].get('hide') is not none %}
+                collapse=true,
+            {%endif%}
+        );
+    {% for metric in values.metric %}
+        {% set comp1 = comp ~ "_" ~ loop.index %}
+        {% for panel_value in metric.panels %}
+            local {{ comp1 }}_P_{{loop.index}} =
+                {% if panel_value.type.lower() == "log" %}
+                    logPanel.new(
+                        title='{{ panel_value.title }}',
+                        datasource='{{ metric.data_source }} ({{ data.environment }})',
+                        showLabels='true',
+                        showTime='true',
+                        sortOrder='{{ (panel_value.sort_order or "descending").capitalize() }}'
+                    )
+                {% elif panel_value.type.lower() == "graph" %}
+                    graphPanel.new(
+                        title='{{ panel_value.title }}',
+                        datasource='{{ metric.data_source }} ({{ data.environment }})',
+                        shared_tooltip='true',
+                        legend_values='true',
+                        legend_min='true',
+                        legend_max='true',
+                        legend_current='true',
+                        legend_avg='true',
+                        legend_alignAsTable='true',
+                        nullPointMode='connected',
+                        description='{{ panel_value.description }}',
+                        {% if panel_value.formatY1 %}
+                            formatY1='{{ panel_value.formatY1 }}',
+                        {%endif%}
+                        {% if panel_value.labelY1 %}
+                            labelY1='{{ panel_value.labelY1 }}',
+                        {%endif%}
+                        {% if panel_value.decimals %}
+                            decimals='{{ panel_value.decimals }}',
+                        {%endif%}
+                    )
+                {% endif %}
+                {% for target in panel_value.targets %}
+                    {{ target.render }}
+                {% endfor %}
+                {{ panel_value.alertrender }};
+        {% endfor %}
+  {% endfor %}
+{% endfor %}
+
+
+
+
+local sdp =
+    text.new(
+        title='Service Description',
+        span=null,
+        mode='markdown',
+        content='# {{ data.title }} \n\n\n #### Components \n{% for component,comp_value in data.component_desc.items() -%} \n\n [{{ component }}]({{comp_value.reference}}): {{comp_value.description}} {% endfor -%} \n\n\n #### References {% for k,v in data.references.items() -%} \n\n [{{ k }}]({{ v }}) {% endfor -%}',
+        transparent=null,
+        description=null,
+        datasource=null,
+    )
+;
+
+local alert_list =
+    alertlist.new(
+        title='Alert List',
+        span=null,
+        show='current',
+        limit=20,
+        onlyAlertsOnDashboard=true,
+        datasource=null,
+        description=null,
+        transparent=null,
+    )
+;
+
+
+dashboard.new(
+'{{ data.title }} - {{ data.environment }}',
+tags={{ data.tags }},
+schemaVersion=18,
+editable='true',
+time_from='now-1h',
+refresh='1m',
+)
+
+.addPanels([ sdp { gridPos: { h: 10, w: 15, x: 0, y: 0 },}, alert_list { gridPos: { h: 10, w: 9, x: 15, y: 0 },},])
+
+.addPanels(
+  [
+    {{ data.assemble_panels }}
+  ]
+)
+

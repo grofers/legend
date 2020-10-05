@@ -1,0 +1,84 @@
+component: celery
+data_source: Prometheus
+metrics_source: https://github.com/zerok/celery-prometheus-exporter
+reference: http://www.celeryproject.org/
+description: Celery is an asynchronous task queue/job queue based on distributed message passing
+
+panels:
+  - title: (U) Number of celery workers
+    type: Graph
+    description: Number of alive celery workers.
+    targets:
+      {% for dimension in data %}
+      - metric: celery_workers{job="{{ dimension.job_name }}"}
+      {% endfor %}
+
+  - title: (S) Total number of tasks in queue
+    type: Graph
+    description: Numbers of tasks in queue which are in received and pending states.
+    targets:
+      {% for dimension in data %}
+      - metric: rate(celery_tasks{job="{{ dimension.job_name }}", state=~"PENDING|RECEIVED"}[5m])
+      {% endfor %}
+
+  - title: (R) Rate of tasks in started state
+    type: Graph
+    description: Numbers of tasks in start state
+    targets:
+      {% for dimension in data %}
+      - metric: rate(celery_tasks{job="{{ dimension.job_name }}", state="STARTED"}[5m])
+      {% endfor %}
+
+  - title: (R) Celery Task Execution Latency
+    type: Graph
+    description: Avg time taken for processing a task
+    targets:
+      {% for dimension in data %}
+      - metric: rate(celery_tasks_runtime_seconds_sum{job="{{ dimension.job_name }}"}[5m]) / rate(celery_tasks_runtime_seconds_count{job="{{ dimension.job_name }}"}[5m])
+        ref_no: 1
+      {% endfor %}
+    formatY1: s
+    alert_config:
+      priority: P2
+      message: '(R) Task execution latency is HIGH'
+      rule:
+        for_duration: 5m
+        evaluate_every: 1m
+      condition_query:
+        - OR,avg,1,now,5m,gt,1020
+
+  - title: (E) Rate of failed tasks
+    type: Graph
+    description: Numbers of tasks in failed state
+    targets:
+      {% for dimension in data %}
+      - metric: rate(celery_tasks{job="{{ dimension.job_name }}", state="FAILURE"}[5m])*100 / rate(celery_tasks{job="{{ dimension.job_name }}", state=~"RECEIVED"}[5m])
+      {% endfor %}
+        ref_no: 1
+    alert_config:
+      priority: P3
+      message: '(E) Percentage of task failures is HIGH'
+      rule:
+        for_duration: 5m
+        evaluate_every: 1m
+      condition_query:
+        - OR,avg,1,now,5m,gt,35
+
+  - title: (D) Celery Latency
+    type: Graph
+    description: Time taken for a task to be picked by a celery worker
+    targets:
+      {% for dimension in data %}
+      - metric: histogram_quantile(0.99, rate(celery_task_latency_bucket{job="{{ dimension.job_name }}"}[5m]))
+        ref_no: 1
+      {% endfor %}
+    formatY1: s
+    alert_config:
+      priority: P3
+      message: '(E) Celery latency is high'
+      rule:
+        for_duration: 5m
+        evaluate_every: 1m
+      condition_query:
+        - OR,avg,1,now,5m,gt,1020
+

@@ -1,0 +1,158 @@
+component: elb
+data_source: Cloudwatch
+metrics_source: built-in
+reference: https://docs.aws.amazon.com/elasticloadbalancing/latest/classic/elb-cloudwatch-metrics.html#loadbalancing-metrics-clb
+description: Provide a reliable solution for load balancing - AWS ELB
+panels:
+  - title: (U) Healthy/Unhealthy Host Count
+    type: Graph
+    description: Number of Healthy and Unhealthy hosts
+    targets:
+      {% for dimension in data %}
+      - dimensions: {"LoadBalancerName": {{ dimension.load_balancer_name }} }
+        metric: HealthyHostCount
+        namespace: AWS/ELB
+        statistic: Maximum
+        alias: '{{ '{{LoadBalancerName}}_{{metric}}_{{stat}}' }}'
+      - dimensions: {"LoadBalancerName": {{ dimension.load_balancer_name }} }
+        metric: UnHealthyHostCount
+        namespace: AWS/ELB
+        statistic: Maximum
+        alias: '{{ '{{LoadBalancerName}}_{{metric}}_{{stat}}' }}'
+        ref_no: 1
+      {% endfor %}
+    alert_config:
+      priority: P3
+      message: 'Unhealthy hosts for more than 15min'
+      rule:
+        for_duration: 15m
+        evaluate_every: 1m
+      condition_query:
+      - OR,avg,1,now,20m,gt,0
+
+  - title: (S) Pending Requests Count
+    type: Graph
+    description: Number of requests pending routing to a healthy instance. The maximum size of the queue is 1,024. Additional requests or connections are rejected when the queue is full.
+    targets:
+      {% for dimension in data %}
+      - dimensions: {"LoadBalancerName": {{ dimension.load_balancer_name }} }
+        metric: SurgeQueueLength
+        namespace: AWS/ELB
+        statistic: Maximum
+        alias: '{{ '{{LoadBalancerName}}_{{metric}}_{{stat}}' }}'
+        ref_no: 1
+      {% endfor %}
+    alert_config:
+      priority: P3
+      message: 'Number of pending requests high. Max allowed is 1024'
+      rule:
+        for_duration: 5m
+        evaluate_every: 1m
+      condition_query:
+      - OR,avg,1,now,5m,gt,100
+
+  - title: (E) Rejected Requests Count
+    type: Graph
+    description: Number of requests rejected because the surge queue is full
+    targets:
+      {% for dimension in data %}
+    - dimensions: {"LoadBalancerName": {{ dimension.load_balancer_name }} }
+      metric: SpilloverCount
+      namespace: AWS/ELB
+      statistic: Sum
+      alias: '{{ '{{LoadBalancerName}}_{{metric}}_{{stat}}' }}'
+      {% endfor %}
+
+  - title: (R) Request Count
+    type: Graph
+    description: Number of Requests completed during the specific interval
+    targets:
+      {% for dimension in data %}
+      - dimensions: {"LoadBalancerName": {{ dimension.load_balancer_name }} }
+        metric: RequestCount
+        namespace: AWS/ELB
+        statistic: Sum
+        alias: '{{ '{{LoadBalancerName}}_{{metric}}_{{stat}}' }}'
+      {% endfor %}
+
+  - title: (E) Backend 4XX/5XX Count
+    type: Graph
+    description: Number of 4xx and 5xx http responses from instances
+    targets:
+      {% for dimension in data %}
+      - dimensions: {"LoadBalancerName": {{ dimension.load_balancer_name }} }
+        metric: HTTPCode_Backend_4XX
+        namespace: AWS/ELB
+        statistic: Sum
+        alias: '{{ '{{LoadBalancerName}}_{{metric}}_{{stat}}' }}'
+      - dimensions: {"LoadBalancerName": {{ dimension.load_balancer_name }} }
+        metric: HTTPCode_Backend_5XX
+        namespace: AWS/ELB
+        statistic: Sum
+        alias: '{{ '{{LoadBalancerName}}_{{metric}}_{{stat}}' }}'
+        ref_no: 1
+      {% endfor %}
+    alert_config:
+      priority: P3
+      message: 'High rate of backend errors (5xx)'
+      rule:
+        for_duration: 5m
+        evaluate_every: 1m
+      condition_query:
+      - OR,avg,1,now,5m,gt,100
+
+  - title: (E) ELB 4XX/5XX Count
+    type: Graph
+    description: Number of 4xx and 5xx http responses from ELB
+    targets:
+      {% for dimension in data %}
+      - dimensions: {"LoadBalancerName": {{ dimension.load_balancer_name }} }
+        metric: HTTPCode_ELB_4XX
+        namespace: AWS/ELB
+        statistic: Sum
+        alias: '{{ '{{LoadBalancerName}}_{{metric}}_{{stat}}' }}'
+      - dimensions: {"LoadBalancerName": {{ dimension.load_balancer_name }} }
+        metric: HTTPCode_ELB_5XX
+        namespace: AWS/ELB
+        statistic: Sum
+        alias: '{{ '{{LoadBalancerName}}_{{metric}}_{{stat}}' }}'
+      {% endfor %}
+
+  - title: (E) ELB Backend Connection Errors
+    type: Graph
+    description: The number of connections that were not successfully established between the load balancer and the registered instances. Because the load balancer retries the connection when there are errors, this count can exceed the request rate. Note that this count also includes any connection errors related to health checks.
+    targets:
+      {% for dimension in data %}
+      - dimensions: {"LoadBalancerName": {{ dimension.load_balancer_name }} }
+        metric: BackendConnectionErrors
+        namespace: AWS/ELB
+        statistic: Sum
+        alias: '{{ '{{LoadBalancerName}}_{{metric}}_{{stat}}' }}'
+      {% endfor %}
+
+  - title: (D) Request Latency max (seconds)
+    type: Graph
+    description: Request Latency max in seconds
+    formatY1: s
+    targets:
+      {% for dimension in data %}
+    - dimensions: {"LoadBalancerName": {{ dimension.load_balancer_name }} }
+      metric: Latency
+      namespace: AWS/ELB
+      statistic: Maximum
+      alias: '{{ '{{LoadBalancerName}}_{{metric}}_{{stat}}' }}'
+      {% endfor %}
+
+  - title: (D) Request Latency avg (seconds)
+    type: Graph
+    description: Request Latency avg in seconds
+    formatY1: s
+    targets:
+      {% for dimension in data %}
+      - dimensions: {"LoadBalancerName": {{ dimension.load_balancer_name }} }
+        metric: Latency
+        namespace: AWS/ELB
+        statistic: Average
+        alias: '{{ '{{LoadBalancerName}}_{{metric}}_{{stat}}' }}'
+        {% endfor %}
+

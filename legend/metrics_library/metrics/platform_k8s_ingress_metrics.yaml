@@ -1,0 +1,29 @@
+component: platform_k8s_ingress
+data_source: Prometheus
+metrics_source: https://github.com/kubernetes/ingress-nginx
+reference: https://github.com/kubernetes/ingress-nginx/blob/master/docs/user-guide/monitoring.md
+description: Kubernetes Ingress
+panels:
+  - title: (R) Requests Count
+    type: Graph
+    description: Request count within a given interval
+    targets:
+      {% for dimension in data %}
+      - metric: sum(idelta(nginx_ingress_controller_requests{namespace="{{ dimension.namespace }}", service="{{ dimension.service_name }}, ingress="{{ dimension.service_type }}"}[5m]))
+      {% endfor %}
+  - title: (E) HTTP 4XX/5XX Count
+    type: Graph
+    description: Number of 4xx and 5xx http responses from instances
+    targets:
+      {% for dimension in data %}
+      - metric: sum(idelta(nginx_ingress_controller_requests{namespace="{{ dimension.namespace }}", service="{{ dimension.service_name }}", ingress="{{ dimension.service_type }}", status=~"^4.*|^5.*"}[5m])) by (status)
+      {% endfor %}
+  - title: (D) Request Latency (seconds)
+    type: Graph
+    description: Request Latency in seconds
+    formatY1: s
+    targets:
+      {% for dimension in data %}
+    - metric: avg(rate(nginx_ingress_controller_request_duration_seconds_bucket{namespace="{{ dimension.namespace }}", service="{{ dimension.service_name }}", ingress="{{ dimension.service_type }}", status=~"^2.*"}[5m]))
+      {% endfor %}
+

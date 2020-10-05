@@ -1,0 +1,38 @@
+component: promtail
+data_source: Prometheus
+metrics_source: built-in
+reference: https://github.com/grafana/loki/tree/master/docs/clients/promtail
+description: Scrapes logs from pods and pushes them to loki, deployed as daemonset across all nodes
+identifier_keys:
+  - pod_name
+panels:
+  - title: (E) Missing pods
+    type: Graph
+    description: Number of missing promtail pods in the cluster
+    targets:
+      {% for dimension in data %}
+    - metric: (count(kube_node_info) - count(kube_pod_info{pod=~".*{{ dimension.pod_name }}.*"}))
+      {% endfor %}
+    alert_config:
+      priority: P1
+      message: 'Missing pods take actions like this 1. 2.'
+      rule:
+        for_duration: 5m
+        evaluate_every: 1m
+      conditions:
+        - evaluator_params: 2
+          evaluator_type: gt
+          operator_type: and
+          query_ref_id: A # it is according to sequence
+          query_time_end: now
+          query_time_start: 5m
+          reducer_params: []
+          reducer_type: avg
+        - evaluator_params: 2
+          evaluator_type: gt
+          operator_type: and
+          query_ref_id: A # it is according to sequence
+          query_time_end: now
+          query_time_start: 5m
+          reducer_params: []
+          reducer_type: avg
