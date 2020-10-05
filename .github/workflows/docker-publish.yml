@@ -8,6 +8,11 @@ on:
     # Publish `v1.2.3` tags as releases.
     tags:
       - v*
+
+  pull_request:
+    paths-ignore: 
+      - docs/* 
+    
 env:
   IMAGE_NAME: legend
 
