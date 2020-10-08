@@ -362,15 +362,18 @@ loki_schema = {
         "schema": {
             "type": "dict",
             "schema": {
-                "namespace": {"type": "string", "required": True},
-                "grofers.io/service": {"type": "string", "required": False, "default": "[a-zA-Z]*"},
-                "grofers.io/component": {"type": "string", "required": False, "default": "[a-zA-Z]*"},
-                "grofers.io/component-role": {"type": "string", "required": False, "default": "[a-zA-Z]*"},
-                "grofers.io/business-service": {"type": "string", "required": False, "default": "[a-zA-Z]*"},
-                "grofers.io/team": {"type": "string", "required": False, "default": "[a-zA-Z]*"},
-                "grofers.io/owner": {"type": "string", "required": False, "default": "[a-zA-Z]*"},
-                "grofers.io/tribe": {"type": "string", "required": False, "default": "[a-zA-Z]*"},
-            }
-        }
+                "labels": {
+                    "type": "dict", 
+                    "required": True,
+                    "schema": {
+                        "namespace": {"type": "string", "required": True,}
+                    }
+                },
+                "filters": {
+                    "type": "list", 
+                    "required": False,
+                },
+            },
+        },
     }
 }
