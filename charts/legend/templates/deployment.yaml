@@ -62,6 +62,9 @@ spec:
                 secretKeyRef:
                   name: "{{ .Values.secrets.name }}"
                   key: sentry_environment
+            {{- if .Values.env }}
+              {{- toYaml .Values.env | nindent 12 }}
+            {{- end }}
           resources:
             {{- toYaml .Values.resources | nindent 12 }}
       {{- with .Values.nodeSelector }}

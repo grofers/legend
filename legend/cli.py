@@ -71,7 +71,10 @@ def publish(input_json, grafana_folder, config_file):
         dashboard_json = json.load(json_data)
     resp = create_or_update_grafana_dashboard(dashboard_json, legend_config, str(grafana_folder))
 
-    grafana_url = urljoin("%s://%s" % (legend_config["grafana_protocol"], legend_config["grafana_host"]), resp["url"],)
+    grafana_url = urljoin(
+        "%s://%s" % (legend_config["grafana_protocol"], legend_config["grafana_host"]),
+        resp["url"],
+    )
 
     click.echo("Dashboard built and applied! %s" % grafana_url)
 
@@ -87,6 +90,9 @@ def apply(input_file, config_file):
     dashboard_json = generate_dashboard_from_jsonnet(jsonnet_file)
     resp = create_or_update_grafana_dashboard(dashboard_json, legend_config, str(input_spec["grafana_folder"]))
 
-    grafana_url = urljoin("%s://%s" % (legend_config["grafana_protocol"], legend_config["grafana_host"]), resp["url"],)
+    grafana_url = urljoin(
+        "%s://%s" % (legend_config["grafana_protocol"], legend_config["grafana_host"]),
+        resp["url"],
+    )
 
     click.echo("Dashboard built and applied! %s" % grafana_url)

@@ -1,5 +1,5 @@
 component: nodejs
-data_source: Prometheus
+data_source_type: Prometheus
 metrics_source: https://github.com/siimon/prom-client
 reference: https://nodejs.org/en/docs/
 description: Node.js is a platform built on Chromes JavaScript runtime for easily building fast and scalable network applications.
@@ -145,4 +145,3 @@ panels:
         evaluate_every: 1m
       condition_query:
       - OR,avg,1,now,5m,gt,20
-    

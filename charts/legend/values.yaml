@@ -72,3 +72,15 @@ nodeSelector: {}
 tolerations: []
 
 affinity: {}
+
+# Extra env variables to pass to the legend container
+env: []
+  # We can define default grafana data sources through env variables
+  # - name: GRAFANA_DEFAULT_PROMETHEUS_DATA_SOURCE
+  #   value: "prometheus"
+  # - name: GRAFANA_DEFAULT_CLOUDWATCH_DATA_SOURCE
+  #   value: "cloudwatch"
+  # - name: GRAFANA_DEFAULT_INFLUXDB_DATA_SOURCE
+  #   value: "influxdb"
+  # - name: GRAFANA_DEFAULT_LOKI_DATA_SOURCE
+  #   value: "loki"

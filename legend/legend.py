@@ -26,6 +26,7 @@ from . import (
     LEGEND_HOME,
     GRAFONNET_REPO_NAME,
     LEGEND_DEFAULT_CONFIG,
+    GRAFANA_DEFAULT_DATA_SOURCES,
 )
 
 make_abs_path = lambda d: os.path.join(os.path.dirname(os.path.abspath(__file__)), d)
@@ -36,7 +37,10 @@ global GRAFONNET_REPO_NAME
 
 def generate_jsonnet(input_spec, legend_config):
     grafana_api_key = legend_config["grafana_api_key"]
-    grafana_url = "%s://%s" % (legend_config["grafana_protocol"], legend_config["grafana_host"],)
+    grafana_url = "%s://%s" % (
+        legend_config["grafana_protocol"],
+        legend_config["grafana_host"],
+    )
 
     component_description = {}
     if input_spec.get("alert_channels"):
@@ -45,11 +49,22 @@ def generate_jsonnet(input_spec, legend_config):
 
     for component, values in input_spec["components"].items():
 
-        template_str = jinja2_to_render(make_abs_path("metrics_library/metrics"), "{}_metrics.j2".format(component.lower()), data=values.get("dimensions", []),)
+        template_str = jinja2_to_render(
+            make_abs_path("metrics_library/metrics"),
+            "{}_metrics.j2".format(component.lower()),
+            data=values.get("dimensions", []),
+        )
         templates = str_yaml_to_json(template_str)
 
         # Adding custom panels and adding custom alerts
         for template in templates:
+
+            data_source = values.get("data_source", GRAFANA_DEFAULT_DATA_SOURCES.get(template["data_source_type"].upper()))
+
+            if data_source is None:
+                raise Exception("data source cannot be empty")
+
+            template["data_source"] = data_source
 
             component_name = component
             if template.get("component") is not None:
@@ -78,8 +93,12 @@ def generate_jsonnet(input_spec, legend_config):
             for panel in template["panels"]:
                 panel["title_var"] = convert_to_alnum(panel["title"])
                 for target in panel["targets"]:
-                    datasource_str = template["data_source"].lower()
-                    render = jinja2_to_render(make_abs_path("templates/datasource"), "{}.j2".format(datasource_str), data=target,)
+                    data_source_type = template["data_source_type"].lower()
+                    render = jinja2_to_render(
+                        make_abs_path("templates/datasource"),
+                        "{}.j2".format(data_source_type),
+                        data=target,
+                    )
                     target["render"] = render
                 panel["alertrender"] = ""
 
@@ -87,12 +106,20 @@ def generate_jsonnet(input_spec, legend_config):
                     panel["alert_config"]["rule"]["name"] = panel["title"]
                     panel["alert_config"]["alert_ids"] = json.dumps(alert_ids)
                     panel["alert_config"]["alert_service"] = alert_service
-                    alertrender = jinja2_to_render(make_abs_path("templates/alert"), "alert.j2", data=panel["alert_config"],)
+                    alertrender = jinja2_to_render(
+                        make_abs_path("templates/alert"),
+                        "alert.j2",
+                        data=panel["alert_config"],
+                    )
                     if panel["alert_config"].get("condition_query"):
                         panel["alert_config"]["conditions"] = parse_condition_query(panel["alert_config"]["condition_query"], panel["targets"])
 
                         for condition in panel["alert_config"]["conditions"]:
-                            conditionrender = jinja2_to_render(make_abs_path("templates/alert"), "alert_condition.j2", data=condition,)
+                            conditionrender = jinja2_to_render(
+                                make_abs_path("templates/alert"),
+                                "alert_condition.j2",
+                                data=condition,
+                            )
                             alertrender += conditionrender
 
                         panel["alertrender"] = alertrender
