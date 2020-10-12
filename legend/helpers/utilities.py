@@ -40,29 +40,13 @@ def assemble_panels(panels_dict):
 
     n = 1
     for k, v in panels_dict.items():
-        assembled_panels += (
-            k + " { gridPos: { h: 4, w: 24, x: 0, y: " + str(n) + " }, }, \n"
-        )
+        assembled_panels += k + " { gridPos: { h: 4, w: 24, x: 0, y: " + str(n) + " }, }, \n"
         n += 1
         for i in range(0, len(v), 2):
             try:
-                assembled_panels += (
-                    str(v[i])
-                    + " { gridPos: { h: 8, w: 12, x: 0, y: "
-                    + str(n)
-                    + " }, }, \n"
-                    + v[i + 1]
-                    + " { gridPos: { h: 8, w: 12, x: 12, y: "
-                    + str(n)
-                    + " }, }, \n"
-                )
+                assembled_panels += str(v[i]) + " { gridPos: { h: 8, w: 12, x: 0, y: " + str(n) + " }, }, \n" + v[i + 1] + " { gridPos: { h: 8, w: 12, x: 12, y: " + str(n) + " }, }, \n"
             except IndexError:
-                assembled_panels += (
-                    v[i]
-                    + "  { gridPos: { h: 8, w: 12, x: 0, y: "
-                    + str(n)
-                    + " }, }, \n"
-                )
+                assembled_panels += v[i] + "  { gridPos: { h: 8, w: 12, x: 0, y: " + str(n) + " }, }, \n"
             n += 1
 
     return assembled_panels
@@ -77,13 +61,7 @@ def assemble_panels_dynamic(input_dashboard):
     for _, v in input_dashboard.get("components").items():
         ri += 1
         r += 1
-        assembled_panels += (
-            "R_"
-            + str(ri)
-            + " { gridPos: { h: 4, w: 24, x: 0, y: "
-            + str(r)
-            + " }, }, \n"
-        )
+        assembled_panels += "R_" + str(ri) + " { gridPos: { h: 4, w: 24, x: 0, y: " + str(r) + " }, }, \n"
 
         for metric_idx in range(len(v["metric"])):
             metric = v["metric"][metric_idx]
@@ -100,21 +78,7 @@ def assemble_panels_dynamic(input_dashboard):
                 row_end = min(len(metric.get("panels")), pi + panels_in_row)
                 width = int(24 / (row_end - pi))
                 for rpi in range(pi, row_end):
-                    assembled_panels += (
-                        "R_"
-                        + str(ri)
-                        + "_"
-                        + str(metric_idx + 1)
-                        + "_P_"
-                        + str(rpi + 1)
-                        + " { gridPos: { h: 8, w: "
-                        + str(width)
-                        + ", x: "
-                        + str(width * p)
-                        + ", y: "
-                        + str(r)
-                        + " }, }, \n"
-                    )
+                    assembled_panels += "R_" + str(ri) + "_" + str(metric_idx + 1) + "_P_" + str(rpi + 1) + " { gridPos: { h: 8, w: " + str(width) + ", x: " + str(width * p) + ", y: " + str(r) + " }, }, \n"
                     p += 1
                     pi = rpi
                     if rpi + 1 == row_end:
@@ -162,16 +126,7 @@ def parse_condition_query(condition_queries, targets):
                 op = "WHEN"
 
             conditions.append(
-                {
-                    "operator_type": op,
-                    "reducer_type": parts[1],
-                    "query_ref_id": chr(ref_id),
-                    "query_time_end": parts[3],
-                    "query_time_start": parts[4],
-                    "evaluator_type": parts[5],
-                    "evaluator_params": parts[6],
-                    "reducer_params": [],
-                }
+                {"operator_type": op, "reducer_type": parts[1], "query_ref_id": chr(ref_id), "query_time_end": parts[3], "query_time_start": parts[4], "evaluator_type": parts[5], "evaluator_params": parts[6], "reducer_params": [],}
             )
 
     return conditions

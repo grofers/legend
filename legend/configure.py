@@ -6,9 +6,7 @@ import configparser
 
 from git import Repo
 
-from .helpers.utilities import (
-    mkdir
-)
+from .helpers.utilities import mkdir
 
 from . import (
     LEGEND_HOME,
@@ -28,9 +26,10 @@ def set_global_vars():
 
     if os.environ.get("GRAFONNET_REPO_URL") is not None:
         GRAFONNET_REPO_URL = os.environ.get("GRAFONNET_REPO_URL")
-    
+
     if os.environ.get("GRAFONNET_REPO_RELEASE_TAG") is not None:
         GRAFONNET_REPO_RELEASE_TAG = os.environ.get("GRAFONNET_REPO_RELEASE_TAG")
+
 
 def install_grafonnet_lib():
     set_global_vars()
@@ -64,17 +63,14 @@ def load_legend_config(config_file=None):
         configuration = config.read(config_file)
         legend_config.update(grafana_api_key=config.get("grafana", "api_key"))
         legend_config.update(grafana_host=config.get("grafana", "host"))
-        legend_config.update(
-            grafana_protocol=config.get("grafana", "protocol"))
+        legend_config.update(grafana_protocol=config.get("grafana", "protocol"))
 
     # Load config from LEGEND_HOME
     elif os.path.exists(os.path.join(LEGEND_HOME, LEGEND_DEFAULT_CONFIG)):
-        configuration = config.read(os.path.join(
-            LEGEND_HOME, LEGEND_DEFAULT_CONFIG))
+        configuration = config.read(os.path.join(LEGEND_HOME, LEGEND_DEFAULT_CONFIG))
         legend_config.update(grafana_api_key=config.get("grafana", "api_key"))
         legend_config.update(grafana_host=config.get("grafana", "host"))
-        legend_config.update(
-            grafana_protocol=config.get("grafana", "protocol"))
+        legend_config.update(grafana_protocol=config.get("grafana", "protocol"))
 
     # Override with environment variables if any
     if os.environ.get("GRAFANA_API_KEY") is not None:
@@ -87,6 +83,4 @@ def load_legend_config(config_file=None):
     if None not in legend_config.values():
         return legend_config
     else:
-        raise Exception(
-            "Incomplete legend config, please update the legend config file or set env values"
-        )
+        raise Exception("Incomplete legend config, please update the legend config file or set env values")

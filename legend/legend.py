@@ -21,9 +21,7 @@ from .helpers.utilities import (
     mkdir,
 )
 
-from .configure import (
-    set_global_vars
-)
+from .configure import set_global_vars
 from . import (
     LEGEND_HOME,
     GRAFONNET_REPO_NAME,
@@ -38,25 +36,16 @@ global GRAFONNET_REPO_NAME
 
 def generate_jsonnet(input_spec, legend_config):
     grafana_api_key = legend_config["grafana_api_key"]
-    grafana_url = "%s://%s" % (
-        legend_config["grafana_protocol"],
-        legend_config["grafana_host"],
-    )
+    grafana_url = "%s://%s" % (legend_config["grafana_protocol"], legend_config["grafana_host"],)
 
     component_description = {}
     if input_spec.get("alert_channels"):
-        alert_ids = get_alert_id(
-            input_spec["alert_channels"], grafana_api_key, grafana_url
-        )
+        alert_ids = get_alert_id(input_spec["alert_channels"], grafana_api_key, grafana_url)
         alert_service = input_spec["service"]
 
     for component, values in input_spec["components"].items():
 
-        template_str = jinja2_to_render(
-            make_abs_path("metrics_library/metrics"),
-            "{}_metrics.yaml".format(component.lower()),
-            data=values.get("dimensions", []),
-        )
+        template_str = jinja2_to_render(make_abs_path("metrics_library/metrics"), "{}_metrics.yaml".format(component.lower()), data=values.get("dimensions", []),)
         templates = str_yaml_to_json(template_str)
 
         # Adding custom panels and adding custom alerts
@@ -90,11 +79,7 @@ def generate_jsonnet(input_spec, legend_config):
                 panel["title_var"] = convert_to_alnum(panel["title"])
                 for target in panel["targets"]:
                     datasource_str = template["data_source"].lower()
-                    render = jinja2_to_render(
-                        make_abs_path("templates/datasource"),
-                        "{}.j2".format(datasource_str),
-                        data=target,
-                    )
+                    render = jinja2_to_render(make_abs_path("templates/datasource"), "{}.j2".format(datasource_str), data=target,)
                     target["render"] = render
                 panel["alertrender"] = ""
 
@@ -102,22 +87,12 @@ def generate_jsonnet(input_spec, legend_config):
                     panel["alert_config"]["rule"]["name"] = panel["title"]
                     panel["alert_config"]["alert_ids"] = json.dumps(alert_ids)
                     panel["alert_config"]["alert_service"] = alert_service
-                    alertrender = jinja2_to_render(
-                        make_abs_path("templates/alert"),
-                        "alert.j2",
-                        data=panel["alert_config"],
-                    )
+                    alertrender = jinja2_to_render(make_abs_path("templates/alert"), "alert.j2", data=panel["alert_config"],)
                     if panel["alert_config"].get("condition_query"):
-                        panel["alert_config"]["conditions"] = parse_condition_query(
-                            panel["alert_config"]["condition_query"], panel["targets"]
-                        )
+                        panel["alert_config"]["conditions"] = parse_condition_query(panel["alert_config"]["condition_query"], panel["targets"])
 
                         for condition in panel["alert_config"]["conditions"]:
-                            conditionrender = jinja2_to_render(
-                                make_abs_path("templates/alert"),
-                                "alert_condition.j2",
-                                data=condition,
-                            )
+                            conditionrender = jinja2_to_render(make_abs_path("templates/alert"), "alert_condition.j2", data=condition,)
                             alertrender += conditionrender
 
                         panel["alertrender"] = alertrender
@@ -152,17 +127,14 @@ def generate_dashboard_from_jsonnet(jsonnet_file_path):
     return json.loads(output)
 
 
-def create_or_update_grafana_dashboard(
-    dashboard_json, legend_config, dashboard_id=None
-):
+def create_or_update_grafana_dashboard(dashboard_json, legend_config, dashboard_id=None):
 
     auth = legend_config["grafana_api_key"]
     host = legend_config["grafana_host"]
     protocol = legend_config["grafana_protocol"]
     grafana_url = "%s://%s" % (protocol, host)
 
-    grafana_api = GrafanaFace(auth=auth, host=host,
-                              protocol=protocol, timeout=30.0)
+    grafana_api = GrafanaFace(auth=auth, host=host, protocol=protocol, timeout=30.0)
 
     # Create dashboard based on the folder, if a new dashboard
     # Check if the folder exists
@@ -186,8 +158,7 @@ def delete_dashboard(legend_config, uid):
     host = legend_config["grafana_host"]
     protocol = legend_config["grafana_protocol"]
 
-    grafana_api = GrafanaFace(auth=auth, host=host,
-                              protocol=protocol, timeout=30.0)
+    grafana_api = GrafanaFace(auth=auth, host=host, protocol=protocol, timeout=30.0)
 
     try:
         grafana_api.dashboard.delete_dashboard(dashboard_uid=uid)
