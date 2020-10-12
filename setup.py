@@ -4,24 +4,24 @@ from setuptools import setup, find_packages
 
 
 def get_requirements():
-    with open('requirements.txt') as fp:
+    with open("requirements.txt") as fp:
         reqs = fp.read()
 
     return reqs.split()
 
 
 setup(
-    name='legend',
-    version='0.1',
-    description='The legendary Grafana dashboard generator.',
-    author='Grofers Engineering',
-    author_email='tech@grofers.com',
-    url='https://github.com/grofers/legend',
+    name="legend",
+    version="0.1",
+    description="The legendary Grafana dashboard generator.",
+    author="Grofers Engineering",
+    author_email="tech@grofers.com",
+    url="https://github.com/grofers/legend",
     packages=find_packages(),
-    package_data={'': ["*.yaml", "*.j2", "*.yml", "*.libsonnet"]},
+    package_data={"": ["*.yaml", "*.j2", "*.yml", "*.libsonnet"]},
     install_requires=get_requirements(),
-    entry_points='''
+    entry_points="""
         [console_scripts]
         legend=legend.cli:cli_main
-    '''
+    """,
 )
