@@ -134,5 +134,9 @@ components:
       - pod_name: promtail
   loki:
     dimensions:
-      - namespace: sample-ns
-        service: sample-service
+      - labels:
+          namespace: sample-namespace
+      - labels:
+          namespace: sample-namespace-2
+        filters:
+          - "err"

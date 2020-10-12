@@ -140,5 +140,9 @@ spec:
         - pod_name: promtail
     loki:
       dimensions:
-        - namespace: nyala
-          grofers.io/service: nyala
+        - labels:
+            namespace: sample-namespace
+        - labels:
+            namespace: sample-namespace-2
+          filters:
+            - "err"

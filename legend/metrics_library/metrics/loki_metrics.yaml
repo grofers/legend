@@ -10,7 +10,15 @@ panels:
       description: Logs with respect to the provided service key (default no such filter)
       targets:
         {% for dimension in data %}
-          - expr: '{namespace=~"{{ dimension.get("namespace") }}", grofers_io_service=~"{{ dimension.get("grofers.io/service") }}", grofers_io_component=~"{{ dimension.get("grofers.io/component") }}", grofers_io_component_role=~"{{ dimension.get("grofers.io/component-role") }}", grofers_io_business_service=~"{{ dimension.get("grofers.io/business-service") }}", grofers_io_team=~"{{ dimension.get("grofers.io/team") }}", grofers_io_tribe=~"{{ dimension.get("grofers.io/tribe") }}", grofers_io_owner=~"{{ dimension.get("grofers.io/owner") }}"}'
+          {% set filter_dict = {'filters': 'namespace=~"'+ dimension.get("labels").get("namespace")+ '"' } %}    #### after being filled up, it would look like, filter_dict = {"filters": "namespace=~xyz, label1=value1, label2=value2" }
+          {% for label in dimension.get("labels").keys() %}
+            {% if label!="namespace" and filter_dict.update({
+                "filters": filter_dict.filters + ', ' + label.replace("/", "_").replace(".", "_").replace("-", "_") + "=~" + '"' + dimension.get("labels").get(label) + '"'
+              }) %} 
+              {% endif %}
+          {% endfor %}
+          {% set expression = filter_dict.get('filters') %}
+          - expr: '{ {{ expression }} }'
         {% endfor %}
     - title: Error Logs
       type: Log
@@ -18,20 +26,39 @@ panels:
       description: All the logs associated with any error
       targets:
         {% for dimension in data %}
-          - expr: '{namespace=~"{{ dimension.get("namespace") }}", grofers_io_service=~"{{ dimension.get("grofers.io/service") }}", grofers_io_component=~"{{ dimension.get("grofers.io/component") }}", grofers_io_component_role=~"{{ dimension.get("grofers.io/component-role") }}", grofers_io_business_service=~"{{ dimension.get("grofers.io/business-service") }}", grofers_io_team=~"{{ dimension.get("grofers.io/team") }}", grofers_io_tribe=~"{{ dimension.get("grofers.io/tribe") }}", grofers_io_owner=~"{{ dimension.get("grofers.io/owner") }}"} |~ "err"' ##  {namespace="nyala"} |~ "err"
+          {% set filter_dict = {'filters': 'namespace=~"'+ dimension.get("labels").get("namespace")+ '"' } %}    #### after being filled up, it would look like, filter_dict = {"filters": "namespace=~xyz, label1=value1, label2=value2" }
+          {% for label in dimension.get("labels").keys() %}
+            {% if label!="namespace" and filter_dict.update({
+                "filters": filter_dict.filters + ', ' + label.replace("/", "_").replace(".", "_").replace("-", "_") + "=~" + '"' + dimension.get("labels").get(label) + '"'
+              }) %} 
+              {% endif %}
+          {% endfor %}
+          {% set expression = filter_dict.get('filters') %}
+          - expr: '{ {{ expression }} } |~ "(?i)err"' ##  {namespace="nyala", customlabel1=value1, customlabel2=value2, ....} |~ "(?i)err"
         {% endfor %}
-    - title: 4xx-status error logs
+    {% for dimension in data%}
+      {% if "filters" in dimension.keys() %}
+        {% set custom_labels_dict = {'custom_labels': 'namespace=~"'+ dimension.get("labels").get("namespace")+ '"' } %}  
+        {% for label in dimension.get("labels").keys() %}
+          {% if label!="namespace" and custom_labels_dict.update({
+              "custom_labels": custom_labels_dict.custom_labels + ', ' + label.replace("/", "_").replace(".", "_").replace("-", "_") + "=~" + '"' + dimension.get("labels").get(label) + '"'
+            }) %} 
+            {% endif %}
+        {% endfor %}
+        {% set custom_filters_dict = {'custom_filters': '' } %}
+        {% for filter in dimension.get("filters") %}
+          {% if custom_filters_dict.update({
+            "custom_filters": custom_filters_dict.custom_filters + ' |~ "' + filter + '"'
+          }) %} 
+          {% endif %}
+        {% endfor %}
+        {% set finalExpression = "{ " + custom_labels_dict.get('custom_labels') + " }" +  custom_filters_dict.get("custom_filters") %}
+    - title: Custom Log Panel - {{ finalExpression }}
       type: Log
-      sort_order: descending
+      sort_order: Descending
+      description: Custom Log Panel for the query - {{ finalExpression }}
       targets:
-        {% for dimension in data %}
-          - expr: '{namespace=~"{{ dimension.get("namespace") }}", grofers_io_service=~"{{ dimension.get("grofers.io/service") }}", grofers_io_component=~"{{ dimension.get("grofers.io/component") }}", grofers_io_component_role=~"{{ dimension.get("grofers.io/component-role") }}", grofers_io_business_service=~"{{ dimension.get("grofers.io/business-service") }}", grofers_io_team=~"{{ dimension.get("grofers.io/team") }}", grofers_io_tribe=~"{{ dimension.get("grofers.io/tribe") }}", grofers_io_owner=~"{{ dimension.get("grofers.io/owner") }}"} |~ "[^0-9]4[0-9]{2}[^0-9]" |~ "GET|POST|PUT|DELETE|PATCH"' ##  {namespace="nyala"} |~ "HTTP GET /route 404 1.1"
-        {% endfor %}
-    - title: 5xx-status error logs
-      type: Log
-      sort_order: descending
-      targets:
-        {% for dimension in data %}
-          - expr: '{namespace=~"{{ dimension.get("namespace") }}", grofers_io_service=~"{{ dimension.get("grofers.io/service") }}", grofers_io_component=~"{{ dimension.get("grofers.io/component") }}", grofers_io_component_role=~"{{ dimension.get("grofers.io/component-role") }}", grofers_io_business_service=~"{{ dimension.get("grofers.io/business-service") }}", grofers_io_team=~"{{ dimension.get("grofers.io/team") }}", grofers_io_tribe=~"{{ dimension.get("grofers.io/tribe") }}", grofers_io_owner=~"{{ dimension.get("grofers.io/owner") }}"} |~ "[^0-9]5[0-9]{2}[^0-9]"  |~ "GET|POST|PUT|DELETE|PATCH"' ##  {namespace="nyala"} |~ "HTTP GET /route 500 1.1"
-        {% endfor %}
+      - expr: '{{ finalExpression }}'
+    {% endif %}
+    {% endfor %}
 
