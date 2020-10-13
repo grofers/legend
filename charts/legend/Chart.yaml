@@ -5,3 +5,12 @@ description: Grafana Dashboard Generator
 type: application
 version: 0.0.1
 appVersion: 0.0.1
+
+keywords:
+  - grafana
+  - monitoring
+  - legend
+
+maintainers:
+  - name: grofers
+    email: tech@grofers.com

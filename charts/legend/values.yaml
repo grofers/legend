@@ -35,6 +35,8 @@ serviceAccount:
   # If not set and create is true, a name is generated using the fullname template
   name: "legend-service-account"
 
+namespace: legend
+
 clusterRoleBinding:
   # Specifies whether a ClusterRolebinding should be created
   create: true

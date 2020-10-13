@@ -1,4 +1,4 @@
-name: Helm lint and test Charts
+name: Helm tests
 
 on:
 
@@ -23,13 +23,15 @@ jobs:
         uses: helm/chart-testing-action@v1.0.0
         with:
           command: lint
+          config: charts/legend/
 
       - name: Create kind cluster
         uses: helm/kind-action@v1.0.0
         # Only build a kind cluster if there are chart changes to test.
         if: steps.lint.outputs.changed == 'true'
 
-      - name: Run chart-testing (install)
-        uses: helm/chart-testing-action@v1.0.0
-        with:
-          command: install
+      # - name: Run chart-testing (install)
+      #   uses: helm/chart-testing-action@v1.0.0
+      #   with:
+      #     command: install
+      #     config: charts/legend/

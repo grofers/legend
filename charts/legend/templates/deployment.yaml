@@ -2,13 +2,11 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: {{ include "legend.fullname" . }}
-  namespace: {{ include "legend.namespace" . }}
+  namespace: {{ .Release.Namespace }}
   labels:
     {{- include "legend.labels" . | nindent 4 }}
 spec:
-{{- if not .Values.autoscaling.enabled }}
   replicas: {{ .Values.replicaCount }}
-{{- end }}
   strategy:
     type: Recreate
   selector:
@@ -42,27 +40,27 @@ spec:
             - name: GRAFANA_API_KEY
               valueFrom:
                 secretKeyRef:
-                  name: {{ include "legend.secretsName" . }}
+                  name: "{{ .Values.secrets.name }}"
                   key: api_key
             - name: GRAFANA_HOST
               valueFrom:
                 secretKeyRef:
-                  name: {{ include "legend.secretsName" . }}
+                  name: "{{ .Values.secrets.name }}"
                   key: host
             - name: GRAFANA_PROTOCOL
               valueFrom:
                 secretKeyRef:
-                  name: {{ include "legend.secretsName" . }}
+                  name: "{{ .Values.secrets.name }}"
                   key: protocol
             - name: SENTRY_DSN
               valueFrom:
                 secretKeyRef:
-                  name: {{ include "legend.secretsName" . }}
+                  name: "{{ .Values.secrets.name }}"
                   key: sentry_dsn
             - name: SENTRY_ENVRIONMENT
               valueFrom:
                 secretKeyRef:
-                  name: {{ include "legend.secretsName" . }}
+                  name: "{{ .Values.secrets.name }}"
                   key: sentry_environment
           resources:
             {{- toYaml .Values.resources | nindent 12 }}

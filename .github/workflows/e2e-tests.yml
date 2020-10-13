@@ -1,4 +1,4 @@
-name: PR e2e testing
+name: e2e tests
 
 on:
 
