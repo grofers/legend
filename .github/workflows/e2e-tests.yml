@@ -8,8 +8,7 @@ on:
 
 
 jobs:
-  # Run tests.
-  # See also https://docs.docker.com/docker-hub/builds/automated-testing/
+
   test-e2e:
     runs-on: ubuntu-latest
 

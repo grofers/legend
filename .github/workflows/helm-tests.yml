@@ -8,7 +8,7 @@ on:
 
 jobs:
   
-  heml-install-test:
+  lint-install-test:
     runs-on: ubuntu-latest
     
     steps:
