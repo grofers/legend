@@ -28,6 +28,10 @@ RUN sed -i '/jsonnet/d' requirements.txt
 
 RUN pip install .
 
-RUN mkdir /src/.legend
+# Installing jq for testing 
+RUN apt-get update && apt-get install -y \
+    jq && rm -rf /var/lib/apt/lists/*
+
+RUN chmod u+x /src/run_tests.sh
 
 CMD kopf run /src/kubernetes/handler.py

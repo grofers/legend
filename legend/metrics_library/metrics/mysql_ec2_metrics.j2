@@ -308,4 +308,4 @@ panels:
         - OR,last,1,now,1m,lt,1
 ---
 {% set data = data.ec2 %}
-{% include "platform_ec2_metrics.yaml" with context %}
+{% include "platform_ec2_metrics.j2" with context %}
