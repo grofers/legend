@@ -1,6 +1,7 @@
 apiVersion: v2
 name: legend
 description: Grafana Dashboard Generator
+home: https://github.com/grofers/legend
 
 type: application
 version: 0.0.1
