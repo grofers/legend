@@ -45,7 +45,7 @@ def generate_jsonnet(input_spec, legend_config):
 
     for component, values in input_spec["components"].items():
 
-        template_str = jinja2_to_render(make_abs_path("metrics_library/metrics"), "{}_metrics.j2".format(component.lower()), data=values.get("dimensions", []),)        
+        template_str = jinja2_to_render(make_abs_path("metrics_library/metrics"), "{}_metrics.j2".format(component.lower()), data=values.get("dimensions", []),)
         templates = str_yaml_to_json(template_str)
 
         # Adding custom panels and adding custom alerts

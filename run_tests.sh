@@ -5,6 +5,7 @@ set -ex
 export LEGEND_HOME=/tmp/.legend 
 
 # Create a new key for Grafana and export as environment variable
+# Waiting for grafana to laod properly, or else will return null 
 sleep 5
 GRAFANA_URL="${GRAFANA_PROTOCOL}://${GRAFANA_HOST}"
 
