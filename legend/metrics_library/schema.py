@@ -111,7 +111,22 @@ default_panels_schema = md(panels_in_row_schema, additional_panels_schema)
 schema = {
     "title": {"type": "string", "required": True, "empty": False},
     "grafana_folder": {"type": "string", "required": True, "empty": False},
-    "alert_channels": {"type": "list", "schema": {"type": "string"}, "required": True},
+    "alert_config": {
+        "type": "dict",
+        "required": True,
+        "schema": {
+            "notification_channels": {
+                "type": "list",
+                "required": False,
+                "empty": False
+            },
+            "tags": {
+                "type": "dict",
+                "required": False,
+                "empty": False
+            }
+        }
+    },
     "service": {"type": "string", "required": True, "empty": False},
     "description": {"type": "string", "required": True, "empty": False},
     "references": {

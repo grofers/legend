@@ -7,6 +7,22 @@ from jinja2 import Environment, FileSystemLoader
 
 from .validations import validate_input
 
+pagerduty_alert_severity_map = {
+    "P1": "critical",
+    "P2": "error",
+    "P3": "warning",
+    "P4": "info",
+    "P5": "info"
+}
+
+opsgenie_alert_severity_map = {
+    "P1": "P1",
+    "P2": "P2",
+    "P3": "P3",
+    "P4": "P4",
+    "P5": "P5",
+}
+
 
 def convert_to_alnum(st):
     return re.sub(r"\W+", "", st)
@@ -102,7 +118,10 @@ def get_alert_id(alert_channels, GRAFANA_API_KEY, GRAFANA_URL):
     r.raise_for_status()
     for g_data in r.json():
         if g_data["name"] in alert_channels:
-            grafana_notification_channel_uid.append({"uid": g_data["uid"]})
+            grafana_notification_channel_uid.append({
+                "uid": g_data["uid"],
+                "type": g_data["type"]
+            })
 
     return grafana_notification_channel_uid
 

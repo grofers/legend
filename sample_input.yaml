@@ -2,7 +2,11 @@
 title: SampleTitle
 service: SampleService
 grafana_folder: SampleFolder
-alert_channels: ["service-opsgenie"]
+alert_config:
+  notification_channels: ["service-opsgenie"]
+  tags:
+    key: value
+environment: Prod
 description: Logging tool for everything deployed on kubernetes
 references:
   deployment: https://github.com/grofers/legend/tree/master/helm-chart/legend/Readme.md
