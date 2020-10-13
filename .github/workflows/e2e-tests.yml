@@ -1,0 +1,25 @@
+name: e2e tests
+
+on:
+
+  pull_request:
+    paths-ignore: 
+      - docs/* 
+
+
+jobs:
+
+  test-e2e:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Run tests
+        run: |
+          if [ -f docker-compose.test.yml ]; then
+            docker-compose --file docker-compose.test.yml build
+            docker-compose --file docker-compose.test.yml run sut
+          else
+            docker build . --file Dockerfile
+          fi

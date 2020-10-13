@@ -1,4 +1,4 @@
-name: Docker
+name: Docker publish
 
 on:
   push:
@@ -8,32 +8,11 @@ on:
     # Publish `v1.2.3` tags as releases.
     tags:
       - v*
-
-  pull_request:
-    paths-ignore: 
-      - docs/* 
     
 env:
   IMAGE_NAME: legend
 
 jobs:
-  # Run tests.
-  # See also https://docs.docker.com/docker-hub/builds/automated-testing/
-  test:
-    runs-on: ubuntu-latest
-
-    steps:
-      - uses: actions/checkout@v2
-
-      - name: Run tests
-        run: |
-          if [ -f docker-compose.test.yml ]; then
-            docker-compose --file docker-compose.test.yml build
-            docker-compose --file docker-compose.test.yml run sut
-          else
-            docker build . --file Dockerfile
-          fi
- 
   # Push image to GitHub Packages.
   # See also https://docs.docker.com/docker-hub/builds/
   push:
@@ -63,7 +42,7 @@ jobs:
           [[ "${{ github.ref }}" == "refs/tags/"* ]] && VERSION=$(echo $VERSION | sed -e 's/^v//')
 
           # Use Docker `latest` tag convention
-          [ "$VERSION" == "master" ] && VERSION=latest
+          [ "$VERSION" == "master" ] && VERSION=master
 
           echo IMAGE_ID=$IMAGE_ID
           echo VERSION=$VERSION

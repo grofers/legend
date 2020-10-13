@@ -1,0 +1,37 @@
+{{- if .Values.crdConfig.create -}}
+apiVersion: apiextensions.k8s.io/v1
+kind: CustomResourceDefinition
+metadata:
+  name: grafana-dashboards.grofers.io
+spec:
+  scope: Namespaced
+  group: grofers.io
+  names:
+    kind: GrafanaDashboard
+    plural: grafana-dashboards
+    singular: grafana-dashboard
+    shortNames:
+      - gd
+  versions:
+  - name: v1
+    served: true
+    storage: true
+    schema:
+      openAPIV3Schema:
+        type: object
+        required: ["spec"]
+        properties:
+          spec:
+            type: object
+    additionalPrinterColumns:
+      - name: Dashboard URL
+        type: string
+        priority: 0
+        jsonPath: .status.create_handler.grafana_url
+        description: URL for the Grafana dashboard.
+      - name: Status
+        type: string
+        priority: 0
+        jsonPath: .status.create_handler.status
+        description: Status of the Grafana dashboard.
+{{- end }}
