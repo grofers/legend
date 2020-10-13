@@ -18,22 +18,7 @@ from . import (
 )
 
 
-def set_global_vars():
-    if os.environ.get("LEGEND_HOME") is not None:
-        LEGEND_HOME = os.environ.get("LEGEND_HOME")
-
-    if os.environ.get("GRAFONNET_REPO_NAME") is not None:
-        GRAFONNET_REPO_NAME = os.environ.get("GRAFONNET_REPO_NAME")
-
-    if os.environ.get("GRAFONNET_REPO_URL") is not None:
-        GRAFONNET_REPO_URL = os.environ.get("GRAFONNET_REPO_URL")
-
-    if os.environ.get("GRAFONNET_REPO_RELEASE_TAG") is not None:
-        GRAFONNET_REPO_RELEASE_TAG = os.environ.get("GRAFONNET_REPO_RELEASE_TAG")
-
-
 def install_grafonnet_lib():
-    set_global_vars()
     legend_path = os.path.join(LEGEND_HOME)
     mkdir(legend_path)
     grafonnet_path = os.path.join(LEGEND_HOME, GRAFONNET_REPO_NAME)
@@ -55,7 +40,6 @@ def install_grafonnet_lib():
 
 
 def load_legend_config(config_file=None):
-    set_global_vars()
     config = configparser.SafeConfigParser()
 
     # Load config from provided input file
