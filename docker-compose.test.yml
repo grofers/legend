@@ -1,0 +1,23 @@
+version: "3.8"
+services:
+  sut:
+    build: .
+    command: /src/run_tests.sh
+    depends_on: 
+      - grafana
+    environment:
+     - GRAFANA_HOST=grafana:3000
+     - GRAFANA_PROTOCOL=http
+
+  grafana:
+    image: grafana/grafana:7.1.5
+    ports: 
+      - 3000:3000
+    environment:
+      - GF_AUTH_ANONYMOUS_ENABLED=true
+      - GF_AUTH_ANONYMOUS_ORG_ROLE=Admin
+      - GF_AUTH_ORG_NAME=Main Org.
+    volumes:
+      - type: bind
+        source: ./tests_config
+        target: /etc/grafana/provisioning/datasources
