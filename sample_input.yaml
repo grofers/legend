@@ -10,8 +10,8 @@ references:
   documentation: https://github.com/grofers/legend/tree/master/docs
   metrics_definition: https://github.com/grofers/legend
 tags:
-- prod
-- infra
+  - prod
+  - infra
 components:
 
 # Application frameworks
@@ -42,8 +42,8 @@ components:
         - host: sample-ec2-host
       db:
         - masters:
-          - host: sample-mysql-host-master
-            db_name: sample-db
+            - host: sample-mysql-host-master
+              db_name: sample-db
           slaves:
             - host: sample-mysql-host-slave
               db_name: sample-db
@@ -119,7 +119,7 @@ components:
       - job: sample-starlette-service
         path: sample-starlette-path
 
-# Applications 
+# Applications
   consul:
     dimensions:
       - region: sample-aws-region
