@@ -14,16 +14,18 @@ jobs:
 
     steps:
       - uses: actions/checkout@v2
-      - name: Black lint test
-        uses: RojerGS/python-black-check@1.0.1
-        with:
-          line-length: '250'
-          path: '.'
+        # - name: Black lint test
+        #   uses: RojerGS/python-black-check@1.0.1
+        #   with:
+        #     line-length: '250'
+        #     path: '.'
+
       - name: Yamllint tests
         uses: karancode/yamllint-github-action@master
         with:
           yamllint_config_filepath: './yamllint.config.yaml'
           yamllint_file_or_dir: 'sample_input.yaml ./kubernetes/ ./tests_config/'
+
       - name: Run tests
         run: |
           if [ -f docker-compose.test.yml ]; then
