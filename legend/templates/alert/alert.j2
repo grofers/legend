@@ -7,7 +7,5 @@
       message='Priority: {{data.priority}}\n Message: {{data.message}}',
       noDataState='no_data',
       notifications={{data.alert_ids}},
-      alertRuleTags={'og_priority': '{{data.priority}}' ,
-                      'og_service': '{{data.alert_service}}',
-                    },
+      alertRuleTags={{data.alert_rule_tags}},
     )

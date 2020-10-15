@@ -20,4 +20,4 @@ services:
     volumes:
       - type: bind
         source: ./tests_config
-        target: /etc/grafana/provisioning/datasources
+        target: /etc/grafana/provisioning/
