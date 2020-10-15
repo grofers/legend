@@ -23,7 +23,6 @@ from .helpers.utilities import (
     mkdir,
 )
 
-from .configure import set_global_vars
 from . import (
     LEGEND_HOME,
     GRAFONNET_REPO_NAME,
@@ -167,7 +166,6 @@ def generate_jsonnet(input_spec, legend_config):
 
 
 def generate_dashboard_from_jsonnet(jsonnet_file_path):
-    set_global_vars()
     cmd_env_vars = dict(os.environ)
     grafonnet_lib = os.path.join(LEGEND_HOME, GRAFONNET_REPO_NAME)
     exec_command = "jsonnet -J %s %s" % (grafonnet_lib, jsonnet_file_path)
