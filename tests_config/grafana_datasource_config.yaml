@@ -1,17 +1,17 @@
 apiVersion: 1
 
 datasources:
-  - name: Prometheus (Prod)
+  - name: prometheus
     type: prometheus
     access: proxy
     url: http://prometheus.dummy
 
-  - name: InfluxDB (Prod)
-    type: influx
+  - name: influxdb
+    type: influxdb
     access: proxy
     url: http://influx.dummy
 
-  - name: Cloudwatch (Prod)
+  - name: cloudwatch
     type: cloudwatch
     access: proxy
     url: http://cloudwatch.dummy

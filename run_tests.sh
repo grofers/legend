@@ -3,6 +3,10 @@
 set -ex
 
 export LEGEND_HOME=/tmp/.legend 
+export GRAFANA_DEFAULT_PROMETHEUS_DATA_SOURCE=prometheus
+export GRAFANA_DEFAULT_INFLUXDB_DATA_SOURCE=influxdb
+export GRAFANA_DEFAULT_CLOUDWATCH_DATA_SOURCE=cloudwatch
+export GRAFANA_DEFAULT_LOKI_DATA_SOURCE=loki
 
 # Create a new key for Grafana and export as environment variable
 # Waiting for grafana to laod properly, or else will return null 

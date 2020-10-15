@@ -29,7 +29,7 @@ local loki = grafana.loki;
                 {% if panel_value.type.lower() == "log" %}
                     logPanel.new(
                         title='{{ panel_value.title }}',
-                        datasource='{{ metric.data_source }} ({{ data.environment }})',
+                        datasource='{{ metric.data_source }}',
                         showLabels='true',
                         showTime='true',
                         sortOrder='{{ (panel_value.sort_order or "descending").capitalize() }}'
@@ -37,7 +37,7 @@ local loki = grafana.loki;
                 {% elif panel_value.type.lower() == "graph" %}
                     graphPanel.new(
                         title='{{ panel_value.title }}',
-                        datasource='{{ metric.data_source }} ({{ data.environment }})',
+                        datasource='{{ metric.data_source }}',
                         shared_tooltip='true',
                         legend_values='true',
                         legend_min='true',
@@ -96,7 +96,7 @@ local alert_list =
 
 
 dashboard.new(
-'{{ data.title }} - {{ data.environment }}',
+'{{ data.title }}',
 tags={{ data.tags }},
 schemaVersion=18,
 editable='true',

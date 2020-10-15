@@ -126,7 +126,16 @@ def parse_condition_query(condition_queries, targets):
                 op = "WHEN"
 
             conditions.append(
-                {"operator_type": op, "reducer_type": parts[1], "query_ref_id": chr(ref_id), "query_time_end": parts[3], "query_time_start": parts[4], "evaluator_type": parts[5], "evaluator_params": parts[6], "reducer_params": [],}
+                {
+                    "operator_type": op,
+                    "reducer_type": parts[1],
+                    "query_ref_id": chr(ref_id),
+                    "query_time_end": parts[3],
+                    "query_time_start": parts[4],
+                    "evaluator_type": parts[5],
+                    "evaluator_params": parts[6],
+                    "reducer_params": [],
+                }
             )
 
     return conditions
