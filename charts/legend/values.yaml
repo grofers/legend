@@ -6,9 +6,9 @@ replicaCount: 1
 
 image:
   repository: "ghcr.io/grofers/legend"
-  pullPolicy: IfNotPresent
+  pullPolicy: Always
   # Overrides the image tag whose default is the chart appVersion.
-  tag: "latest"
+  tag: "master"
 
 imagePullSecrets: []
 nameOverride: ""
@@ -74,13 +74,13 @@ tolerations: []
 affinity: {}
 
 # Extra env variables to pass to the legend container
-env: []
+env:
   # We can define default grafana data sources through env variables
   # - name: GRAFANA_DEFAULT_PROMETHEUS_DATA_SOURCE
-  #   value: "prometheus"
+  #   value: "Prometheus"
   # - name: GRAFANA_DEFAULT_CLOUDWATCH_DATA_SOURCE
-  #   value: "cloudwatch"
+  #   value: "Cloudwatch"
   # - name: GRAFANA_DEFAULT_INFLUXDB_DATA_SOURCE
-  #   value: "influxdb"
+  #   value: "Influxdb"
   # - name: GRAFANA_DEFAULT_LOKI_DATA_SOURCE
-  #   value: "loki"
+  #   value: "Loki"

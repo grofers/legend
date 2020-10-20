@@ -32,14 +32,13 @@ install_grafonnet_lib()
 
 def create_or_update_handler(spec, name, **kwargs):
     body = kwargs["body"]
-    spec = body["spec"]
+    spec = body["spec"]["grafana_dashboard_spec"]
 
-    dashboard_id = str(spec["grafana_folder"])
-
-    legend_config = load_legend_config()
     validate_input(schema, spec)
+    legend_config = load_legend_config()
     jsonnet_file = generate_jsonnet(spec, legend_config)
     dashboard_json = generate_dashboard_from_jsonnet(jsonnet_file)
+    dashboard_id = str(spec["grafana_folder"])
     resp = create_or_update_grafana_dashboard(dashboard_json, legend_config, dashboard_id)
 
     host = legend_config["grafana_host"]
@@ -56,7 +55,7 @@ def create_or_update_handler(spec, name, **kwargs):
     }
 
 
-@kopf.on.create("grofers.io", "v1", "grafana-dashboards")
+@kopf.on.create("grofers.io", "v1beta1", "grafana-dashboards")
 def create_handler(spec, name, **kwargs):
     logger.info("Creating new Grafana dashboard: %s", name)
     kopf.info(spec, reason="CreatingDashboard", message="Creating new grafana-dashboard.")
@@ -73,7 +72,7 @@ def create_handler(spec, name, **kwargs):
         raise kopf.PermanentError("Failed creating the dashboard")
 
 
-@kopf.on.update("grofers.io", "v1", "grafana-dashboards")
+@kopf.on.update("grofers.io", "v1beta1", "grafana-dashboards")
 def update_handler(spec, name, **kwargs):
     logger.info("Updating existing Grafana dashboard object: %s", name)
     kopf.info(spec, reason="UpdatingDashboard", message="Updating Grafana dashboard.")
@@ -89,7 +88,7 @@ def update_handler(spec, name, **kwargs):
         raise kopf.PermanentError("Failed creating the dashboard")
 
 
-@kopf.on.delete("grofers.io", "v1", "grafana-dashboards")
+@kopf.on.delete("grofers.io", "v1beta1", "grafana-dashboards")
 def delete_handler(spec, name, body, **kwargs):
     logger.info("Deleting Grafana dashboard: %s", name)
     kopf.info(spec, reason="DeletingDashboard", message="Deleting grafana dashboard.")
