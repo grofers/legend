@@ -97,17 +97,22 @@ def delete_handler(spec, name, body, **kwargs):
 
     # Fetch the uid / try deleting the dashboard only if the object creation
     # was successful earlier
-    status = body["status"]
-    if status.get("create_handler") or status.get("update_handler"):
-        uid = body["status"]["create_handler"]["uid"]
+    if "status" in body:
+        status = body["status"]
+        if status.get("create_handler") or status.get("update_handler"):
+            uid = body["status"]["create_handler"]["uid"]
 
-        try:
-            legend_config = load_legend_config()
-            status = delete_dashboard(legend_config, uid)
-            kopf.info(spec, reason="DeletedDashboard", message="Finished deleting dashboard:  %s." % name)
-            logger.info("Finished deleting Grafana dashboard: %s", name)
-            return {"status": status}
-        except Exception as e:
-            logger.error(("Failed to delete dashboard due to the following " "exception: %s"), e)
-            kopf.exception(spec, reason="APIError", message=("Failed to delete dashboard due to API " "error: %s" % e))
-            raise kopf.PermanentError("Failed deleting the dashboard")
+            try:
+                legend_config = load_legend_config()
+                status = delete_dashboard(legend_config, uid)
+                kopf.info(spec, reason="DeletedDashboard", message="Finished deleting dashboard:  %s." % name)
+                logger.info("Finished deleting Grafana dashboard: %s", name)
+                return {"status": status}
+            except Exception as e:
+                logger.error(("Failed to delete dashboard due to the following " "exception: %s"), e)
+                kopf.exception(spec, reason="APIError", message=("Failed to delete dashboard due to API " "error: %s" % e))
+                raise kopf.PermanentError("Failed deleting the dashboard")
+    else:
+        kopf.info(spec, reason="DeletedDashboard", message="Finished deleting dashboard:  %s." % name)
+        logger.info("Finished deleting Grafana dashboard: %s", name)
+        return {"status": "Deleted"}
