@@ -45,6 +45,7 @@ def generate_jsonnet(input_spec, legend_config):
 
     component_description = {}
     alert_rule_tags = {}
+    alert_ids = []
     if input_spec.get("alert_config"):
         alert_ids = get_alert_id(
             input_spec["alert_config"]["notification_channels"], grafana_api_key, grafana_url
@@ -115,15 +116,16 @@ def generate_jsonnet(input_spec, legend_config):
                     # adds alertrule tags based on notification channel types
                     if panel["alert_config"].get("priority") is not None:
                         priority = panel["alert_config"].get("priority")
-                        for id in alert_ids:
-                            if id["type"] == "opsgenie":
-                                severity = opsgenie_alert_severity_map.get(priority)
-                                if severity is not None:
-                                    alert_rule_tags["og_priority"] = severity
-                            elif id["type"] == "pagerduty":
-                                severity = pagerduty_alert_severity_map.get(priority)
-                                if severity is not None:
-                                    alert_rule_tags["Severity"] = severity
+                        if alert_ids:
+                            for id in alert_ids:
+                                if id["type"] == "opsgenie":
+                                    severity = opsgenie_alert_severity_map.get(priority)
+                                    if severity is not None:
+                                        alert_rule_tags["og_priority"] = severity
+                                elif id["type"] == "pagerduty":
+                                    severity = pagerduty_alert_severity_map.get(priority)
+                                    if severity is not None:
+                                        alert_rule_tags["Severity"] = severity
 
                     panel["alert_config"]["alert_rule_tags"] = json.dumps(alert_rule_tags)
 
