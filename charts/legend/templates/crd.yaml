@@ -13,16 +13,19 @@ spec:
     shortNames:
       - gd
   versions:
-  - name: v1
+  - name: v1beta1
     served: true
     storage: true
     schema:
       openAPIV3Schema:
         type: object
-        required: ["spec"]
+        required: 
+          - spec
         properties:
           spec:
             type: object
+            x-kubernetes-preserve-unknown-fields: true
+            x-kubernetes-embedded-resource: true
     additionalPrinterColumns:
       - name: Dashboard URL
         type: string
