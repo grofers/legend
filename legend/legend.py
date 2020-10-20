@@ -44,12 +44,14 @@ def generate_jsonnet(input_spec, legend_config):
     )
 
     component_description = {}
+    alert_rule_tags = {}
     if input_spec.get("alert_config"):
         alert_ids = get_alert_id(
             input_spec["alert_config"]["notification_channels"], grafana_api_key, grafana_url
         )
 
-    alert_rule_tags = input_spec["alert_config"]["tags"]
+        if input_spec["alert_config"].get("tags") is not None:
+            alert_rule_tags = input_spec["alert_config"].get("tags")
 
     for component, values in input_spec["components"].items():
 
@@ -123,7 +125,7 @@ def generate_jsonnet(input_spec, legend_config):
                                 if severity is not None:
                                     alert_rule_tags["Severity"] = severity
 
-                    panel["alert_config"]["alert_rule_tags"] = alert_rule_tags
+                    panel["alert_config"]["alert_rule_tags"] = json.dumps(alert_rule_tags)
 
                     alertrender = jinja2_to_render(
                         make_abs_path("templates/alert"),

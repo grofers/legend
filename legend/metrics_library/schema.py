@@ -113,11 +113,11 @@ schema = {
     "grafana_folder": {"type": "string", "required": True, "empty": False},
     "alert_config": {
         "type": "dict",
-        "required": True,
+        "required": False,
         "schema": {
             "notification_channels": {
                 "type": "list",
-                "required": False,
+                "required": True,
                 "empty": False
             },
             "tags": {
