@@ -1,8 +1,8 @@
 # A demo custom resource for the Kopf example operators.
-apiVersion: grofers.io/v1
+apiVersion: grofers.io/v1beta1
 kind: GrafanaDashboard
 metadata:
-  name: sample-title-9
+  name: sample-title
   labels:
     app: sample-title
 spec:
@@ -12,46 +12,15 @@ spec:
     title: SampleTitle
     service: SampleService
     grafana_folder: SampleFolder
-    alert_channels: ["service-opsgenie"]
-    environment: Prod
     description: Logging tool for everything deployed on kubernetes
     references:
       deployment: https://github.com/grofers/legend/tree/master/helm-chart/legend/Readme.md
       documentation: https://github.com/grofers/legend/tree/master/docs
       metrics_definition: https://github.com/grofers/legend
     tags:
-    - stage
-    - infra
-    - crd-testing
+      - prod
+      - infra
     components:
-      s3:
+      playframework:
         dimensions:
-        - bucket_name: sample-bucket
-          filter_id: EntireBucket
-        panels:
-        - title: (R) Request Count - WriteMY
-          type: Graph
-          description: TODO
-          targets:
-          - dimensions: {"BucketName": "sample-bucket" ,"FilterId": "EntireBucket"}
-            metric: PutRequests
-            namespace: AWS/S3
-            statistic: Sum
-            alias: '{{ metric }}'
-            ref_no: 1
-          - dimensions: {"BucketName": "sample-bucket" ,"FilterId": "EntireBucket"}
-            metric: PostRequests
-            namespace: AWS/S3
-            statistic: Sum
-            alias: '{{ metric }}'
-            ref_no: 2
-
-      platform_ec2:
-        dimensions:
-        - host: sample-ec2-host
-      redis:
-        dimensions:
-          - job_name: sampl-redis-host
-      celery:
-        dimensions:
-          - job_name: sample-celery-host
+          - service: sample-play-service
