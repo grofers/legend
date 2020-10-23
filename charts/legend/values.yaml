@@ -21,9 +21,12 @@ crdConfig:
 # Intial legend configuration comes under this
 secrets:
   name: "legend-conf"
-  api_key: ""  # API Key for accessing the Grafana API
-  protocol: "" # http/https
-  host: "" # Endpoint of Grafana server where dashboards are supposed to be deployed
+  # API Key for accessing the Grafana API
+  api_key: ""
+  # http/https
+  protocol: ""
+  # Endpoint of Grafana server where dashboards are supposed to be deployed
+  host: ""
   sentry_dsn: ""
   sentry_environment: ""
 
