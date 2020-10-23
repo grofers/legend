@@ -124,9 +124,13 @@ You can conribute to legend in two ways:
 
 *Developing/improving legend's functionality*
 
-* You can pick up the existing issues in the github repo of legend and work on the fixes
-* Follow the guide [developing on legend](docs/developing-on-legend.md)
-* Improve the metrics legend creates for a service*
+* You can pick up the existing issues in the github repo of legend and work on the fixes.
+* Or, you can raise an issue (bug-report or feature-request).
+* Fork this repo and setup up a branch on your forked repo to work on the contribution.
+* Follow the guide [developing on legend](docs/developing-on-legend.md) for getting a detailed idea about the rightful way of developing and testing over legend.
+* Raise the PR containing the reference to the issue it intends to solve.
+
+*Improve the metrics legend creates for a service*
 * This is one of the biggest offerings of Legend - pre configured metrics for a wide variety of
 components.
 * If you are contibuting to the existing metrics or writing new ones please follow the giude [contributing-to-metric-library](docs/contributing-to-metric-library.md)

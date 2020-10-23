@@ -7,15 +7,15 @@ The input file must be written in [yaml](#yaml) format
 
 ## Service
 
-The construct of service is similar to the application for which the dashboard is being built for
+The construct of service is similar to the application for which the dashboard is being built for.
 
 ## Components
 
-These are discrete components which the application is using to provide the service. Simply put - this can be all the tech stack of the application's architecture
+These are discrete components which the application is using to provide the service. Simply put - this can be all the tech stack of the application's architecture. Examples of components - SQS, ALB, Consul, EC2, etc. 
 
 ## Metric library
 
-A core feature of Legend is that it creates dashboards with pre filled metrics. All these metrics are stored in [metric library](../legend/metrics_library/metrics). Every file in this folder represents the default metrics which are plotted for that component. The default alerting configuration is also defined in the same file.
+A core feature of Legend is that it creates dashboards with pre filled metrics. All those metrics' filters and config are stored in [metric library](../legend/metrics_library/metrics). Every file in this folder represents the default metrics which are plotted for that component. The default alerting configuration is also defined in the same file.
 
 The metrics here have been coallated using standard industry practices, you can find some of the
 references here:
@@ -39,7 +39,11 @@ All descriptional fields of this spec are compulsory. For fileds within componen
 title: # Title of the dashboard. Should ususally be the service name. While creating the title in Grafana, this is appended with the environment filed mentioned below
 service: # Name of the service for which the dashboard is being generated. For all the alerts in this dashboard, a tag og_servce:<service> will be created which is further used for associating alerts from this dashabord to a particular service in opsgenie 
 grafana_folder: # The grafana folder in which the dashboard has to be created. If the folder is not present in Grafana, Legend creates it
-alert_channels: [] # List of alert channels for notifications. These have to be present in Grafana from before
+alert_config: # Configuration associated with the alerts which are going to be setup for the respective panels.
+  notification_channels: [] # List of alert channels for notifications. These have to be present in Grafana from before. For example:  "service-opsgenie", "pagerduty"
+  tags: # Alert will be tagged with the following tags. For example :- Priority: P2
+    key1: value1 
+    key2: value2
 environment: # The environment for which the dashboard is being generated for
 description: # Description on what is the pupose of the service/application
 references:

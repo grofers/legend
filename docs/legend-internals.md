@@ -1,7 +1,7 @@
 # Legend Internals
 
-## How does legend work internalls
+## How does legend work internally
 
-* Using grafonnet-lib
-* Why metrics library
-* Input file to jsonnet (legend), jsonnet to json (jsonnet and grafonnet-lib), json to Grafana (legend)
+* Legend makes use of [grafonnet-lib](https://github.com/grafana/grafonnet-lib).
+* With grafonnet-lib, legend builds relevant dashboard files declaratively in [jsonnet](https://jsonnet.org/) format on the basis of the provided input YAML manifest.
+* And, it finally makes use of Grafana API to push those corresponding dashboards to the respective grafana endpoint (provided by the user in legend's initial configuration).
