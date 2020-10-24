@@ -3,5 +3,5 @@
 * Please edit the [values.yaml](./values.yaml) according to your use-case's configuration. 
 * Run the following command:
 ```sh
-helm install <legend-release-name> ./legend -f values.yaml
+helm install <legend-release-name> . -f values.yaml
 ```
