@@ -23,5 +23,3 @@ We’d love to have you contribute! Please refer to our [contribution guidelines
 ## License
 
 [Apache 2.0 License](https://github.com/grofers/legend/blob/main/LICENSE).
-
-This site is open source. Improve this page.
