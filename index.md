@@ -14,7 +14,7 @@ helm repo add grafana https://grofers.github.io/legend
 
 You can then run `helm search repo legend` to see the charts.
 
-Chart documentation is available in [grafana directory](https://github.com/grofers/legend/blob/main/charts/legend/README.md)
+Chart documentation is available in [legend directory](https://github.com/grofers/legend/blob/main/charts/legend/README.md)
 
 ## Contributing
 
