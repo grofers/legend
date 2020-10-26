@@ -1,4 +1,4 @@
-# Developing on legend
+# Developer's guide
 
 For developing features or fixing bugs on legend, please use this guide 
 
@@ -8,7 +8,7 @@ For developing features or fixing bugs on legend, please use this guide
 brew install jsonnet
 git clone https://github.com/grofers/legend.git
 cd legend
-pip install -e .
+pip install --ignore-installed -e .
 ```
 
 ## Developing on the CLI
@@ -55,7 +55,7 @@ Setup the development environment:
 
 ```shell
 mkvirtualenv legend
-pip install -e .
+pip install --ignore-installed -e .
 pip install -r kubernetes/requirements.txt
 ```
 
@@ -83,7 +83,7 @@ in the first place to create a config file `/tmp/.legend/legend.cfg`
 Run the tests
 
 ```shell
-./tests.sh
+./run_tests.sh
 ```
 
 This will verify two things

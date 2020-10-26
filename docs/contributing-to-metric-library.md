@@ -2,12 +2,19 @@
 
 > The default metrics which are plotted for every component within a service
 
+## Overview
+
+Legend supports a wide variety of metric types for creating panels for "components" like SQS, Promtail, Loki, EC2 and many more. Refer to [sample_input.yaml](../sample_input.yaml) for getting to know all the supported metrics.
+
+But if your use-case still ends up requiring a metric component type which is currently not supported by legend, then you can refer to the following guide to add support over legend to support your needs in a simple and conventional manner. 
+
 ## Metrics library
 
 All the metrics plotted per component are part of the metrics library which lives within legend.
 Each component has an associated metrics file in the metrics library in the format
 `<component>_metrics.yaml`. The metrics file is actually a jinja2 template which is rendered to
 be a yaml file.
+These files are present (and supposed to be added) in `legend/metrics_library/metrics/` directory. 
 
 ## Spec
 
@@ -65,6 +72,6 @@ labelY1:  # The label to put in the Y1 graph panel (sample : bytes/sec , bytes ,
 
 ## Adding metrics for new components
 
-* If you are addining metrics for a new component, please follow the spec as mentioned above.
+* If you are adding metrics for a new component, please follow the spec as mentioned above and name the jinja (j2) file of your metric with the following convention `<component name>_metrics.j2`.
 * The variables and the component spec has to be added in the [metrics_schema](../legend/metrics_library/metrics_schema.py) and import the configuration into the [schema](../legend/metrics_library/schema.py) to ensure proper validation - this will enable input validation.
-* In the [sample_input.yaml](../sample_input.yaml) add the component with basic/sample confiugration - this will enable testing and ensure backward compatability also making adaptability easy
+* In the [sample_input.yaml](../sample_input.yaml) add the component with basic/sample configuration - this will enable testing and ensure backward compatability also making adaptability easy.
