@@ -3,9 +3,9 @@ entries:
   legend:
   - apiVersion: v2
     appVersion: 0.1.0
-    created: "2020-10-27T10:25:36.076086+05:30"
+    created: "2020-10-27T12:04:25.734657+05:30"
     description: Grafana Dashboard Generator
-    digest: add047e4ebee057d575ad29aa3d25cd25183912e376a88cd72c66f5711c45d2b
+    digest: 68c01930577a723f94c4509aceb91dbd9dd95ee4d16a56058b818df0f977b1d5
     home: https://github.com/grofers/legend
     keywords:
     - grafana
@@ -21,7 +21,7 @@ entries:
     version: 0.1.0
   - apiVersion: v2
     appVersion: 0.0.5
-    created: "2020-10-27T10:25:36.07405+05:30"
+    created: "2020-10-27T12:04:25.73413+05:30"
     description: Grafana Dashboard Generator
     digest: 541364735cacf98494b45fa5e9c1fa15e26deb6e78b9f5a9e7ae89fdd787e024
     home: https://github.com/grofers/legend
@@ -37,4 +37,4 @@ entries:
     urls:
     - https://grofers.github.io/legend/legend-0.0.5.tgz
     version: 0.0.5
-generated: "2020-10-27T10:25:36.07152+05:30"
+generated: "2020-10-27T12:04:25.733402+05:30"
