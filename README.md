@@ -12,16 +12,16 @@ The code is provided as-is with no warranties.
 Once Helm is set up properly, add the repo as follows:
 
 ```
-helm repo add grafana https://grofers.github.io/legend
+helm repo add legend https://grofers.github.io/legend
 ```
 
 You can then run `helm search repo legend` to see the charts.
 
-Chart documentation is available in [legend directory](https://github.com/grofers/legend/blob/main/charts/legend/README.md)
+Chart documentation is available in [legend directory](https://github.com/grofers/legend/blob/master/charts/legend/Readme.md)
 
 ## Contributing
 
-We’d love to have you contribute! Please refer to our [contribution guidelines](https://github.com/grofers/legend/blob/main/CONTRIBUTING.md) for details.
+We’d love to have you contribute! Please refer to our [contribution guidelines](https://github.com/grofers/legend/#contribution) for details.
 
 ## License
 
