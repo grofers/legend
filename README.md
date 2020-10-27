@@ -1,6 +1,6 @@
 # Legend Helm Charts
 
-[![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
+[![License](https://img.shields.io/badge/License-GPL%203.0-blue.svg)](https://opensource.org/licenses/GPL-3.0)
 [![Artifact HUB](https://img.shields.io/endpoint?url=https://artifacthub.io/badge/repository/legend)](https://artifacthub.io/packages/search?repo=legend)
 
 The code is provided as-is with no warranties.
@@ -25,4 +25,4 @@ We’d love to have you contribute! Please refer to our [contribution guidelines
 
 ## License
 
-[Apache 2.0 License](https://github.com/grofers/legend/blob/main/LICENSE).
+[GPL 3.0 License](https://github.com/grofers/legend/blob/master/COPYING).
