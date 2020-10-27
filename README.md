@@ -1,6 +1,6 @@
 # Legend
 
-> The legendary tool wwhich builds and manages grafana dashboards for your applications
+> The legendary tool which builds and manages grafana dashboards for your applications
 
 ## What is Legend
 Legend builds and publishes Grafana dashboards for your services with prefilled metrics and alerts for your services. 
