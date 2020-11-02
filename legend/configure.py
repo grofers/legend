@@ -42,30 +42,21 @@ def install_grafonnet_lib():
 def load_legend_config(config_file=None):
     config = configparser.SafeConfigParser()
 
-    # Load config from provided input file
+    # Read config from provided input file
     legend_config = {}
     if config_file is not None:
-        configuration = config.read(config_file)
-        legend_config.update(grafana_api_key=config.get("grafana", "api_key"))
-        legend_config.update(grafana_host=config.get("grafana", "host"))
-        legend_config.update(grafana_protocol=config.get("grafana", "protocol"))
+        config.read(config_file)
 
-    # Load config from LEGEND_HOME
+    # Read config from LEGEND_HOME
     elif os.path.exists(os.path.join(LEGEND_HOME, LEGEND_DEFAULT_CONFIG)):
-        configuration = config.read(os.path.join(LEGEND_HOME, LEGEND_DEFAULT_CONFIG))
-        legend_config.update(grafana_api_key=config.get("grafana", "api_key"))
-        legend_config.update(grafana_host=config.get("grafana", "host"))
-        legend_config.update(grafana_protocol=config.get("grafana", "protocol"))
+        config.read(os.path.join(LEGEND_HOME, LEGEND_DEFAULT_CONFIG))
 
-    # Override with environment variables if any
-    if os.environ.get("GRAFANA_API_KEY") is not None:
-        legend_config.update(grafana_api_key=os.environ["GRAFANA_API_KEY"])
-    if os.environ.get("GRAFANA_HOST") is not None:
-        legend_config.update(grafana_host=os.environ["GRAFANA_HOST"])
-    if os.environ.get("GRAFANA_PROTOCOL") is not None:
-        legend_config.update(grafana_protocol=os.environ["GRAFANA_PROTOCOL"])
+    # Load the config. If any of the config value is present in env variables then, load from there instead
+    legend_config.update(grafana_api_key=os.environ.get("GRAFANA_API_KEY", config.get("grafana", "api_key", fallback=None)))
+    legend_config.update(grafana_host=os.environ.get("GRAFANA_HOST", config.get("grafana", "host", fallback=None)))
+    legend_config.update(grafana_protocol=os.environ.get("GRAFANA_PROTOCOL", config.get("grafana", "protocol", fallback=None)))
 
     if None not in legend_config.values():
         return legend_config
-    else:
-        raise Exception("Incomplete legend config, please update the legend config file or set env values")
+        
+    raise Exception("Incomplete legend config, please update the legend config file or set env values")
