@@ -148,12 +148,9 @@ def generate_jsonnet(input_spec, legend_config):
 
                         panel["alertrender"] = alertrender
 
-        if values.get("hide") is not None:
-            if len(templates) > 0:
-                templates[0]["hide"] = values.get("hide", None)
-        if values.get("panels_in_row") is not None:
-            if len(templates) > 0:
-                templates[0]["panels_in_row"] = values.get("panels_in_row", None)
+        for key in ["hide", "panels_in_row"]:
+            if values.get(key) is not None and len(templates) > 0:
+                templates[0][key] = values.get(key, None)
         values["metric"] = templates
 
     input_spec["component_desc"] = component_description

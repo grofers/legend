@@ -51,7 +51,6 @@ def jinja2_to_render(directory, filename, data):
 
 
 def assemble_panels(panels_dict):
-
     assembled_panels = ""
 
     n = 1
@@ -69,7 +68,6 @@ def assemble_panels(panels_dict):
 
 
 def assemble_panels_dynamic(input_dashboard):
-
     assembled_panels = ""
 
     ri = 0
@@ -96,9 +94,7 @@ def assemble_panels_dynamic(input_dashboard):
                 for rpi in range(pi, row_end):
                     assembled_panels += "R_" + str(ri) + "_" + str(metric_idx + 1) + "_P_" + str(rpi + 1) + " { gridPos: { h: 8, w: " + str(width) + ", x: " + str(width * p) + ", y: " + str(r) + " }, }, \n"
                     p += 1
-                    pi = rpi
-                    if rpi + 1 == row_end:
-                        pi = rpi + 1
+                    pi = rpi + int(rpi+1==row_end)
                 if pi >= len(metric.get("panels")):
                     break
 
@@ -131,13 +127,12 @@ def parse_condition_query(condition_queries, targets):
     ref_id_index = 64
     for t, _ in enumerate(targets):
         ref_id_index += 1
-        if ref_id_index == ord("Z"):
-            ref_id_index = ord("A")
+        ref_id_index = ord("A") if ref_id_index==ord("Z") else ref_id_index
         for condition_query in condition_queries:
             parts = condition_query.split(",")
             if len(parts) != 7:
                 raise Exception("Condition query parameters not complete")
-            if not int(parts[2]) == targets[t].get("ref_no"):
+            if int(parts[2]) != targets[t].get("ref_no"):
                 continue
             ref_id = ref_id_index
             op = parts[0]
