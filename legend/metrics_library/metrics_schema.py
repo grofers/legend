@@ -223,6 +223,19 @@ django_schema = {
     },
 }
 
+flask_schema = {
+    "data_source": {"type": "string", "required": False},
+    "dimensions": {
+        "type": "list",
+        "schema": {
+            "type": "dict",
+            "schema": {
+                "job": {"type": "string", "required": True},
+            },
+        },
+    },
+}
+
 playframework_schema = {
     "data_source": {"type": "string", "required": False},
     "dimensions": {

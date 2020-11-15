@@ -12,6 +12,7 @@ from .metrics_schema import (
     elb_schema,
     alb_schema,
     django_schema,
+    flask_schema,
     couchdb_schema,
     consul_schema,
     vault_schema,
@@ -236,6 +237,11 @@ schema = {
             "django": {
                 "type": "dict",
                 "schema": md(default_panels_schema, django_schema),
+                "required": False,
+            },
+            "flask": {
+                "type": "dict",
+                "schema": md(default_panels_schema, flask_schema),
                 "required": False,
             },
             "elb": {
