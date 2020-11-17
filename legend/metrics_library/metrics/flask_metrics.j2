@@ -1,0 +1,127 @@
+component: flask
+data_source_type: Prometheus
+metrics_source: https://github.com/rycus86/prometheus_flask_exporter#default-metrics
+reference: https://flask.palletsprojects.com/en/1.1.x/
+description: Flask is a lightweight WSGI web application framework
+panels:
+  - title: (R) Rate of requests (qps) - aggregated over all methods
+    type: Graph
+    description: qps
+    targets:
+    {% for dimension in data %}
+      - metric: sum(rate(flask_http_request_total{job=~"{{ dimension.job }}"}[5m]))
+        legend: Aggregate
+      - metric: sum(rate(flask_http_request_total{job=~"{{ dimension.job }}"}[5m])) by (instance)
+        legend: '{{ '{{instance}}' }}'
+    {% endfor %}
+
+  - title: (R) Rate of requests per API
+    type: Graph
+    description: qps per API
+    targets:
+    {% for dimension in data %}
+    - metric: sum(rate(flask_http_request_total{job=~"{{ dimension.job }}"}[5m])) by (endpoint,method)
+      legend: '{{ '{{method}} - {{endpoint}}' }}'
+    {% endfor %}
+
+  - title: (E) Error rate - aggregated over all methods (4xx)
+    type: Graph
+    description: 4xx Error rate at service level. Client side errors
+    targets:
+    {% for dimension in data %}
+      - metric: sum(rate(flask_http_request_total{job=~"{{ dimension.job }}", status =~ "4.."}[5m]))
+        legend: Aggregate
+      - metric: sum(rate(flask_http_request_total{job=~"{{ dimension.job }}", status =~ "4.."}[5m])) by (instance)
+        legend: '{{ '{{instance}}' }}'
+    {% endfor %}
+
+  - title: (E) Error rate - per API (4xx)
+    type: Graph
+    description: error per API. Client side errors
+    targets:
+    {% for dimension in data %}
+    - metric: sum(rate(flask_http_request_total{job=~"{{ dimension.job }}", status =~ "4.."}[5m])) by (endpoint,method)
+      legend: '{{ '{{method}} - {{endpoint}}' }}'
+    {% endfor %}
+
+  - title: (E) Error rate - aggregated over all methods (5xx)
+    type: Graph
+    description: 5xx Error rate at service level. Server side errors
+    targets:
+    {% for dimension in data %}
+      - metric: sum(rate(flask_http_request_total{job=~"{{ dimension.job }}",status =~ "5.."}[5m]))
+        legend: Aggregate
+        ref_no: 1
+      - metric: sum(rate(flask_http_request_total{job=~"{{ dimension.job }}", status =~ "5.."}[5m])) by (instance)
+        legend: '{{ '{{instance}}' }}'
+        ref_no: 2
+    {% endfor %}
+    alert_config:
+      priority: P3
+      message: 'High error rate (5xx)'
+      rule:
+        for_duration: 5m
+        evaluate_every: 1m
+      condition_query:
+      - OR,avg,1,now,5m,gt,20
+      - OR,avg,2,now,5m,gt,30
+
+
+  - title: (E) Error rate - per API (5xx)
+    type: Graph
+    description: error per API. Server side errors
+    targets:
+    {% for dimension in data %}
+    - metric: sum(rate(flask_http_request_total{job=~"{{ dimension.job }}", status =~ "5.."}[5m])) by (endpoint,method)
+      legend: '{{ '{{method}} - {{endpoint}}' }}'
+      ref_no: 1
+    {% endfor %}
+    alert_config:
+      priority: P3
+      message: 'High error rate - per API (5xx)'
+      rule:
+        for_duration: 5m
+        evaluate_every: 1m
+      condition_query:
+      - OR,avg,1,now,5m,gt,20
+
+  - title: (D) Latency over all methods (99th percentile)
+    type: Graph
+    description: overall latency
+    formatY1: s
+    targets:
+    {% for dimension in data %}
+      - metric: histogram_quantile(0.99, sum(rate(flask_http_request_duration_seconds_bucket{job=~"{{ dimension.job }}"}[5m])) by (le))
+        legend: Aggregate
+        ref_no: 1
+      - metric: histogram_quantile(0.99, sum(rate(flask_http_request_duration_seconds_bucket{job=~"{{ dimension.job }}"}[5m])) by (instance,le))
+        legend: '{{ '{{instance}}' }}'
+        ref_no: 2
+    {% endfor %}
+    alert_config:
+      priority: P3
+      message: 'High latency'
+      rule:
+        for_duration: 5m
+        evaluate_every: 1m
+      condition_query:
+      - OR,avg,1,now,5m,gt,20
+      - OR,avg,2,now,5m,gt,25
+
+  - title: (D) Latency per API (99th percentile)
+    type: Graph
+    description: API level latency
+    targets:
+    {% for dimension in data %}
+      - metric: histogram_quantile(0.99, sum(rate(flask_http_request_duration_seconds_bucket{job=~"{{ dimension.job }}"}[5m])) by (endpoint,method,le))
+        legend: '{{ '{{method}} - {{endpoint}}' }}'
+        ref_no: 1
+    {% endfor %}
+    alert_config:
+      priority: P3
+      message: 'High latency - per API'
+      rule:
+        for_duration: 5m
+        evaluate_every: 1m
+      condition_query:
+      - OR,avg,1,now,5m,gt,20
