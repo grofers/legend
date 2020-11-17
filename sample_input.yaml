@@ -30,6 +30,9 @@ components:
   django:
     dimensions:
       - job: sample-django-service
+  flask:
+    dimensions:
+      - job: sample-flask-service
   nodejs:
     dimensions:
       - job: sample-nodejs-service

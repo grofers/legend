@@ -29,6 +29,7 @@ Say you got an EC2 to monitor, an S3 to monitor, a Kubernetes cronjob to monitor
   * Consul
   * CouchDB
   * Django
+  * Flask
   * Amazon ELB
   * Go
   * HAProxy
