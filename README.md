@@ -2,6 +2,12 @@
 
 > The legendary tool which builds and manages grafana dashboards for your applications
 
+[![License](https://img.shields.io/badge/License-GPLv3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0) [![Release](https://img.shields.io/github/v/tag/grofers/legend)](https://github.com/grofers/legend/releases/tag/v0.1) [![Artifact HUB](https://img.shields.io/endpoint?url=https://artifacthub.io/badge/repository/legend)](https://artifacthub.io/packages/search?repo=legend)
+
+
+[![Grofers Engineering](https://img.shields.io/badge/Grofers-Engineering-orange)](https://lambda.grofers.com/)
+
+
 ## What is Legend
 Legend builds and publishes Grafana dashboards for your services with prefilled metrics and alerts for your services. 
 
@@ -75,20 +81,30 @@ This section describes on how to get started with using Legend.
 
 You can use `legend` in one of the two ways:
 
-* [Use legend from kubernetes (CRD)](#use-legend-from-kubernetes-(crd))
+* [Use legend in kubernetes](#use-legend-in-kubernetes)
 * [Legend CLI](#legend-cli)
+
+**The recommended way to use Legend is to deploy it in Kubernetes**
 
 You need to create an input file describing the components of your service [writing-input-file](docs/writing-input-file.md)
 
-#### Use legend from kubernetes (CRD)
+#### Use legend in kubernetes
 
-Legend can be installed as a CRD with which you can create/delete dashboards by running it over kubernetes.
+Legend installs as a CRD in Kubernetes
+
+**Required kubernetes >= 1.16**
 
 *Installation*
+Quick instructions
+Legend is installed via [helm](https://helm.sh/):
 
-Please install the legend's CRD via helm as per the instructions provided [here](./charts/legend/Readme.md)
+* Add the helm repo: `helm repo add legend https://grofers.github.io/legend`
+* Configure Legend, make a local copy of [values.yaml](charts/legend/values.yaml) and edit the values as necessary
+* Deploy the chart: `helm install legend legend/legend -f values.yaml`
 
-*Configuration*
+Legend Helm Chart is hosted [here](https://artifacthub.io/packages/helm/legend/legend)
+
+*Usage*
 
 To use legend via its CRD (Current version: v1beta1), create a spec file in the following format:
 
@@ -103,21 +119,10 @@ spec:
   apiVersion: grofers.io/v1beta1
   kind: GrafanaDashboard
   grafana_dashboard_spec: # The core spec/configuration on the basis of which legend will build the dashboards
-    title: SampleTitle # Title of the dashboard
-    service: SampleService # Name of the service for which dashboard is being built
-    grafana_folder: SampleFolder # Name of the folder on Grafana where you want to store this dashboard
-    description: Sample Description # Description about this dashboard
-    references: # Any references which you would like to your dashboard. For example, documentation, link to the project, etc.
-      sample_documentation: www.sample_link.com
-    tags: # Tags with which you want to tag your dashboards.
-      - sample_tag_1
-      - sample_tag_2
-    components: # Configuration about the components which you want to be plotted.
-      playframework:
-        dimensions:
-          - service: sample-play-service
+    #Dashboard Spec
 ```
-*[Format of the fields to be entered under the above spec fields](./sample_input.yaml)
+
+Format for [spec.grafana_dashboard_spec](./sample_input.yaml)
 
 To create/update/delete the dashboard, run:
 
@@ -126,7 +131,7 @@ kubectl apply -f <input-file.yaml>
 kubectl delete -f <input-file.yaml>
 ```
 
-#### Use Legend CLI
+#### Use Legend CLI 
 
 Legend can also be installed as a CLI and used to create dashboards.
 > At the current stage, Legend can only create dashboards but not delete them becuase it does not
