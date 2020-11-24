@@ -6,6 +6,7 @@ home: https://github.com/grofers/legend
 type: application
 version: 0.1.1
 appVersion: 0.1.0
+kubeVersion: ">=1.16.0-0"
 
 keywords:
   - grafana
