@@ -4,12 +4,11 @@
 
 [![License](https://img.shields.io/badge/License-GPLv3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0) [![Release](https://img.shields.io/github/v/tag/grofers/legend)](https://github.com/grofers/legend/releases/tag/v0.1) [![Artifact HUB](https://img.shields.io/endpoint?url=https://artifacthub.io/badge/repository/legend)](https://artifacthub.io/packages/search?repo=legend)
 
-
 [![Grofers Engineering](https://img.shields.io/badge/Grofers-Engineering-orange)](https://lambda.grofers.com/)
 
-
 ## What is Legend
-Legend builds and publishes Grafana dashboards for your services with prefilled metrics and alerts for your services. 
+
+Legend builds and publishes Grafana dashboards for your services with prefilled metrics and alerts for your services.
 
 Say you got an EC2 to monitor, an S3 to monitor, a Kubernetes cronjob to monitor (or one of many other things); legend has got your back. It will do all the menial work of setting up grafana dashboards for you without you needing to setup grafana dashboards manually or write cloudwatch/prometheus/influxdb queries by hand.
 
@@ -126,12 +125,12 @@ Format for [spec.grafana_dashboard_spec](./sample_input.yaml)
 
 To create/update/delete the dashboard, run:
 
-```shell
+```python
 kubectl apply -f <input-file.yaml>
 kubectl delete -f <input-file.yaml>
 ```
 
-#### Use Legend CLI 
+#### Use Legend CLI
 
 Legend can also be installed as a CLI and used to create dashboards.
 > At the current stage, Legend can only create dashboards but not delete them becuase it does not
