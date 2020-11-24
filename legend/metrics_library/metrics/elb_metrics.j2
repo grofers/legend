@@ -14,6 +14,7 @@ panels:
         namespace: AWS/ELB
         statistic: Maximum
         alias: '{{ '{{LoadBalancerName}}_{{metric}}_{{stat}}' }}'
+        ref_no: 2
       - dimensions: {"LoadBalancerName": {{ dimension.load_balancer_name }} }
         metric: UnHealthyHostCount
         namespace: AWS/ELB
@@ -28,7 +29,7 @@ panels:
         for_duration: 15m
         evaluate_every: 1m
       condition_query:
-      - OR,avg,1,now,20m,gt,0
+      - OR,avg,1,now,20m,gt,0.9
 
   - title: (S) Pending Requests Count
     type: Graph
