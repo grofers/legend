@@ -3,7 +3,26 @@ entries:
   legend:
   - apiVersion: v2
     appVersion: 0.1.0
-    created: "2020-10-27T12:04:25.734657+05:30"
+    created: "2020-11-24T13:58:48.907769+05:30"
+    description: Grafana Dashboard Generator
+    digest: e2d5606c444662e356f634ff34f3dce98a5def14813efdc4368d0ea1b7921289
+    home: https://github.com/grofers/legend
+    keywords:
+    - grafana
+    - monitoring
+    - legend
+    kubeVersion: '>=1.16.0-0'
+    maintainers:
+    - email: tech@grofers.com
+      name: grofers
+    name: legend
+    type: application
+    urls:
+    - https://grofers.github.io/legend/legend-0.1.2.tgz
+    version: 0.1.2
+  - apiVersion: v2
+    appVersion: 0.1.0
+    created: "2020-11-24T13:58:48.905897+05:30"
     description: Grafana Dashboard Generator
     digest: 68c01930577a723f94c4509aceb91dbd9dd95ee4d16a56058b818df0f977b1d5
     home: https://github.com/grofers/legend
@@ -21,7 +40,7 @@ entries:
     version: 0.1.0
   - apiVersion: v2
     appVersion: 0.0.5
-    created: "2020-10-27T12:04:25.73413+05:30"
+    created: "2020-11-24T13:58:48.904285+05:30"
     description: Grafana Dashboard Generator
     digest: 541364735cacf98494b45fa5e9c1fa15e26deb6e78b9f5a9e7ae89fdd787e024
     home: https://github.com/grofers/legend
@@ -37,4 +56,4 @@ entries:
     urls:
     - https://grofers.github.io/legend/legend-0.0.5.tgz
     version: 0.0.5
-generated: "2020-10-27T12:04:25.733402+05:30"
+generated: "2020-11-24T13:58:48.902707+05:30"
