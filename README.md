@@ -125,7 +125,7 @@ Format for [spec.grafana_dashboard_spec](./sample_input.yaml)
 
 To create/update/delete the dashboard, run:
 
-```python
+```shell
 kubectl apply -f <input-file.yaml>
 kubectl delete -f <input-file.yaml>
 ```
