@@ -23,6 +23,11 @@ from .helpers.utilities import (
     mkdir,
 )
 
+from .kubernetes_library.adapter import (
+    kubernetes_library_eval,
+    kubernetes_library_component_exists,
+)
+
 from . import (
     LEGEND_HOME,
     GRAFONNET_REPO_NAME,
@@ -34,6 +39,17 @@ make_abs_path = lambda d: os.path.join(os.path.dirname(os.path.abspath(__file__)
 
 global LEGEND_HOME
 global GRAFONNET_REPO_NAME
+
+
+def process_kubernetes_integrations(input_spec):
+    for component, values in input_spec["components"].items():
+        if kubernetes_library_component_exists(component.lower()) == True:
+            template_str = jinja2_to_render(
+                make_abs_path("kubernetes_library/templates"),
+                "{}_template.j2".format(component.lower()),
+                data=values.get("dimensions", []),
+            )
+            kubernetes_library_eval(component.lower(), template_str)
 
 
 def generate_jsonnet(input_spec, legend_config):

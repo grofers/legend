@@ -6,6 +6,7 @@ import json
 import click
 
 from .legend import (
+    process_kubernetes_integrations,
     generate_jsonnet,
     generate_dashboard_from_jsonnet,
     create_or_update_grafana_dashboard,
@@ -51,6 +52,7 @@ def build(input_file, config_file, silent, output_file):
     check_if_file_exists(input_file)
     legend_config = load_legend_config(config_file=config_file)
     input_spec = input_yaml_to_json(schema, input_file)
+    process_kubernetes_integrations(input_spec)
     jsonnet_file = generate_jsonnet(input_spec, legend_config)
     dashboard_json = generate_dashboard_from_jsonnet(jsonnet_file)
     if not silent:
