@@ -5,7 +5,13 @@ import kopf
 
 from urllib.parse import urljoin
 
-from legend.legend import delete_dashboard, generate_jsonnet, generate_dashboard_from_jsonnet, create_or_update_grafana_dashboard
+from legend.legend import (
+    delete_dashboard,
+    generate_jsonnet,
+    generate_dashboard_from_jsonnet,
+    create_or_update_grafana_dashboard,
+    process_kubernetes_integrations,
+)
 
 from legend.helpers.validations import validate_input
 
@@ -36,6 +42,7 @@ def create_or_update_handler(spec, name, **kwargs):
 
     validate_input(schema, spec)
     legend_config = load_legend_config()
+    process_kubernetes_integrations(spec)
     jsonnet_file = generate_jsonnet(spec, legend_config)
     dashboard_json = generate_dashboard_from_jsonnet(jsonnet_file)
     dashboard_id = str(spec["grafana_folder"])
