@@ -341,6 +341,23 @@ platform_ec2_schema = {
     },
 }
 
+slo_schema = {
+    "data_source": {"type": "string", "required": False},
+    "dimensions": {
+        "type": "list",
+        "schema": {
+            "type": "dict",
+            "schema": {
+                "name": {"type": "string", "required": True},
+                "availablity": {"type": "string", "required": True},
+                "totalQuery": {"type": "string", "required": True},
+                "errorQuery": {"type": "string", "required": True},
+            },
+        },
+    },
+}
+
+
 s3_schema = {
     "data_source": {"type": "string", "required": False},
     "dimensions": {

@@ -1,0 +1,27 @@
+component: slo
+data_source_type: Prometheus
+metrics_source: built-in (via percona)
+reference: https://github.com/spotahome/service-level-operator
+description: Generates SLO panels with base metrics scraped from server-level-operator
+panels:
+  - title: Service Level Compliance
+    type: Graph
+    description: The availablity % of selected SLO
+    targets:
+    {% for dimension in data %}
+      - metric: (1-(sum(rate(service_level_sli_result_error_ratio_total{slo="{{ dimension.name }}"}[${interval}]))/sum(rate(service_level_sli_result_count_total{slo="{{ dimension.name }}"}[${interval}])))
+        legend: "availability %"
+      - metric: (1-(sum(rate(service_level_sli_result_error_ratio_total{slo="{{ dimension.name }}"}[${interval}] offset 7d))/sum(rate(service_level_sli_result_count_total{service_level="{{ dimension.name }}"}[${interval}] offset 7d)))) * 100
+        legend: availability % - 7d
+    {% endfor %}
+
+  - title: Error Budget Burn Rate
+    type: Graph
+    description: The availablity % of selected SLO
+    targets:
+    {% for dimension in data %}
+      - metric: increase(service_level_sli_result_error_ratio_total{slo="{{ dimension.name }}"}[${interval}])
+        legend: "budget burn rate"
+      - metric: (1 - service_level_slo_objective_ratio{slo="{{ dimension.name }}"}) * increase(service_level_sli_result_count_total{slo="{{ dimension.name }}"}[${interval}])
+        legend: Max Budget
+    {% endfor %}

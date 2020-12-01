@@ -16,6 +16,13 @@ tags:
   - infra
 components:
 
+# SLO component sample input
+  slo:
+    dimensions:
+      - name: "legend-availablity-slo"
+        availablity: "90"
+        totalQuery: "sum(increase(apiserver_request_total[2m]))"
+        errorQuery: "sum(increase(apiserver_request_total[2m]))"
 # Application frameworks
   playframework:
     dimensions:

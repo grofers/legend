@@ -1,29 +1,15 @@
-from kubernetes import client, config, utils
-import yaml
+import sys, os, os.path
 
-def slo_component(body):
-    config.load_kube_config()
-    v1 = client.CustomObjectsApi()
-    v1.create_namespaced_custom_object(
-        group="monitoring.spotahome.com",
-        version="v1alpha1",
-        namespace="monitoring",
-        plural="servicelevels",
-        body=yaml.load(body, Loader=yaml.FullLoader)
-    )
-
-function_mapping = {
-  "slo": slo_component,
-}
-
-def kubernetes_library_eval(function_name, arg):
-    function = function_mapping[function_name]
-    function(arg)
+def kubernetes_library_eval(component_name, arg):
+    BASE_DIR = os.path.dirname(os.path.realpath(__file__))
+    sys.path.append(BASE_DIR)
+    module = __import__(component_name)
+    func = getattr(module, 'run')
+    func(arg)
 
 def kubernetes_library_component_exists(component_name):
-    print("Checking if component is a kubernetes component")
-    print(component_name)
-    if component_name in function_mapping:
+    BASE_DIR = os.path.dirname(os.path.realpath(__file__))
+    if os.path.isfile("{}/{}.py".format(BASE_DIR, component_name)) == True:
         return True
-    print("No component found")
     return False
+
