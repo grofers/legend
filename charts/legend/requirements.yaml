@@ -1,0 +1,4 @@
+dependencies:
+  - name: service-level-operator
+    version: 0.1.0
+    repository: https://charts.cloudposse.com/incubator/
