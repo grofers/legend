@@ -84,3 +84,10 @@ env:
   #   value: "Influxdb"
   # - name: GRAFANA_DEFAULT_LOKI_DATA_SOURCE
   #   value: "Loki"
+kube-proemtheus-stack:
+  enabled: false
+service-level-operator:
+  enabled: false
+tags:
+  service-level-operator: false
+  kube-prometheus-stack: false

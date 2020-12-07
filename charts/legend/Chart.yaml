@@ -13,6 +13,19 @@ keywords:
   - monitoring
   - legend
 
+dependencies:
+  - name: kube-prometheus-stack
+    version: 12.7.0
+    repository: https://prometheus-community.github.io/helm-charts
+    condition: kube-prometheus-stack.enabled
+    tags:
+      - kube-prometheus-stack
+  - name: service-level-operator
+    version: 0.1.0
+    repository: https://charts.cloudposse.com/incubator/
+    condition: service-level-operator.enabled
+    tags:
+      - service-level-operator
 maintainers:
   - name: grofers
     email: tech@grofers.com
