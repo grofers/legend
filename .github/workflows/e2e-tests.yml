@@ -53,20 +53,14 @@ jobs:
           wget https://get.helm.sh/$HELM_VERSION-$HELM_PLATFORM.tar.gz && tar -xvzf $HELM_VERSION-$HELM_PLATFORM.tar.gz && rm -rf $HELM_VERSION-$HELM_PLATFORM.tar.gz && mv $HELM_PLATFORM/helm helm3 && chmod +x helm3
           export PATH=$PATH:$(pwd)
           helm3 init && helm3 repo update
-          export CUR_DIR=$(pwd)
           cd charts/legend
           helm3 repo add cloudposse https://charts.cloudposse.com/incubator/
           helm3 repo add prometheus-community https://prometheus-community.github.io/helm-charts
           helm3 dep update
-          helm3 install --set tag.service-level-operator=true --set tag.kube-prometheus-stack=true --set service-level-operator.enabled=true --set kube-prometheus-stack.enabled=true legend --namespace monitoring .
-          kubectl get deployments -A
-          cd $CUR_DIR
-      - name: Interact with kubernetes
+          helm3 install --set tag.service-level-operator=true --set tag.kube-prometheus-stack=true --set service-level-operator.enabled=true --set kube-prometheus-stack.enabled=true legend --namespace monitoring ./charts/legend
+      - name: Wait for Service-Level Operator to become ready
         run: |
           sleep 50
-          kubectl get pods -A
-          kubectl logs -l app=service-level-operator
-          kubectl get servicelevel
       - uses: actions/setup-python@v2
         with:
           python-version: '3.7'
