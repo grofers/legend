@@ -75,6 +75,6 @@ labelY1:  # The label to put in the Y1 graph panel (sample : bytes/sec , bytes ,
 
 ## Adding metrics for new components
 
-* If you are adding metrics for a new component, please follow the spec as mentioned above and name the Jinja2 file of your metric with the following convention `<component name>_metrics.j2`.
+* If you are adding metrics for a new component, please follow the spec as mentioned above and name the Jinja2 file of your metric with the following convention `<component name>_metrics.j2` and update docs [here](docs/enabling-monitoring.md).
 * The variables and the component spec has to be added in the [metrics_schema](../legend/metrics_library/metrics_schema.py) and import the configuration into the [schema](../legend/metrics_library/schema.py) to ensure proper validation - this will enable input validation.
 * In the [sample_input.yaml](../sample_input.yaml) add the component with basic/sample configuration - this will enable testing and ensure backward compatibility also making adaptability easy.

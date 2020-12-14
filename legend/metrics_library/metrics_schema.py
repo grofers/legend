@@ -40,6 +40,19 @@ pgsql_rds_schema = {
     },
 }
 
+pgbouncer_schema = {
+    "data_source": {"type": "string", "required": False},
+    "dimensions": {
+        "type": "list",
+        "schema": {
+            "type": "dict",
+            "schema": {
+                "job_name": {"type": "string", "required": True},
+            },
+        },
+    },
+}
+
 platform_k8s_deployment_schema = {
     "data_source": {"type": "string", "required": False},
     "dimensions": {
