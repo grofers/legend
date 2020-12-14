@@ -128,7 +128,7 @@ schema = {
             }
         }
     },
-    "service": {"type": "string", "required": True, "empty": False},
+    "service": {"type": "string", "required": False, "empty": False},
     "description": {"type": "string", "required": True, "empty": False},
     "references": {
         "type": "dict",
