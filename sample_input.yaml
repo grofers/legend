@@ -58,6 +58,9 @@ components:
   pgsql_rds:
     dimensions:
       - db_instance_identifier: sample-rds-psql
+  pgbouncer:
+    dimensions:
+      - job_name: sample-pgbouncer
   couchdb:
     dimensions:
       - job_name: sample-couch-service

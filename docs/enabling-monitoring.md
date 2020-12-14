@@ -13,6 +13,7 @@
 * [Couchdb](#couchdb)
 * [Nodejs](#nodejs)
 * [Golang](#golang)
+* [PgBouncer](#PgBouncer)
 
 ## Django
 
@@ -286,5 +287,9 @@ const httpRequestDurationInSeconds = new Prometheus.Histogram({
 
 # Golang
 
-Please setup client_golang exporter for you GO application
+Please setup client_golang exporter for your GO application
 Install from: [https://github.com/prometheus/client_golang](https://github.com/prometheus/client_golang)
+
+# PgBouncer
+
+Please setup PgBouncer exporter from [here](https://github.com/spreaker/prometheus-pgbouncer-exporter).

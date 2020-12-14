@@ -44,6 +44,7 @@ Say you got an EC2 to monitor, an S3 to monitor, a Kubernetes cronjob to monitor
   * MySQL - EC2
   * NodeJS
   * PostgreSQL
+  * PgBouncer
   * Phoenix
   * EC2 Platform level metrics
   * Kubernetes CronJob
