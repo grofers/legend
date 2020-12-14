@@ -145,8 +145,14 @@ spec:
       loki:
         dimensions:
           - labels:
-              namespace: sample-namespace
+              namespace: sample-namespace ## mandatory field
+              app: sample-app
+              tier: presentation
           - labels:
-              namespace: sample-namespace-2
+              namespace: sample-namespace-2 ## mandatory field
+              app: sample-app-2
+              tier: data
+              region: sample-region
             filters:
               - "err"
+              - "500"

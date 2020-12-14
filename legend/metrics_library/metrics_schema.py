@@ -439,6 +439,7 @@ loki_schema = {
                 "labels": {
                     "type": "dict",
                     "required": True,
+                    "allow_unknown": True,
                     "schema": {
                         "namespace": {
                             "type": "string",

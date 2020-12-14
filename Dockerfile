@@ -16,11 +16,11 @@ COPY requirements.txt .
 
 RUN sed -i '/jsonnet/d' requirements.txt
 
-RUN pip install --no-cache-dir -r requirements.txt
+RUN pip install --no-cache-dir --ignore-installed -r requirements.txt
 
 COPY kubernetes/requirements.txt .
 
-RUN pip install --no-cache-dir -r requirements.txt
+RUN pip install --no-cache-dir --ignore-installed -r requirements.txt
 
 ADD . /src
 
