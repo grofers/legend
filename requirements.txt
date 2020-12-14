@@ -1,7 +1,7 @@
 Jinja2==2.10.1
 PyYAML==5.3.1
 requests==2.22.0
-pylint==2.4.4
+pylint==2.5.0
 prospector==1.2.0
 grafana-api==1.0.0
 configparser==4.0.2
