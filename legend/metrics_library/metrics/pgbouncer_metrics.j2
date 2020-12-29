@@ -1,0 +1,57 @@
+component: pgbouncer
+data_source_type: Prometheus
+metrics_source: https://github.com/spreaker/prometheus-pgbouncer-exporter
+reference: https://www.pgbouncer.org
+description: PgBouncer is a lightweight connection pooler for PostgreSQL
+
+panels:
+  - title: (U) Active Client Connections
+    type: Graph
+    description: "Client connections that are linked to server connection and can process queries"
+    targets:
+      {% for dimension in data %}
+      - metric: sum(pgbouncer_pools_client_active_connections{job=~\"{{ dimension.job_name }}\"}) by (database, user)
+        legend: Active client connections - {{ '{{database}} - {{user}' }}
+      {% endfor %}
+
+  - title: (S) Waiting Client Connections
+    type: Graph
+    description: "Client connections have sent queries but have not yet got a server connection"
+    targets:
+      {% for dimension in data %}
+      - metric: sum(pgbouncer_pools_client_waiting_connections{job=~\"{{ dimension.job_name }}\"}) by (database, user)
+        ref_no: 1
+        legend: Waiting client connections - {{ '{{database}} - {{user}' }}
+      {% endfor %}
+    alert_config:
+      priority: P3
+      message: 'PgBouncer clients are in waiting state'
+      rule:
+        for_duration: 10m
+        evaluate_every: 1m
+      condition_query:
+        - OR,avg,1,now,10m,gt,0
+
+  - title: (S) Database server connections
+    type: Graph
+    description: "Number of connections to the database & total pool size per database"
+    targets:
+      {% for dimension in data %}
+      - metric: sum(pgbouncer_pools_server_idle_connections{job=~\"{{ dimension.job_name }}\"} + pgbouncer_pools_server_active_connections{job=~\"{{ dimension.job_name }}\"} + pgbouncer_pools_server_testing_connections{job=~\"{{ dimension.job_name }}\"} + pgbouncer_pools_server_used_connections{job=~\"{{ dimension.job_name }}\"} + pgbouncer_pools_server_login_connections{job=~\"{{ dimension.job_name }}\"}) by (database,user)
+        legend: Database server connections - {{ '{{database}}' }}
+      - metric: sum(pgbouncer_databases_database_pool_size{job=~\"{{ dimension.job_name }}\"}) by (database)
+        legend: Database pool size - {{ '{{database}}' }}
+      - metric: sum(pgbouncer_databases_database_reserve_pool_size{job=~\"{{ dimension.job_name }}\"}) by (database)
+        legend: Database reserve pool size - {{ '{{database}}' }}
+      {% endfor %}
+
+  - title: (D) Stats Queries Duration
+    type: Graph
+    description: "Total number of microseconds spent waiting for an available connection or waiting for a server to return a query response"
+    targets:
+      {% for dimension in data %}
+      - metric: sum(rate(pgbouncer_stats_queries_duration_microseconds{job=~\"{{ dimension.job_name }}\"}[1m])) by (database)
+        legend: Queries duration - {{ '{{database}}' }}
+      - metric: sum(rate(pgbouncer_stats_waiting_duration_microseconds{job=~\"{{ dimension.job_name }}\"}[1m])) by (database)
+        legend: Queries waiting duration - {{ '{{database}}' }}
+      {% endfor %}

@@ -73,23 +73,26 @@ Create your dashboard:
 kubectl apply -f test/obj.yaml
 ```
 
-## Building / testing
+## Testing
 
-Legend does not require a seperae build step, you can validate your changes by running 
-the tests. Please note that unlike while running in production, while testing Legend
-actually assumes `/tmp/` to be the home root directory. Hence, it is suggested to use this 
-in the first place to create a config file `/tmp/.legend/legend.cfg`
+You can test legend by running e2e tests in a completely isolated environment.
 
-Run the tests
-
+Prerequisite
 ```shell
-./run_tests.sh
+ * Kind
+ * Python 3 (use pyenv or virtualenv)
+ * Jsonnet
+ * Helm3
+ * Docker
 ```
 
-This will verify two things
+Following script will spawn a new kubernetes cluster using kind and will install relevent dependencies on kubernetes cluster.
+Script will automatically clean relevent kind cluster. 
 
-1. If all the commands of the CLI are working fine (by actually trying to create dashboards)
-2. Verifies if there are any breaking changes with the metrics files and input configurations
+```shell
+chmod +x isolated_legend_e2e_test.sh
+./isolated_legend_e2e_test.sh
+```
 
 ### Deploying / Publishing
 

@@ -3,6 +3,7 @@ from .metrics_schema import (
     airflow_schema,
     mysql_ec2_schema,
     pgsql_rds_schema,
+    pgbouncer_schema,
     mysql_56_rds_schema,
     sqs_schema,
     springboot_schema,
@@ -129,7 +130,7 @@ schema = {
             }
         }
     },
-    "service": {"type": "string", "required": True, "empty": False},
+    "service": {"type": "string", "required": False, "empty": False},
     "description": {"type": "string", "required": True, "empty": False},
     "references": {
         "type": "dict",
@@ -298,6 +299,11 @@ schema = {
             "pgsql_rds": {
                 "type": "dict",
                 "schema": md(default_panels_schema, pgsql_rds_schema),
+                "required": False,
+            },
+            "pgbouncer": {
+                "type": "dict",
+                "schema": md(default_panels_schema, pgbouncer_schema),
                 "required": False,
             },
             "playframework": {

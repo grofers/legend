@@ -40,6 +40,19 @@ pgsql_rds_schema = {
     },
 }
 
+pgbouncer_schema = {
+    "data_source": {"type": "string", "required": False},
+    "dimensions": {
+        "type": "list",
+        "schema": {
+            "type": "dict",
+            "schema": {
+                "job_name": {"type": "string", "required": True},
+            },
+        },
+    },
+}
+
 platform_k8s_deployment_schema = {
     "data_source": {"type": "string", "required": False},
     "dimensions": {
@@ -456,6 +469,7 @@ loki_schema = {
                 "labels": {
                     "type": "dict",
                     "required": True,
+                    "allow_unknown": True,
                     "schema": {
                         "namespace": {
                             "type": "string",
