@@ -23,6 +23,7 @@ from .metrics_schema import (
     platform_k8s_ingress_schema,
     redis_schema,
     platform_ec2_schema,
+    slo_schema,
     s3_schema,
     playframework_schema,
     starlette_schema,
@@ -213,6 +214,11 @@ schema = {
             "platform_ec2": {
                 "type": "dict",
                 "schema": md(default_panels_schema, platform_ec2_schema),
+                "required": False,
+            },
+            "slo": {
+                "type": "dict",
+                "schema": md(default_panels_schema, slo_schema),
                 "required": False,
             },
             "s3": {

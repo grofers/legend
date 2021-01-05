@@ -1,0 +1,22 @@
+{% for dimension in data %}
+---
+apiVersion: monitoring.spotahome.com/v1alpha1
+kind: ServiceLevel
+metadata:
+  name: {{ dimension.name }}
+spec:
+  serviceLevelObjectives:
+    - name: "{{ dimension.name }}"
+      description: "Legend Generate SLO component {{ dimension.name }}"
+      disable: false
+      availabilityObjectivePercent: {{ dimension.availablity }}
+      serviceLevelIndicator:
+        prometheus:
+          address: http://thanos-query-service:9090
+          totalQuery: {{ dimension.totalQuery }}
+          errorQuery: {{ dimension.errorQuery }}
+      output:
+        prometheus:
+          labels:
+            legend-slo: true
+{% endfor %}

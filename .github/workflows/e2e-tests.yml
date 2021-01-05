@@ -12,6 +12,19 @@ jobs:
   test-e2e:
     runs-on: ubuntu-latest
 
+    services:
+      grafana:
+        image: grafana/grafana:7.1.5
+        options: -v ${{ github.workspace }}/tests_config:/etc/grafana/provisioning --name grafana
+        ports:
+          - 3000:3000
+        env:
+          GF_AUTH_ANONYMOUS_ENABLED: true
+          GF_AUTH_ANONYMOUS_ORG_ROLE: Admin
+          GF_AUTH_ORG_NAME: Main Org.
+            #volumes:
+            #- /home/runner/work/legend/legend/tests_config:/etc/grafana/provisioning
+
     steps:
       - uses: actions/checkout@v2
         # - name: Black lint test
@@ -19,18 +32,52 @@ jobs:
         #   with:
         #     line-length: '250'
         #     path: '.'
-
+        #
+      - name: Restart grafana
+        uses: docker://docker
+        with:
+          args: docker restart grafana
       - name: Yamllint tests
         uses: karancode/yamllint-github-action@master
         with:
           yamllint_config_filepath: './yamllint.config.yaml'
           yamllint_file_or_dir: 'sample_input.yaml ./kubernetes/ ./tests_config/'
-
+      - name: Setup Minikube
+        env:
+          ACTIONS_ALLOW_UNSECURE_COMMANDS: true
+        uses: hiberbee/github-action-minikube@latest
+      - name: Install helm3
+        run: |
+          kubectl create namespace monitoring
+          export HELM_PLATFORM=linux-amd64 && export HELM_VERSION=helm-v3.4.1
+          wget https://get.helm.sh/$HELM_VERSION-$HELM_PLATFORM.tar.gz && tar -xvzf $HELM_VERSION-$HELM_PLATFORM.tar.gz && rm -rf $HELM_VERSION-$HELM_PLATFORM.tar.gz && mv $HELM_PLATFORM/helm helm3 && chmod +x helm3
+          export PATH=$PATH:$(pwd)
+          helm3 init && helm3 repo update
+          cd charts/legend
+          helm3 repo add cloudposse https://charts.cloudposse.com/incubator/
+          helm3 repo add prometheus-community https://prometheus-community.github.io/helm-charts
+          helm3 dep update
+          helm3 install --set tag.service-level-operator=true --set tag.kube-prometheus-stack=true --set service-level-operator.enabled=true --set kube-prometheus-stack.enabled=true legend --namespace monitoring .
+      - name: Wait for Service-Level Operator to become ready
+        run: |
+          sleep 50
+      - uses: actions/setup-python@v2
+        with:
+          python-version: '3.7'
+          architecture: 'x64'
+      - name: Setup dependencies
+        run: pip install -r requirements.txt && pip install -r ./kubernetes/requirements.txt && pip install jsonnet && pip install .
+      - name: Install jsonnet
+        run: |
+          wget --no-check-certificate --content-disposition  https://github.com/google/jsonnet/releases/download/v0.16.0/jsonnet-bin-v0.16.0-linux.tar.gz
+          tar -xvf jsonnet-bin-v0.16.0-linux.tar.gz
+      - name: Python Build
+        run: python setup.py build
       - name: Run tests
         run: |
-          if [ -f docker-compose.test.yml ]; then
-            docker-compose --file docker-compose.test.yml build
-            docker-compose --file docker-compose.test.yml run sut
-          else
-            docker build . --file Dockerfile
-          fi
+          export PATH=$PATH:$(pwd)
+          ./run_tests.sh
+        env:
+          GRAFANA_HOST: 0.0.0.0:3000
+          GRAFANA_PROTOCOL: http
+

@@ -23,6 +23,11 @@ from .helpers.utilities import (
     mkdir,
 )
 
+from .kubernetes_library.adapter import (
+    kubernetes_library_eval,
+    kubernetes_library_component_exists,
+)
+
 from . import (
     LEGEND_HOME,
     GRAFONNET_REPO_NAME,
@@ -34,7 +39,6 @@ make_abs_path = lambda d: os.path.join(os.path.dirname(os.path.abspath(__file__)
 
 global LEGEND_HOME
 global GRAFONNET_REPO_NAME
-
 
 def generate_jsonnet(input_spec, legend_config):
     grafana_api_key = legend_config["grafana_api_key"]
@@ -55,6 +59,14 @@ def generate_jsonnet(input_spec, legend_config):
             alert_rule_tags = input_spec["alert_config"].get("tags")
 
     for component, values in input_spec["components"].items():
+
+        if kubernetes_library_component_exists(component.lower()) == True:
+            template_str = jinja2_to_render(
+                make_abs_path("kubernetes_library/templates"),
+                "{}_template.j2".format(component.lower()),
+                data=values.get("dimensions", []),
+            )
+            kubernetes_library_eval(component.lower(), template_str)
 
         template_str = jinja2_to_render(
             make_abs_path("metrics_library/metrics"),

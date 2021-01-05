@@ -1,0 +1,9 @@
+chart-repos:
+  - cloudposse=https://charts.cloudposse.com/incubator/
+  - prometheus-community=https://prometheus-community.github.io/helm-charts
+    #helm-extra-args: >-
+    #--set tags.kube-prometheus-stack=false
+    #--set kube-prometheus-stack.enabled=false
+    #--set global.kube-proemtheus-stack.enabled=false
+    #--set tags.service-level-operator=false
+    #--set service-level-operator.enabled=false

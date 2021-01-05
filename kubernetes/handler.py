@@ -5,7 +5,12 @@ import kopf
 
 from urllib.parse import urljoin
 
-from legend.legend import delete_dashboard, generate_jsonnet, generate_dashboard_from_jsonnet, create_or_update_grafana_dashboard
+from legend.legend import (
+    delete_dashboard,
+    generate_jsonnet,
+    generate_dashboard_from_jsonnet,
+    create_or_update_grafana_dashboard,
+)
 
 from legend.helpers.validations import validate_input
 

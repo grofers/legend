@@ -202,14 +202,7 @@ You can contribute to legend in two ways:
 * This is one of the biggest offerings of Legend - pre configured metrics for a wide variety of
 components.
 * If you are contibuting to the existing metrics or writing new ones please follow the giude [contributing-to-metric-library](docs/contributing-to-metric-library.md)
-* Run tests locally using `tests.sh` (you'll need to setup local config file)
-* Run tests for crd using pytest (you'll need to setup minikube to talk to handler)
-
-```shell
-minikube start
-kubectl proxy
-pytest  (In parallel to minikube)
-```
+* To Run e2e tests locally follow the guide [testing on legend](docs/developing-on-legend.md#testing).
 
 * Raise a PR
 
