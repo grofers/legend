@@ -42,10 +42,13 @@ panels:
       {% for dimension in data %}
       - metric: rabbitmq_queue_messages{queue=~"{{ dimension.queue_name }}",job =~"{{dimension.job}}"}
         legend: '{{ '{{queue}}' 'Queue_depth' }}'
+        ref_no: 1
       - metric: rabbitmq_queue_messages_ready{queue=~"{{ dimension.queue_name }}",job =~"{{dimension.job}}"}
         legend: '{{ '{{queue}}' 'Ready_messages' }}'
+        ref_no: 2
       - metric: rabbitmq_queue_messages_unacknowledged{queue=~"{{ dimension.queue_name }}",job =~"{{dimension.job}}"}
         legend: '{{ '{{queue}}' 'Unacknowledged_messages' }}'
+        ref_no: 3
       {% endfor %}
 
   - title: (R) Rate of messages published
