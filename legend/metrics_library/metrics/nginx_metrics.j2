@@ -1,0 +1,101 @@
+component: nginx
+data_source_type: Prometheus
+metrics_source: https://github.com/martin-helmich/prometheus-nginxlog-exporter
+reference: https://blog.ruanbekker.com/blog/2020/04/25/nginx-metrics-on-prometheus-with-the-nginx-log-exporter
+description: Prometheus-nginxlog-exporter constructs a bunch of metrics on the basis of the contents of the nginx access log file. All the metrics are prepended by "<nginx namespace>_". For example, for the provided nginx namespace "myns", myns_http_response_count_total metric will give the total count of HTTP requests processed for the "myns" namespace.
+panels:
+  - title: (R) Average response time latency
+    type: Graph
+    description: Average response time latency of all the http requests over the last 5 minutes.
+    formatY1: s
+    targets:
+    {% for dimension in data %}
+      - metric: sum(rate(sum({{dimension.nginx_namespace}}_http_response_time_seconds[5m]))) by (instance) / sum(rate(count({{dimension.nginx_namespace}}_http_response_time_seconds[5m]))) by (instance)
+        legend: 'Namespace: {{'{{namespace}}'}} Instance: {{'{{instance}}'}}'
+    {% endfor %}
+
+  - title: (R) Rate of requests
+    type: Graph
+    description: Per-second rate of incoming requests as per last 1 minute.
+    targets:
+    {% for dimension in data %}
+      - metric: sum(rate(count({{dimension.nginx_namespace}}_http_response_time_seconds[1m]))) by (instance)
+        legend: 'Namespace: {{'{{namespace}}'}} Instance: {{'{{instance}}'}}'
+    {% endfor %}
+
+  - title: (D) GET Response time latency (95th percentile)
+    type: Graph
+    description: p95 Response time latency of all the 2xx GET responses
+    formatY1: s
+    targets:
+    {% for dimension in data %}
+      - metric: {{dimension.nginx_namespace}}_http_response_time_seconds{quantile="0.95",method="GET",status=~"2[0-9]*"}
+        legend: 'Namespace: {{'{{namespace}}'}} Status: All 2xx'
+        statistic: p95
+        ref_no: 1
+      - metric: sum({{dimension.nginx_namespace}}_http_response_time_seconds{quantile="0.95",method="GET",status=~"2[0-9]*"}) by (status)
+        legend: 'Namespace: {{'{{namespace}}'}} Status: {{status}}'
+        statistic: p95
+    {% endfor %}
+    alert_config:
+      priority: P3
+      message: 'Spike in p95 GET Response time latency'
+      rule:
+        for_duration: 5m
+        evaluate_every: 1m
+      condition_query:
+      - OR,avg,1,now,5m,gt,0.15
+
+  - title: (R) HTTP Traffic Content
+    type: Graph
+    description: Per-second rate of content transferred (bytes) over the last 5 minutes.
+    targets:
+    {% for dimension in data %}
+      - metric: sum(rate({{dimension.nginx_namespace}}_http_response_size_bytes[5m])) by (instance)
+        legend: 'Namespace: {{'{{namespace}}'}} Instance: {{'{{instance}}'}}'
+    {% endfor %}
+
+  - title: (R) Rate of successful responses (2xx)
+    type: Graph
+    description: Per-second rate of successful (2xx) responses segregated by status codes over the last 1 minute.  
+    targets:
+    {% for dimension in data %}
+      - metric: sum(rate({{dimension.nginx_namespace}}_http_response_count_total{status=~"2[0-9]*"}[1m])) by (status)
+        legend: 'Namespace: {{'{{namespace}}'}} Status: {{status}}'
+    {% endfor %}
+
+  - title: (E) Server-side error rate (5xx)
+    type: Graph
+    description: Per-second rate of unsuccessful server-side error responses (5xx) segregated by status codes over the last 1 minute.  
+    targets:
+    {% for dimension in data %}
+      - metric: sum(rate({{dimension.nginx_namespace}}_http_response_count_total{status=~"5[0-9]*"}[1m])) by (status)
+        legend: 'Namespace: {{'{{namespace}}'}} Status: {{status}}'
+    {% endfor %}
+        ref_no: 1
+    alert_config:
+      priority: P3
+      message: 'Spike in server-side error rate (5xx)'
+      rule:
+        for_duration: 5m
+        evaluate_every: 1m
+      condition_query:
+      - OR,avg,1,now,5m,gt,30
+
+  - title: (E) Client-side error rate (4xx)
+    type: Graph
+    description: Per-second rate of unsuccessful client-side error responses (4xx) segregated by status codes over the last 1 minute.  
+    targets:
+    {% for dimension in data %}
+      - metric: sum(rate({{dimension.nginx_namespace}}_http_response_count_total{status=~"4[0-9]*"}[1m])) by (status)
+        legend: 'Namespace: {{'{{namespace}}'}} Status: {{status}}'
+        ref_no: 1
+    {% endfor %}
+    alert_config:
+      priority: P4
+      message: 'Spike in client-side error rate (4xx)'
+      rule:
+        for_duration: 5m
+        evaluate_every: 1m
+      condition_query:
+      - OR,avg,1,now,5m,gt,75

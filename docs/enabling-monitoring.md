@@ -14,7 +14,7 @@
 * [Nodejs](#nodejs)
 * [Golang](#golang)
 * [PgBouncer](#PgBouncer)
-
+* [Nginx](#Nginx)
 ## Django
 
 ### Configure prometheus metrics exporter
@@ -293,3 +293,10 @@ Install from: [https://github.com/prometheus/client_golang](https://github.com/p
 # PgBouncer
 
 Please setup PgBouncer exporter from [here](https://github.com/spreaker/prometheus-pgbouncer-exporter).
+
+# NGINX
+
+* Please setup the Prometheus-NginxLog-Exporter from [here](https://github.com/martin-helmich/prometheus-nginxlog-exporter).
+* Please setup namespacing over your NGINX (don't mistake this for kubernetes namespace. They are not at all related ). Refer to [this](https://github.com/martin-helmich/prometheus-nginxlog-exporter#namespace-as-labels) for more details around nginx namespacing. 
+  * Do not use any other special characters apart from "underscores" (_) while naming any namespace as the namespace names are used directly as placeholders in the names of the metrics created by the above exporter (for example `<namespace>_http_response_count_total`) and prometheus would expect all the metric names to NOT contain any special character apart from underscores (\_).
+* Finally, setup a Prometheus server to periodically scrape the `/metrics` endpoint exposed by the above prometheus-nginxlog-exporter thereby, exposing the required NGINX metrics. 
