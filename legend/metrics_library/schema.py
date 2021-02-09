@@ -162,6 +162,12 @@ schema = {
         "required": True,
         "empty": False,
     },
+    "graphTooltip": {
+        "type": "integer", 
+        "required": False, 
+        "empty": False, 
+        "allowed": [0, 1, 2] # 0 for no shared crosshair or tooltip (default), 1 for shared crosshair, 2 for shared crosshair and shared tooltip
+    },
     "components": {
         "type": "dict",
         "required": False,
@@ -309,11 +315,6 @@ schema = {
             "playframework": {
                 "type": "dict",
                 "schema": md(default_panels_schema, playframework_schema),
-                "required": False,
-            },
-            "starlette": {
-                "type": "dict",
-                "schema": md(default_panels_schema, starlette_schema),
                 "required": False,
             },
             "nodejs": {
