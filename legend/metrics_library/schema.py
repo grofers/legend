@@ -32,6 +32,7 @@ from .metrics_schema import (
     platform_k8s_cronjob_schema,
     platform_k8s_hpa_schema,
     loki_schema,
+    nginx_schema,
 )
 
 
@@ -330,6 +331,11 @@ schema = {
             "loki": {
                 "type": "dict",
                 "schema": md(default_panels_schema, loki_schema),
+                "required": False,
+            },
+            "nginx": {
+                "type": "dict",
+                "schema": md(default_panels_schema, nginx_schema),
                 "required": False,
             },
         },

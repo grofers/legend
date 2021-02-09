@@ -117,6 +117,9 @@ spec:
         dimensions:
           - bucket_name: sample-s3-bucket
             filter_id: EntireBucket
+      nginx:
+        dimensions:
+          - nginx_namespace: sample_nginx_namespace
 
     # Data science tools
       airflow:

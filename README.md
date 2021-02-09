@@ -42,6 +42,7 @@ Say you got an EC2 to monitor, an S3 to monitor, a Kubernetes cronjob to monitor
   * Loki
   * MySQL - RDS
   * MySQL - EC2
+  * NGINX (Log-based metrics)
   * NodeJS
   * PostgreSQL
   * PgBouncer
@@ -60,7 +61,7 @@ Say you got an EC2 to monitor, an S3 to monitor, a Kubernetes cronjob to monitor
   * SQS
   * Starlette
   * Hashicorp Vault
-* Legend currently has the capability to further have support for any other component, provided that component's log generation is backed by one of the following exporters:
+* Legend currently has the capability to further have support for any other component, provided that component's log generation is backed by one of the following metric/log stores:
   * Cloudwatch
   * InfluxDB
   * Loki

@@ -485,3 +485,16 @@ loki_schema = {
         },
     },
 }
+
+nginx_schema = {
+    "data_source": {"type": "string", "required": False},
+    "dimensions": {
+        "type": "list",
+        "schema": {
+            "type": "dict",
+            "schema": {
+                "nginx_namespace": {"type": "string", "required": True},
+            },
+        },
+    },
+}
