@@ -9,7 +9,7 @@ panels:
     description: Request count within a given interval
     targets:
       {% for dimension in data %}
-      - metric: sum(idelta(nginx_ingress_controller_requests{namespace="{{ dimension.namespace }}", service="{{ dimension.service_name }}, ingress="{{ dimension.service_type }}"}[5m]))
+      - metric: sum(idelta(nginx_ingress_controller_requests{namespace="{{ dimension.namespace }}", service="{{ dimension.service_name }}", ingress="{{ dimension.service_type }}"}[5m]))
       {% endfor %}
   - title: (E) HTTP 4XX/5XX Count
     type: Graph
