@@ -19,6 +19,7 @@ panels:
           {% endfor %}
           {% set expression = filter_dict.get('filters') %}
           - expr: '{ {{ expression }} }'
+            ref_no: 1
         {% endfor %}
     - title: Error Logs
       type: Log
@@ -35,6 +36,7 @@ panels:
           {% endfor %}
           {% set expression = filter_dict.get('filters') %}
           - expr: '{ {{ expression }} } |~ "(?i)err"' ##  {namespace="nyala", customlabel1=value1, customlabel2=value2, ....} |~ "(?i)err"
+            ref_no: 1
         {% endfor %}
     {% for dimension in data%}
       {% if "filters" in dimension.keys() %}
@@ -53,12 +55,14 @@ panels:
           {% endif %}
         {% endfor %}
         {% set finalExpression = "{ " + custom_labels_dict.get('custom_labels') + " }" +  custom_filters_dict.get("custom_filters") %}
-    - title: Custom Log Panel - {{ finalExpression }}
+    - title: Custom Log Panel - {{ dimension.get("panel_name") }}
       type: Log
       sort_order: Descending
       description: Custom Log Panel for the query - {{ finalExpression }}
       targets:
       - expr: '{{ finalExpression }}'
+        ref_no: 1
+      alert_config: 
     {% endif %}
     {% endfor %}
 

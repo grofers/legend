@@ -159,3 +159,15 @@ spec:
             filters:
               - "err"
               - "500"
+            panel_name: sample-panel ## mandatory field because "filters" key is present here, otherwise no need to specify
+            ## "Custom Log Panel - <panel_name>" will be the name of the custom log panel generated on the basis of the above provided "filters"
+        panels: # Custom panel spec
+        - title: Custom Log Panel - sample-panel
+          alert_config:
+            priority: P5
+            message: 'dead queue depth is higher than 10'
+            rule:
+              for_duration: 5m
+              evaluate_every: 1m
+            condition_query:
+              - OR,avg,1,now,5m,gt,10

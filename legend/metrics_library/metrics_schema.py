@@ -481,6 +481,10 @@ loki_schema = {
                     "type": "list",
                     "required": False,
                 },
+                "panel_name": {
+                    "type": "string",
+                    "required": False,
+                }
             },
         },
     },

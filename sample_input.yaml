@@ -1,6 +1,6 @@
 ---
-title: SampleTitle
-service: SampleService
+title: SampleTitle-Loki
+service: SampleService-Loki
 grafana_folder: SampleFolder
 alert_config:
   notification_channels: ["service-opsgenie"]
@@ -12,145 +12,15 @@ references:
   documentation: https://github.com/grofers/legend/tree/master/docs
   metrics_definition: https://github.com/grofers/legend
 tags:
-  - prod
+  - stage
   - infra
 graphTooltip: 1
 components:
-
-# SLO component sample input
-  slo:
-    dimensions:
-      - name: "legend-availablity-slo"
-        availablity: "90"
-        totalQuery: "sum(increase(apiserver_request_total[2m]))"
-        errorQuery: "sum(increase(apiserver_request_total[2m]))"
-# Application frameworks
-  playframework:
-    dimensions:
-      - service: sample-play-service
-  springboot:
-    dimensions:
-      - job: sample-sprintboot-service
-  jmx:
-    dimensions:
-      - job: sample-jmx-job
-        service: sample-jmx-service
-  django:
-    dimensions:
-      - job: sample-django-service
-  flask:
-    dimensions:
-      - job: sample-flask-service
-  nodejs:
-    dimensions:
-      - job: sample-nodejs-service
-  go:
-    dimensions:
-      - job: sample-go-service
-
-# Databases
-  mysql_ec2:
-    dimensions:
-      ec2:
-        - host: sample-ec2-host
-      db:
-        - masters:
-            - host: sample-mysql-host-master
-              db_name: sample-db
-          slaves:
-            - host: sample-mysql-host-slave
-              db_name: sample-db
-  mysql_56_rds:
-    dimensions:
-      - db_instance_identifier: sample-rds-mysql56
-  pgsql_rds:
-    dimensions:
-      - db_instance_identifier: sample-rds-psql
-  pgbouncer:
-    dimensions:
-      - job_name: sample-pgbouncer
-  couchdb:
-    dimensions:
-      - job_name: sample-couch-service
-  redis:
-    dimensions:
-      - job_name: sample-redis-host
-
-# Workers
-  celery:
-    dimensions:
-      - job_name: sample-celery-instances
-
-# Queues
-  sqs:
-    dimensions:
-      - queue_name: sample-sqs-queue
-        dead_queue_name: sample-sqs-dead-queue
-  rabbitmq:
-    dimensions:
-      - queue_name: sample-rabbitmq-queue
-        job: sample-rabbitmq-queue
-
-# Platforms
-  platform_ec2:
-    dimensions:
-      - host: sample-ec2-host
-  platform_k8s_deployment:
-    dimensions:
-      - deployment_name: sample-deployment-name
-  platform_k8s_ingress:
-    dimensions:
-      - namespace: sample-namespace
-        service_name: sample-ingress-name
-        service_type: sample-ingress-type
-  platform_k8s_cronjob:
-    dimensions:
-      - namespace: sample-namespace
-        cronjob_name: sample-cronjob-name
-  platform_k8s_hpa:
-    dimensions:
-      - deployment_name: sample-deployment-name
-        hpa_name: sample-hpa-name
-  elb:
-    dimensions:
-      - load_balancer_name: sample-elb-name
-  alb:
-    dimensions:
-      - load_balancer_id: sample-alb-id
-        region: sample-region
-        target_group_id: samepl-alb-targetgroup-id
-  s3:
-    dimensions:
-      - bucket_name: sample-s3-bucket
-        filter_id: EntireBucket
-  nginx:
-    dimensions:
-      - nginx_namespace: sample_nginx_namespace
-
-# Data science tools
   airflow:
     dimensions:
       - cluster: sample-cluster
         namespace: sample-namespace
         dag_id: samepl-dag-id
-  starlette:
-    dimensions:
-      - job: sample-starlette-service
-        path: sample-starlette-path
-
-# Applications
-  consul:
-    dimensions:
-      - region: sample-aws-region
-  haproxy:
-    dimensions:
-      - backend: sample-haproxy-backend
-  vault:
-    dimensions:
-      - environment: sample-environment
-  promtail:
-    dimensions:
-      - pod_name: promtail
   loki:
     dimensions:
       - labels:
@@ -165,3 +35,16 @@ components:
         filters:
           - "err"
           - "500"
+        panel_name: sample-panel ## mandatory field because "filters" key is present here, otherwise no need to specify
+        ## "Custom Log Panel - <panel_name>" will be the name of the custom log panel generated on the basis of the above provided "filters"
+    panels: # Custom panel spec
+    - title: "Custom Log Panel - sample-panel"
+      alert_config:
+        priority: P3
+        message: 'Random message'
+        rule:
+          for_duration: 15m
+          evaluate_every: 1m
+        condition_query:
+        - OR,avg,1,now,20m,gt,0
+      
