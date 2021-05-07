@@ -9,8 +9,8 @@ panels:
     description: current cpu utilisation per container
     targets:
       {% for dimension in data %}
-      - metric: round(((sum(rate(container_cpu_usage_seconds_total{container!~"POD", pod=~"^{{ dimension.deployment_name }}.*"}[5m])) by (container_name) / sum(label_join(kube_pod_container_resource_limits_cpu_cores{pod=~"^{{ dimension.deployment_name }}.*"}, "container_name", "", "container")) by (container_name)) * 100), 0.1)
-        legend: '{{ '{{container_name}}' }}'
+      - metric: round(((sum(rate(container_cpu_usage_seconds_total{container!~"POD", pod=~"^{{ dimension.deployment_name }}.*"}[5m])) by (container) / sum(kube_pod_container_resource_limits{pod=~"^{{ dimension.deployment_name }}.*", resource="cpu", unit="core"}) by (container)) * 100), 0.1)
+        legend: '{{ '{{container}' }}'
         ref_no: 1
       {% endfor %}
     formatY1: percent
@@ -28,8 +28,8 @@ panels:
     description: Amount of time the container was throttled
     targets:
       {% for dimension in data %}
-      - metric: sum(rate(container_cpu_cfs_throttled_seconds_total{container!~"POD", pod=~"^{{ dimension.deployment_name }}.*"}[5m])) by (container_name)
-        legend: '{{ '{{container_name}}' }}'
+      - metric: sum(rate(container_cpu_cfs_throttled_seconds_total{container!~"POD", pod=~"^{{ dimension.deployment_name }}.*"}[5m])) by (container)
+        legend: '{{ '{{container}}' }}'
       {% endfor %}
     formatY1: s
 
@@ -38,8 +38,8 @@ panels:
     description: Current memory usage per container
     targets:
       {% for dimension in data %}
-      - metric: round(((sum(container_memory_working_set_bytes{container!~"POD", pod=~"^{{ dimension.deployment_name }}.*"}) by (container_name) / sum(label_join(kube_pod_container_resource_limits_memory_bytes{pod=~"^{{ dimension.deployment_name }}.*"}, "container_name", "", "container")) by (container_name)) * 100), 0.1)
-        legend: '{{ '{{container_name}}' }}'
+      - metric: round(((sum(container_memory_working_set_bytes{container!~"POD", pod=~"^{{ dimension.deployment_name }}.*"}) by (container) / sum(kube_pod_container_resource_limits{pod=~"^{{ dimension.deployment_name }}.*", resource="memory", unit="byte"}) by (container)) * 100), 0.1)
+        legend: '{{ '{{container}}' }}'
         ref_no: 1
       {% endfor %}
     formatY1: percent
@@ -57,8 +57,8 @@ panels:
     description: Amount of available memory from the limit
     targets:
       {% for dimension in data %}
-      - metric: (sum(container_memory_working_set_bytes{pod=~"^{{ dimension.deployment_name }}.*"}) by (container_name) / sum(label_join(kube_pod_container_resource_limits_memory_bytes{pod=~"^{{ dimension.deployment_name }}.*"}, "container_name", "", "container")) by (container_name))
-        legend: '{{ '{{container_name}}' }}'
+      - metric: (sum(container_memory_working_set_bytes{pod=~"^{{ dimension.deployment_name }}.*"}) by (container) / sum(label_join(kube_pod_container_resource_limits{pod=~"^{{ dimension.deployment_name }}.*", resource="memory", unit="byte"}) by (container))
+        legend: '{{ '{{container}}' }}'
       {% endfor %}
     formatY1: bytes
 
@@ -67,10 +67,10 @@ panels:
     description: bytes read/written
     targets:
       {% for dimension in data %}
-      - metric: sum(rate(container_fs_writes_bytes_total{pod=~"^{{ dimension.deployment_name }}.*"}[5m])) by (container_name,device)
-        legend: '{{ '{{container_name}} {{device}} Writes' }}'
-      - metric: sum(rate(container_fs_reads_bytes_total{pod=~"^{{ dimension.deployment_name }}.*"}[5m])) by (container_name,device)
-        legend: '{{ '{{container_name}} {{device}} Reads' }}'
+      - metric: sum(rate(container_fs_writes_bytes_total{pod=~"^{{ dimension.deployment_name }}.*"}[5m])) by (container,device)
+        legend: '{{ '{{container}} {{device}} Writes' }}'
+      - metric: sum(rate(container_fs_reads_bytes_total{pod=~"^{{ dimension.deployment_name }}.*"}[5m])) by (container,device)
+        legend: '{{ '{{container}} {{device}} Reads' }}'
       {% endfor %}
     formatY1: bytes
 
@@ -130,8 +130,8 @@ panels:
     description: current cpu utilisation per container from the request
     targets:
       {% for dimension in data %}
-      - metric: round(((sum(rate(container_cpu_usage_seconds_total{container!~"POD", pod=~"^{{ dimension.deployment_name }}.*"}[5m])) by (container_name) / sum(label_join(kube_pod_container_resource_requests_cpu_cores{pod=~"^{{ dimension.deployment_name }}.*"}, "container_name", "", "container")) by (container_name)) * 100), 0.1)
-        legend: '{{ '{{container_name}}' }}'
+      - metric: round(((sum(rate(container_cpu_usage_seconds_total{container!~"POD", pod=~"^{{ dimension.deployment_name }}.*"}[5m])) by (container) / sum(kube_pod_container_resource_requests{pod=~"^{{ dimension.deployment_name }}.*", resource="cpu", unit="core"}) by (container)) * 100), 0.1)
+        legend: '{{ '{{container}}' }}'
         ref_no: 1
       {% endfor %}
     formatY1: percent
@@ -141,8 +141,8 @@ panels:
     description: Amount of available memory from the request
     targets:
       {% for dimension in data %}
-      - metric: (sum(container_memory_working_set_bytes{pod=~"^{{ dimension.deployment_name }}.*"}) by (container_name) / sum(label_join(kube_pod_container_resource_requests_memory_bytes{pod=~"^{{ dimension.deployment_name }}.*"}, "container_name", "", "container")) by (container_name))
-        legend: '{{ '{{container_name}}' }}'
+      - metric: (sum(container_memory_working_set_bytes{pod=~"^{{ dimension.deployment_name }}.*"}) by (container) / sum(kube_pod_container_resource_requests{pod=~"^{{ dimension.deployment_name }}.*", resource="memory", unit="byte"}) by (container))
+        legend: '{{ '{{container}}' }}'
       {% endfor %}
     formatY1: bytes
 
@@ -151,8 +151,8 @@ panels:
     description: Current memory usage per container
     targets:
       {% for dimension in data %}
-      - metric: round(((sum(container_memory_working_set_bytes{container!~"POD", pod=~"^{{ dimension.deployment_name }}.*"}) by (container_name) / sum(label_join(kube_pod_container_resource_requests_memory_bytes{pod=~"^{{ dimension.deployment_name }}.*"}, "container_name", "", "container")) by (container_name)) * 100), 0.1)
-        legend: '{{ '{{container_name}}' }}'
+      - metric: round(((sum(container_memory_working_set_bytes{container!~"POD", pod=~"^{{ dimension.deployment_name }}.*"}) by (container) / sum(kube_pod_container_resource_requests{pod=~"^{{ dimension.deployment_name }}.*", resource="memory", unit="byte"}) by (container)) * 100), 0.1)
+        legend: '{{ '{{container}}' }}'
         ref_no: 1
       {% endfor %}
     formatY1: percent
