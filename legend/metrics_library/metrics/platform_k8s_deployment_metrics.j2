@@ -10,7 +10,7 @@ panels:
     targets:
       {% for dimension in data %}
       - metric: round(((sum(rate(container_cpu_usage_seconds_total{container!~"POD", pod=~"^{{ dimension.deployment_name }}.*"}[5m])) by (container) / sum(kube_pod_container_resource_limits{pod=~"^{{ dimension.deployment_name }}.*", resource="cpu", unit="core"}) by (container)) * 100), 0.1)
-        legend: '{{ '{{container}' }}'
+        legend: '{{ '{{container}}' }}'
         ref_no: 1
       {% endfor %}
     formatY1: percent
