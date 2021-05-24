@@ -12,6 +12,10 @@ Legend builds and publishes Grafana dashboards for your services with prefilled 
 
 Say you got an EC2 to monitor, an S3 to monitor, a Kubernetes cronjob to monitor (or one of many other things); legend has got your back. It will do all the menial work of setting up grafana dashboards for you without you needing to setup grafana dashboards manually or write cloudwatch/prometheus/influxdb queries by hand.
 
+### Methodology
+
+Legend uses the [USE](http://www.brendangregg.com/usemethod.html) and [RED](https://thenewstack.io/monitoring-microservices-red-method/) methodology of monitoring service and infrastructure level metrics.
+
 ## Table of contents
 
 * [Features](#features)
