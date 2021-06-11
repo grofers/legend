@@ -77,6 +77,7 @@ def create_handler(spec, name, **kwargs):
         raise kopf.PermanentError("Failed creating the dashboard")
 
 
+@kopf.on.resume("grofers.io", "v1beta1", "grafana-dashboards")
 @kopf.on.update("grofers.io", "v1beta1", "grafana-dashboards")
 def update_handler(spec, name, **kwargs):
     logger.info("Updating existing Grafana dashboard object: %s", name)
