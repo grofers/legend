@@ -1,0 +1,54 @@
+version: 2
+updates:
+- package-ecosystem: pip
+  directory: "/"
+  schedule:
+    interval: daily
+    time: "23:30"
+  open-pull-requests-limit: 10
+  ignore:
+  - dependency-name: black
+    versions:
+    - 20.8b1
+    - 21.4b0
+  - dependency-name: pylint
+    versions:
+    - 2.6.2
+    - 2.7.0
+    - 2.7.1
+    - 2.7.2
+    - 2.7.3
+    - 2.7.4
+  - dependency-name: kopf
+    versions:
+    - 1.29.0
+    - 1.29.1
+    - 1.29.2
+    - 1.30.1
+    - 1.30.2
+    - 1.30.3
+  - dependency-name: sentry-sdk
+    versions:
+    - 0.20.0
+    - 0.20.1
+    - 0.20.2
+    - 0.20.3
+  - dependency-name: gitpython
+    versions:
+    - 3.1.12
+    - 3.1.13
+  - dependency-name: configparser
+    versions:
+    - 5.0.1
+  - dependency-name: jinja2
+    versions:
+    - 2.11.2
+  - dependency-name: yamllint
+    versions:
+    - 1.26.0
+  - dependency-name: pyyaml
+    versions:
+    - 5.4.1
+  - dependency-name: grafana-api
+    versions:
+    - 1.0.3
