@@ -57,7 +57,7 @@ panels:
     description: Amount of available memory from the limit
     targets:
       {% for dimension in data %}
-      - metric: (sum(container_memory_working_set_bytes{pod=~"^{{ dimension.deployment_name }}.*"}) by (container) / sum(label_join(kube_pod_container_resource_limits{pod=~"^{{ dimension.deployment_name }}.*", resource="memory", unit="byte"}) by (container))
+      - metric: (sum(container_memory_working_set_bytes{pod=~"^{{ dimension.deployment_name }}.*"}) by (container) / sum(kube_pod_container_resource_limits{pod=~"^{{ dimension.deployment_name }}.*", resource="memory", unit="byte"}) by (container))
         legend: '{{ '{{container}}' }}'
       {% endfor %}
     formatY1: bytes
