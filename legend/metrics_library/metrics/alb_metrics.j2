@@ -68,10 +68,12 @@ panels:
         metric: HTTPCode_Target_4XX_Count
         namespace: AWS/ApplicationELB
         region: {{ dimension.region }}
+        expression: FILL(SEARCH('{"AWS/ApplicationELB","LoadBalancerName"} MetricName="HTTPCode_Target_4XX_Count" "LoadBalancerName"=({{ dimension.load_balancer_name }})', 'Sum'), 0)
         statistic: Sum
         alias: '{{ '{{LoadBalancer}}_{{TargetGroup}}_{{metric}}_{{stat}}' }}'
       - dimensions: {"LoadBalancer": {{ dimension.load_balancer_id }}, "TargetGroup": {{ dimension.target_group_id }} }
         metric: HTTPCode_Target_5XX_Count
+        expression: FILL(SEARCH('{"AWS/ApplicationELB","LoadBalancerName"} MetricName="HTTPCode_Target_5XX_Count" "LoadBalancerName"=({{ dimension.load_balancer_name }})', 'Sum'), 0)
         namespace: AWS/ApplicationELB
         region: {{ dimension.region }}
         statistic: Sum
@@ -86,12 +88,14 @@ panels:
       - dimensions: {"LoadBalancer": {{ dimension.load_balancer_id }}, "TargetGroup": {{ dimension.target_group_id }} }
         metric: HTTPCode_ELB_4XX_Count
         namespace: AWS/ApplicationELB
+        expression: FILL(SEARCH('{"AWS/ApplicationELB","LoadBalancerName"} MetricName="HTTPCode_ELB_4XX_Count" "LoadBalancerName"=({{ dimension.load_balancer_name }})', 'Sum'), 0)
         region: {{ dimension.region }}
         statistic: Sum
         alias: '{{ '{{LoadBalancer}}_{{TargetGroup}}_{{metric}}_{{stat}}' }}'
       - dimensions: {"LoadBalancer": {{ dimension.load_balancer_id }}, "TargetGroup": {{ dimension.target_group_id }} }
         metric: HTTPCode_ELB_5XX_Count
         namespace: AWS/ApplicationELB
+        expression: FILL(SEARCH('{"AWS/ApplicationELB","LoadBalancerName"} MetricName="HTTPCode_ELB_5XX_Count" "LoadBalancerName"=({{ dimension.load_balancer_name }})', 'Sum'), 0)
         region: {{ dimension.region }}
         statistic: Sum
         alias: '{{ '{{LoadBalancer}}_{{TargetGroup}}_{{metric}}_{{stat}}' }}'
