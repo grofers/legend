@@ -8,6 +8,11 @@
     alias='{{data.alias}}',
     highResolution='false',
     period='1m',
-    dimensions={{data.dimensions}}
+    {% if data.get('dimensions') is not none %}
+    dimensions={{data.dimensions}},
+    {%endif%}
+    {% if data.get('expression') is not none %}
+    expression="{{data.expression}}",
+    {%endif%}
     )
 )

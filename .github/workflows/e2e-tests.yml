@@ -46,18 +46,21 @@ jobs:
         env:
           ACTIONS_ALLOW_UNSECURE_COMMANDS: true
         uses: hiberbee/github-action-minikube@latest
+        with:
+          minikube-version: 1.22.0
+        
       - name: Install helm3
         run: |
           kubectl create namespace monitoring
           export HELM_PLATFORM=linux-amd64 && export HELM_VERSION=helm-v3.4.1
           wget https://get.helm.sh/$HELM_VERSION-$HELM_PLATFORM.tar.gz && tar -xvzf $HELM_VERSION-$HELM_PLATFORM.tar.gz && rm -rf $HELM_VERSION-$HELM_PLATFORM.tar.gz && mv $HELM_PLATFORM/helm helm3 && chmod +x helm3
           export PATH=$PATH:$(pwd)
-          helm3 init && helm3 repo update
           cd charts/legend
           helm3 repo add cloudposse https://charts.cloudposse.com/incubator/
           helm3 repo add prometheus-community https://prometheus-community.github.io/helm-charts
           helm3 dep update
-          helm3 install --set tag.service-level-operator=true --set tag.kube-prometheus-stack=true --set service-level-operator.enabled=true --set kube-prometheus-stack.enabled=true legend --namespace monitoring .
+          helm3 install --set tag.service-level-operator=true --set tag.kube-prometheus-stack=true --set service-level-operator.enabled=true --set kube-prometheus-stack.enabled=true legend --namespace monitoring .   
+        
       - name: Wait for Service-Level Operator to become ready
         run: |
           sleep 50
