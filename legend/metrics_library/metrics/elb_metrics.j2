@@ -111,10 +111,12 @@ panels:
         metric: HTTPCode_ELB_4XX
         namespace: AWS/ELB
         statistic: Sum
+        expression: "FILL(SEARCH('{AWS/ELB,LoadBalancerName} MetricName=HTTPCode_ELB_4XX LoadBalancerName=({{ dimension.load_balancer_name }})', 'Sum', 60), 0)"
         alias: '{{ '{{LoadBalancerName}}_{{metric}}_{{stat}}' }}'
       - dimensions: {"LoadBalancerName": {{ dimension.load_balancer_name }} }
         metric: HTTPCode_ELB_5XX
         namespace: AWS/ELB
+        expression: "FILL(SEARCH('{AWS/ELB,LoadBalancerName} MetricName=HTTPCode_ELB_5XX LoadBalancerName=({{ dimension.load_balancer_name }})', 'Sum', 60), 0)"
         statistic: Sum
         alias: '{{ '{{LoadBalancerName}}_{{metric}}_{{stat}}' }}'
       {% endfor %}
