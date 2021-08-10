@@ -18,7 +18,7 @@ panels:
     description: Rate of requests
     targets:
     {% for dimension in data %}
-      - metric: sum(irate(starlette_requests_total{job=~"{{ dimension.job }}", path=~"{{ dimension.path }}"}[5m]))
+      - metric: sum(irate(starlette_requests_total{job=~"{{ dimension.job }}", path=~"{{ dimension.path }}"}[1m]))
     {% endfor %}
     alert_config:
 
@@ -27,7 +27,7 @@ panels:
     description: Request error rate (4xx)
     targets:
     {% for dimension in data %}
-      - metric: sum(irate(starlette_responses_total{job=~"{{ dimension.job }}", path=~"{{ dimension.path }}", status_code=~"4.."}[5m]) or vector(0))
+      - metric: sum(irate(starlette_responses_total{job=~"{{ dimension.job }}", path=~"{{ dimension.path }}", status_code=~"4.."}[1m]) or vector(0))
         ref_no: {{ loop.index }}
     {% endfor %}
     alert_config:
@@ -44,7 +44,7 @@ panels:
     description: Request error rate (5xx)
     targets:
     {% for dimension in data %}
-      - metric: sum(irate(starlette_responses_total{job=~"{{ dimension.job }}", path=~"{{ dimension.path }}", status_code=~"5.."}[5m]) or vector(0))
+      - metric: sum(irate(starlette_responses_total{job=~"{{ dimension.job }}", path=~"{{ dimension.path }}", status_code=~"5.."}[1m]) or vector(0))
         ref_no: {{ loop.index }}
     {% endfor %}
     alert_config:
@@ -63,7 +63,7 @@ panels:
     labelY1: seconds
     targets:
     {% for dimension in data %}
-      - metric: sum(rate(starlette_requests_processing_time_seconds_sum{job=~"{{ dimension.job }}", path=~"{{ dimension.path }}"}[5m])) / sum(rate(starlette_requests_processing_time_seconds_count{job=~"{{ dimension.job }}", path=~"{{ dimension.path }}"}[5m]))
+      - metric: sum(rate(starlette_requests_processing_time_seconds_sum{job=~"{{ dimension.job }}", path=~"{{ dimension.path }}"}[1m])) / sum(rate(starlette_requests_processing_time_seconds_count{job=~"{{ dimension.job }}", path=~"{{ dimension.path }}"}[5m]))
         ref_no: {{ loop.index }}
     {% endfor %}
     alert_config:
@@ -82,7 +82,7 @@ panels:
     labelY1: seconds
     targets:
     {% for dimension in data %}
-      - metric: histogram_quantile(0.95, sum(rate(starlette_requests_processing_time_seconds_bucket{job=~"{{ dimension.job }}"}[5m])) by (le))
+      - metric: histogram_quantile(0.95, sum(rate(starlette_requests_processing_time_seconds_bucket{job=~"{{ dimension.job }}"}[1m])) by (le))
         ref_no: {{ loop.index }}
     {% endfor %}
     alert_config:
@@ -101,7 +101,7 @@ panels:
     labelY1: seconds
     targets:
     {% for dimension in data %}
-      - metric: histogram_quantile(0.95, sum(rate(starlette_requests_processing_time_seconds_bucket{job=~"{{ dimension.job }}"}[5m])) by (path, method, le))
+      - metric: histogram_quantile(0.95, sum(rate(starlette_requests_processing_time_seconds_bucket{job=~"{{ dimension.job }}"}[1m])) by (path, method, le))
         legend: '{{ '{{ method }} - {{ path }}' }}'
         ref_no: {{ loop.index }}
     {% endfor %}
