@@ -27,6 +27,20 @@ starlette_schema = {
     },
 }
 
+fastapi_schema = {
+    "data_source": {"type": "string", "required": False},
+    "dimensions": {
+        "type": "list",
+        "schema": {
+            "type": "dict",
+            "schema": {
+                "job": {"type": "string", "required": True},
+                "path": {"type": "string", "required": True},
+            },
+        },
+    },
+}
+
 pgsql_rds_schema = {
     "data_source": {"type": "string", "required": False},
     "dimensions": {

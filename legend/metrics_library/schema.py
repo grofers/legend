@@ -27,6 +27,7 @@ from .metrics_schema import (
     s3_schema,
     playframework_schema,
     starlette_schema,
+    fastapi_schema,
     nodejs_schema,
     go_schema,
     platform_k8s_cronjob_schema,
