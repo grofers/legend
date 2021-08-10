@@ -184,6 +184,11 @@ schema = {
                 "schema": md(default_panels_schema, starlette_schema),
                 "required": False,
             },
+            "fastapi": {
+                "type": "dict",
+                "schema": md(default_panels_schema, fastapi_schema),
+                "required": False,
+            },
             "celery": {
                 "type": "dict",
                 "schema": md(default_panels_schema, celery_schema),
