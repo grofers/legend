@@ -1,7 +1,7 @@
 FROM bitnami/jsonnet AS jsonnet
 RUN echo "`which jsonnet`"
 
-FROM python:3.7
+FROM python:3.9.5
 
 ENV LEGEND_HOME="/src"
 ENV GRAFONNET_REPO_URL="https://github.com/grafana/grafonnet-lib"
