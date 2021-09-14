@@ -2,3 +2,4 @@ kopf==0.28.3
 kubernetes==10.0.1
 python-consul==1.1.0
 PyYAML==5.3
+rsa>=4.7 # not directly required, pinned by Snyk to avoid a vulnerability
