@@ -1,4 +1,4 @@
 kopf==0.28.3
 kubernetes==10.0.1
 python-consul==1.1.0
-PyYAML==5.3
+PyYAML==5.3.1
