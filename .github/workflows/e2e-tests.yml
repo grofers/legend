@@ -47,7 +47,8 @@ jobs:
           ACTIONS_ALLOW_UNSECURE_COMMANDS: true
         uses: hiberbee/github-action-minikube@latest
         with:
-          minikube-version: 1.22.0
+          minikube-version: 1.23.0
+          kubernetes-version: 1.19.13
         
       - name: Install helm3
         run: |
