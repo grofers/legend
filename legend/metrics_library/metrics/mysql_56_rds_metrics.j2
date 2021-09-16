@@ -154,6 +154,28 @@ panels:
     labelY1: seconds
     formatY1: s
 
+  - title: (U) Disk Burst Balance
+    type: Graph
+    description: The percentage of Burst Balance remaining
+    targets:
+      {% for dimension in data %}
+    - dimensions: {"DBInstanceIdentifier": {{ dimension.db_instance_identifier }}}
+      metric: BurstBalance
+      namespace: AWS/RDS
+      statistic: Average
+      alias: '{{ '{{DBInstanceIdentifier}}_{{metric}}_{{stat}}' }}'
+      ref_no: 1
+      {% endfor %}
+    formatY1: percent
+    alert_config:
+      priority: P3
+      message: 'Disk Burst Balance is low'
+      rule:
+        for_duration: 5m
+        evaluate_every: 1m
+      condition_query:
+        - OR,avg,1,now,5m,lt,75
+
   - title: (D) Replication Lag (Only for read replicas)
     type: Graph
     description: The max amount of time a Read Replica DB instance lags behind the source DB instance.
