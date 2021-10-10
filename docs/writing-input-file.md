@@ -61,7 +61,7 @@ components: # The components which the service consists of along with the identi
 ## Add custom metrics and alert configurations
 
 To suit your use case you can edit the default alerts and metrics for each component. Or create new
-panels with custom metrics. You need to add the sepc in the input file under the component for which the config has to be changed. If the panel title is new a new panel is created, if not the existing panel will be alerted.
+panels with custom metrics. You need to add the sepc in the input file under the component for which the config has to be changed. If the panel title is new a new panel is created, if not the existing panel will be altered.
 
 The custom panels/metrics should follow the same format/syntax from the original component file in `metrics_library/metrics`. Please refer to [contributing-to-metric-library](../docs/contributing-to-metric-library.md) to understand this spec
 
