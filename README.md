@@ -52,7 +52,7 @@ Legend uses the [USE](http://www.brendangregg.com/usemethod.html) and [RED](http
   * PgBouncer
   * Phoenix
   * EC2 Platform level metrics
-  * Kubernetes CronJob
+  * [Kubernetes CronJob](docs/cronjob-prometheus-rule.md)
   * Kubernetes Deployment
   * Kubernetes Horizontal Pod Autoscaler
   * Kubernetes Ingress
@@ -82,6 +82,7 @@ This section describes on how to get started with using Legend.
 
 * Based on the component an additional step of enabling metrics for the component has to happen. The monitoring queries written are based on specific exporters userd to expose the metrics, mentioned in [enabling metrics](docs/contributing-to-metric-library.md). If other exporters are used, the queries might have to be changed.
 
+* For cronjobs an additional custom prometheus rule is required. You can find more details [here](docs/cronjob-prometheus-rule.md)
 ### Using Legend
 
 You can use `legend` in one of the two ways:

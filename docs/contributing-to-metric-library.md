@@ -69,7 +69,7 @@ panels: # The metrics to be plotted
 ### Addtional Spec
 
 ``` yaml
-formatY1: # The fomat of the data in the Y1 axis, this follows the Grafana standard (sample : Bps, bytes, s, percent)
+formatY1: # The format of the data in the Y1 axis, this follows the Grafana standard (sample : Bps, bytes, s, percent)
 labelY1:  # The label to put in the Y1 graph panel (sample : bytes/sec , bytes , seconds, percent)
 ```
 
