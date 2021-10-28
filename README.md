@@ -48,7 +48,7 @@ Legend uses the [USE](http://www.brendangregg.com/usemethod.html) and [RED](http
   * MySQL - EC2
   * NGINX (Log-based metrics)
   * NodeJS
-  * PostgreSQL
+  * PostgreSQL - RDS
   * PgBouncer
   * Phoenix
   * EC2 Platform level metrics
@@ -60,6 +60,7 @@ Legend uses the [USE](http://www.brendangregg.com/usemethod.html) and [RED](http
   * Promtail
   * RabbitMQ
   * Redis
+  * Redis - Elasticache
   * S3
   * Sprintboot
   * SQS
