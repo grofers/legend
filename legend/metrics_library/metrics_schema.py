@@ -341,6 +341,19 @@ redis_schema = {
     },
 }
 
+redis_elasticache_schema = {
+    "data_source": {"type": "string", "required": False},
+    "dimensions": {
+        "type": "list",
+        "schema": {
+            "type": "dict",
+            "schema": {
+                "cache_cluster_identifier": {"type": "string", "required": True},
+            },
+        },
+    },
+}
+
 platform_ec2_schema = {
     "data_source": {"type": "string", "required": False},
     "dimensions": {

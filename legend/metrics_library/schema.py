@@ -22,6 +22,7 @@ from .metrics_schema import (
     platform_k8s_deployment_schema,
     platform_k8s_ingress_schema,
     redis_schema,
+    redis_elasticache_schema,
     platform_ec2_schema,
     slo_schema,
     s3_schema,
@@ -216,6 +217,11 @@ schema = {
             "redis": {
                 "type": "dict",
                 "schema": md(default_panels_schema, redis_schema),
+                "required": False,
+            },
+            "redis_elasticache": {
+                "type": "dict",
+                "schema": md(default_panels_schema, redis_elasticache_schema),
                 "required": False,
             },
             "platform_ec2": {
