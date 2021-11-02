@@ -10,6 +10,7 @@ panels:
     targets:
       {% for dimension in data %}
     - dimensions: {"CacheClusterId": {{ dimension.cache_cluster_identifier }}}
+      region: {{ dimension.region or 'default' }}
       metric: EngineCPUUtilization
       namespace: AWS/ElastiCache
       statistic: Maximum
@@ -34,6 +35,7 @@ panels:
     targets:
       {% for dimension in data %}
     - dimensions: {"CacheClusterId": {{ dimension.cache_cluster_identifier }}}
+      region: {{ dimension.region or 'default' }}
       metric: DatabaseMemoryUsagePercentage
       namespace: AWS/ElastiCache
       statistic: Maximum
@@ -58,6 +60,7 @@ panels:
     targets:
       {% for dimension in data %}
     - dimensions: {"CacheClusterId": {{ dimension.cache_cluster_identifier }}}
+      region: {{ dimension.region or 'default' }}
       metric: CurrConnections
       namespace: AWS/ElastiCache
       statistic: Average
@@ -81,6 +84,7 @@ panels:
     targets:
       {% for dimension in data %}
     - dimensions: {"CacheClusterId": {{ dimension.cache_cluster_identifier }}}
+      region: {{ dimension.region or 'default' }}
       metric: NewConnections
       namespace: AWS/ElastiCache
       statistic: Average
@@ -94,6 +98,7 @@ panels:
     targets:
       {% for dimension in data %}
     - dimensions: {"CacheClusterId": {{ dimension.cache_cluster_identifier }}}
+      region: {{ dimension.region or 'default' }}
       metric: FreeableMemory
       namespace: AWS/ElastiCache
       statistic: Average
@@ -108,6 +113,7 @@ panels:
     targets:
       {% for dimension in data %}
     - dimensions: {"CacheClusterId": {{ dimension.cache_cluster_identifier }}}
+      region: {{ dimension.region or 'default' }}
       metric: SwapUsage
       namespace: AWS/ElastiCache
       statistic: Average
@@ -122,6 +128,7 @@ panels:
     targets:
       {% for dimension in data %}
     - dimensions: {"CacheClusterId": {{ dimension.cache_cluster_identifier }}}
+      region: {{ dimension.region or 'default' }}
       metric: CacheHits
       namespace: AWS/ElastiCache
       statistic: Average
@@ -135,6 +142,7 @@ panels:
     targets:
       {% for dimension in data %}
     - dimensions: {"CacheClusterId": {{ dimension.cache_cluster_identifier }}}
+      region: {{ dimension.region or 'default' }}
       metric: CacheMisses
       namespace: AWS/ElastiCache
       statistic: Average
@@ -148,6 +156,7 @@ panels:
     targets:
       {% for dimension in data %}
     - dimensions: {"CacheClusterId": {{ dimension.cache_cluster_identifier }}}
+      region: {{ dimension.region or 'default' }}
       metric: Evictions
       namespace: AWS/ElastiCache
       statistic: Average
@@ -171,6 +180,7 @@ panels:
     targets:
       {% for dimension in data %}
     - dimensions: {"CacheClusterId": {{ dimension.cache_cluster_identifier }}}
+      region: {{ dimension.region or 'default' }}
       metric: NetworkBytesIn
       namespace: AWS/ElastiCache
       statistic: Average
@@ -185,6 +195,7 @@ panels:
     targets:
       {% for dimension in data %}
     - dimensions: {"CacheClusterId": {{ dimension.cache_cluster_identifier }}}
+      region: {{ dimension.region or 'default' }}
       metric: NetworkBytesOut
       namespace: AWS/ElastiCache
       statistic: Average

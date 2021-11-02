@@ -35,6 +35,7 @@ pgsql_rds_schema = {
             "type": "dict",
             "schema": {
                 "db_instance_identifier": {"type": "string", "required": True},
+                "region": {"type": "string", "required": False},
             },
         },
     },
@@ -117,6 +118,7 @@ mysql_56_rds_schema = {
             "type": "dict",
             "schema": {
                 "db_instance_identifier": {"type": "string", "required": True},
+                "region": {"type": "string", "required": False},
             },
         },
     },
@@ -349,6 +351,7 @@ redis_elasticache_schema = {
             "type": "dict",
             "schema": {
                 "cache_cluster_identifier": {"type": "string", "required": True},
+                "region": {"type": "string", "required": False},
             },
         },
     },

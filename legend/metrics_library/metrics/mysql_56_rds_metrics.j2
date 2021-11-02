@@ -10,6 +10,7 @@ panels:
     targets:
       {% for dimension in data %}
     - dimensions: {"DBInstanceIdentifier": {{ dimension.db_instance_identifier }}}
+      region: {{ dimension.region or 'default' }}
       metric: CPUUtilization
       namespace: AWS/RDS
       statistic: Maximum
@@ -33,6 +34,7 @@ panels:
     targets:
       {% for dimension in data %}
     - dimensions: {"DBInstanceIdentifier": {{ dimension.db_instance_identifier }}}
+      region: {{ dimension.region or 'default' }}
       metric: DatabaseConnections
       namespace: AWS/RDS
       statistic: Maximum
@@ -54,6 +56,7 @@ panels:
     targets:
       {% for dimension in data %}
       - dimensions: {"DBInstanceIdentifier": {{ dimension.db_instance_identifier }}}
+        region: {{ dimension.region or 'default' }}
         metric: FreeableMemory
         namespace: AWS/RDS
         statistic: Average
@@ -68,11 +71,13 @@ panels:
     targets:
       {% for dimension in data %}
     - dimensions: {"DBInstanceIdentifier": {{ dimension.db_instance_identifier }}}
+      region: {{ dimension.region or 'default' }}
       metric: NetworkReceiveThroughput
       namespace: AWS/RDS
       statistic: Maximum
       alias: '{{ '{{DBInstanceIdentifier}}_{{metric}}_{{stat}}' }}'
     - dimensions: {"DBInstanceIdentifier": {{ dimension.db_instance_identifier }}}
+      region: {{ dimension.region or 'default' }}
       metric: NetworkTransmitThroughput
       namespace: AWS/RDS
       statistic: Maximum
@@ -87,11 +92,13 @@ panels:
     targets:
       {% for dimension in data %}
       - dimensions: {"DBInstanceIdentifier": {{ dimension.db_instance_identifier }}}
+        region: {{ dimension.region or 'default' }}
         metric: ReadThroughput
         namespace: AWS/RDS
         statistic: Maximum
         alias: '{{ '{{DBInstanceIdentifier}}_{{metric}}_{{stat}}' }}'
       - dimensions: {"DBInstanceIdentifier": {{ dimension.db_instance_identifier }}}
+        region: {{ dimension.region or 'default' }}
         metric: WriteThroughput
         namespace: AWS/RDS
         statistic: Maximum
@@ -106,6 +113,7 @@ panels:
     targets:
       {% for dimension in data %}
       - dimensions: {"DBInstanceIdentifier": {{ dimension.db_instance_identifier }}}
+        region: {{ dimension.region or 'default' }}
         metric: FreeStorageSpace
         namespace: AWS/RDS
         statistic: Minimum
@@ -129,6 +137,7 @@ panels:
     targets:
       {% for dimension in data %}
       - dimensions: {"DBInstanceIdentifier": {{ dimension.db_instance_identifier }}}
+        region: {{ dimension.region or 'default' }}
         metric: DiskQueueDepth
         namespace: AWS/RDS
         statistic: Average
@@ -141,11 +150,13 @@ panels:
     targets:
       {% for dimension in data %}
       - dimensions: {"DBInstanceIdentifier": {{ dimension.db_instance_identifier }}}
+        region: {{ dimension.region or 'default' }}
         metric: ReadLatency
         namespace: AWS/RDS
         statistic: Maximum
         alias: '{{ '{{DBInstanceIdentifier}}_{{metric}}_{{stat}}' }}'
       - dimensions: {"DBInstanceIdentifier": {{ dimension.db_instance_identifier }}}
+        region: {{ dimension.region or 'default' }}
         metric: WriteLatency
         namespace: AWS/RDS
         statistic: Maximum
@@ -160,6 +171,7 @@ panels:
     targets:
       {% for dimension in data %}
     - dimensions: {"DBInstanceIdentifier": {{ dimension.db_instance_identifier }}}
+      region: {{ dimension.region or 'default' }}
       metric: BurstBalance
       namespace: AWS/RDS
       statistic: Average
@@ -182,6 +194,7 @@ panels:
     targets:
       {% for dimension in data %}
       - dimensions: {"DBInstanceIdentifier": {{ dimension.db_instance_identifier }}}
+        region: {{ dimension.region or 'default' }}
         metric: ReplicaLag
         namespace: AWS/RDS
         statistic: Maximum
@@ -205,6 +218,7 @@ panels:
     targets:
       {% for dimension in data %}
       - dimensions: {}
+        region: {{ dimension.region or 'default' }}
         metric: SlowQueryCount-{{ dimension.db_instance_identifier }}
         namespace: RDSCustomMetric
         statistic: Maximum
@@ -216,6 +230,7 @@ panels:
     targets:
       {% for dimension in data %}
       - dimensions: {}
+        region: {{ dimension.region or 'default' }}
         metric: ReplicationErrorCount-{{ dimension.db_instance_identifier }}
         namespace: RDSCustomMetric
         statistic: Maximum
