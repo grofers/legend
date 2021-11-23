@@ -15,7 +15,7 @@ panels:
       namespace: AWS/RDS
       statistic: Maximum
       alias: '{{ '{{DBInstanceIdentifier}}_{{metric}}_{{stat}}' }}'
-      ref_no: 1
+      ref_no: {{ loop.index }}
       {% endfor %}
     formatY1: percent
     alert_config:
@@ -25,7 +25,9 @@ panels:
         for_duration: 5m
         evaluate_every: 1m
       condition_query:
-        - OR,avg,1,now,5m,gt,75
+      {% for dimension in data %}
+        - OR,avg,{{ loop.index }},now,5m,gt,75
+      {% endfor %}
 
   - title: (U) Database Connection Count
     type: Graph
@@ -38,7 +40,7 @@ panels:
       namespace: AWS/RDS
       statistic: Maximum
       alias: '{{ '{{DBInstanceIdentifier}}_{{metric}}_{{stat}}' }}'
-      ref_no: 1
+      ref_no: {{ loop.index }}
       {% endfor %}
     alert_config:
       priority: P4
@@ -47,7 +49,9 @@ panels:
         for_duration: 5m
         evaluate_every: 1m
       condition_query:
-        - OR,avg,1,now,5m,gt,500
+      {% for dimension in data %}
+        - OR,avg,{{ loop.index }},now,5m,gt,500
+      {% endfor %}
 
   - title: (D) Read/Write latency
     type: Graph
@@ -96,13 +100,17 @@ panels:
     description: The percentage of Burst Balance remaining
     targets:
       {% for dimension in data %}
+        {% if dimension.get('is_disk_gp2') is none or dimension.get('is_disk_gp2') is sameas true %}
+          {% if dimension.get('is_aurora') is none or dimension.get('is_aurora') is sameas false %}
     - dimensions: {"DBInstanceIdentifier": {{ dimension.db_instance_identifier }}}
       region: {{ dimension.region or 'default' }}
       metric: BurstBalance
       namespace: AWS/RDS
       statistic: Average
       alias: '{{ '{{DBInstanceIdentifier}}_{{metric}}_{{stat}}' }}'
-      ref_no: 1
+      ref_no: {{ loop.index }}
+          {% endif %}
+        {% endif %}
       {% endfor %}
     formatY1: percent
     alert_config:
@@ -112,7 +120,36 @@ panels:
         for_duration: 5m
         evaluate_every: 1m
       condition_query:
-        - OR,avg,1,now,5m,lt,75
+      {% for dimension in data %}
+        - OR,avg,{{ loop.index }},now,5m,lt,75
+      {% endfor %}
+
+  - title: (U) Free Storage Space
+    type: Graph
+    description: The amount of available storage space
+    targets:
+      {% for dimension in data %}
+        {% if dimension.get('is_aurora') is none or dimension.get('is_aurora') is sameas false %}
+      - dimensions: {"DBInstanceIdentifier": {{ dimension.db_instance_identifier }}}
+        region: {{ dimension.region or 'default' }}
+        metric: FreeStorageSpace
+        namespace: AWS/RDS
+        statistic: Maximum
+        alias: '{{ '{{DBInstanceIdentifier}}_{{metric}}_{{stat}}' }}'
+        ref_no: {{ loop.index }}
+        {% endif %}
+      {% endfor %}
+    formatY1: bytes
+    alert_config:
+      priority: P3
+      message: 'Free Storage Space is Low'
+      rule:
+        for_duration: 5m
+        evaluate_every: 1m
+      condition_query:
+      {% for dimension in data %}
+        - OR,min,{{ loop.index }},now,5m,lt,50*1024*1024*1024
+      {% endfor %}
 
   - title: (U) Freeable Memory
     type: Graph
@@ -127,29 +164,6 @@ panels:
         alias: '{{ '{{DBInstanceIdentifier}}_{{metric}}_{{stat}}' }}'
         {% endfor %}
     formatY1: bytes
-
-  - title: (U) Free Storage Space
-    type: Graph
-    description: The amount of available storage space
-    targets:
-      {% for dimension in data %}
-      - dimensions: {"DBInstanceIdentifier": {{ dimension.db_instance_identifier }}}
-        region: {{ dimension.region or 'default' }}
-        metric: FreeStorageSpace
-        namespace: AWS/RDS
-        statistic: Maximum
-        alias: '{{ '{{DBInstanceIdentifier}}_{{metric}}_{{stat}}' }}'
-        ref_no: 1
-      {% endfor %}
-    formatY1: bytes
-    alert_config:
-      priority: P3
-      message: 'Free Storage Space is Low'
-      rule:
-        for_duration: 5m
-        evaluate_every: 1m
-      condition_query:
-        - OR,min,1,now,5m,lt,50*1024*1024*1024
 
   - title: (U) Network Throughput (Bytes/Second)
     type: Graph
@@ -235,12 +249,28 @@ panels:
     description: The max amount of time a Read Replica DB instance lags behind the source DB instance.
     targets:
       {% for dimension in data %}
+        {% if dimension.get('is_replica') is none or dimension.get('is_replica') is sameas true %}
       - dimensions: {"DBInstanceIdentifier": {{ dimension.db_instance_identifier }}}
         region: {{ dimension.region or 'default' }}
         metric: ReplicaLag
         namespace: AWS/RDS
         statistic: Maximum
         alias: '{{ '{{DBInstanceIdentifier}}_{{metric}}_{{stat}}' }}'
+        {% endif %}
+      {% endfor %}
+
+  - title: (E) Replication error count (Only for read replica)
+    type: Graph
+    description: Replication related errors from logs (Custom Metric)
+    targets:
+      {% for dimension in data %}
+        {% if dimension.get('is_replica') is none or dimension.get('is_replica') is sameas true %}
+      - dimensions: {}
+        region: {{ dimension.region or 'default' }}
+        metric: ReplicationErrorCount-{{ dimension.db_instance_identifier }}
+        namespace: RDSCustomMetric
+        statistic: Maximum
+        {% endif %}
       {% endfor %}
 
   - title: (D) Slow Query Count
@@ -251,18 +281,6 @@ panels:
       - dimensions: {}
         region: {{ dimension.region or 'default' }}
         metric: SlowQueryCount-{{ dimension.db_instance_identifier }}
-        namespace: RDSCustomMetric
-        statistic: Maximum
-      {% endfor %}
-
-  - title: (E) Replication error count (Only for read replica)
-    type: Graph
-    description: Replication related errors from logs (Custom Metric)
-    targets:
-      {% for dimension in data %}
-      - dimensions: {}
-        region: {{ dimension.region or 'default' }}
-        metric: ReplicationErrorCount-{{ dimension.db_instance_identifier }}
         namespace: RDSCustomMetric
         statistic: Maximum
       {% endfor %}

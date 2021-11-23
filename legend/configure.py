@@ -1,21 +1,20 @@
 #!/usr/bin/env python
 
+import configparser
 import json
 import os
-import configparser
 
 from git import Repo
 
-from .helpers.utilities import mkdir
-
 from . import (
-    LEGEND_HOME,
-    GRAFONNET_REPO_URL,
-    GRAFONNET_REPO_NAME,
-    LEGEND_DEFAULT_CONFIG,
-    GRAFONNET_REPO_RELEASE_TAG,
     GRAFANA_DEFAULT_DATA_SOURCES,
+    GRAFONNET_REPO_NAME,
+    GRAFONNET_REPO_RELEASE_TAG,
+    GRAFONNET_REPO_URL,
+    LEGEND_DEFAULT_CONFIG,
+    LEGEND_HOME,
 )
+from .helpers.utilities import mkdir
 
 
 def install_grafonnet_lib():
@@ -35,7 +34,11 @@ def install_grafonnet_lib():
             repo.git.checkout(GRAFONNET_REPO_RELEASE_TAG)
             repo.git.pull("origin", GRAFONNET_REPO_RELEASE_TAG)
         except Exception:
-            raise ValueError("Not a valid git repo/unable to pull {release_tag}".format(release_tag=GRAFONNET_REPO_RELEASE_TAG))
+            raise ValueError(
+                "Not a valid git repo/unable to pull {release_tag}".format(
+                    release_tag=GRAFONNET_REPO_RELEASE_TAG
+                )
+            )
     return ()
 
 
@@ -52,11 +55,25 @@ def load_legend_config(config_file=None):
         config.read(os.path.join(LEGEND_HOME, LEGEND_DEFAULT_CONFIG))
 
     # Load the config. If any of the config value is present in env variables then, load from there instead
-    legend_config.update(grafana_api_key=os.environ.get("GRAFANA_API_KEY", config.get("grafana", "api_key", fallback=None)))
-    legend_config.update(grafana_host=os.environ.get("GRAFANA_HOST", config.get("grafana", "host", fallback=None)))
-    legend_config.update(grafana_protocol=os.environ.get("GRAFANA_PROTOCOL", config.get("grafana", "protocol", fallback=None)))
+    legend_config.update(
+        grafana_api_key=os.environ.get(
+            "GRAFANA_API_KEY", config.get("grafana", "api_key", fallback=None)
+        )
+    )
+    legend_config.update(
+        grafana_host=os.environ.get(
+            "GRAFANA_HOST", config.get("grafana", "host", fallback=None)
+        )
+    )
+    legend_config.update(
+        grafana_protocol=os.environ.get(
+            "GRAFANA_PROTOCOL", config.get("grafana", "protocol", fallback=None)
+        )
+    )
 
     if None not in legend_config.values():
         return legend_config
-        
-    raise Exception("Incomplete legend config, please update the legend config file or set env values")
+
+    raise Exception(
+        "Incomplete legend config, please update the legend config file or set env values"
+    )

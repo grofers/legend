@@ -1,39 +1,40 @@
 import collections
+
 from .metrics_schema import (
     airflow_schema,
-    mysql_ec2_schema,
-    pgsql_rds_schema,
-    pgbouncer_schema,
-    mysql_56_rds_schema,
-    sqs_schema,
-    springboot_schema,
-    rabbitmq_schema,
-    jmx_schema,
-    haproxy_schema,
-    elb_schema,
     alb_schema,
-    django_schema,
-    flask_schema,
-    couchdb_schema,
-    consul_schema,
-    vault_schema,
-    promtail_schema,
     celery_schema,
-    platform_k8s_deployment_schema,
-    platform_k8s_ingress_schema,
-    redis_schema,
-    redis_elasticache_schema,
-    platform_ec2_schema,
-    slo_schema,
-    s3_schema,
-    playframework_schema,
-    starlette_schema,
-    nodejs_schema,
+    consul_schema,
+    couchdb_schema,
+    django_schema,
+    elb_schema,
+    flask_schema,
     go_schema,
-    platform_k8s_cronjob_schema,
-    platform_k8s_hpa_schema,
+    haproxy_schema,
+    jmx_schema,
     loki_schema,
+    mysql_56_rds_schema,
+    mysql_ec2_schema,
     nginx_schema,
+    nodejs_schema,
+    pgbouncer_schema,
+    pgsql_rds_schema,
+    platform_ec2_schema,
+    platform_k8s_cronjob_schema,
+    platform_k8s_deployment_schema,
+    platform_k8s_hpa_schema,
+    platform_k8s_ingress_schema,
+    playframework_schema,
+    promtail_schema,
+    rabbitmq_schema,
+    redis_elasticache_schema,
+    redis_schema,
+    s3_schema,
+    slo_schema,
+    springboot_schema,
+    sqs_schema,
+    starlette_schema,
+    vault_schema,
 )
 
 
@@ -56,9 +57,17 @@ additional_panels_schema = {
                 "title": {"type": "string", "required": True},
                 "formatY1": {"type": "string", "required": False},
                 "labelY1": {"type": "string", "required": False},
-                "type": {"type": "string", "required": False, "allowed": ["Graph", "Log"]},
+                "type": {
+                    "type": "string",
+                    "required": False,
+                    "allowed": ["Graph", "Log"],
+                },
                 "description": {"type": "string", "required": False},
-                "sort_order": {"type": "string", "required": False, "allowed": ["Ascending", "Descending"]},
+                "sort_order": {
+                    "type": "string",
+                    "required": False,
+                    "allowed": ["Ascending", "Descending"],
+                },
                 "targets": {
                     "type": "list",
                     "schema": {
@@ -120,17 +129,9 @@ schema = {
         "type": "dict",
         "required": False,
         "schema": {
-            "notification_channels": {
-                "type": "list",
-                "required": True,
-                "empty": False
-            },
-            "tags": {
-                "type": "dict",
-                "required": False,
-                "empty": False
-            }
-        }
+            "notification_channels": {"type": "list", "required": True, "empty": False},
+            "tags": {"type": "dict", "required": False, "empty": False},
+        },
     },
     "service": {"type": "string", "required": False, "empty": False},
     "description": {"type": "string", "required": True, "empty": False},
@@ -165,10 +166,14 @@ schema = {
         "empty": False,
     },
     "graphTooltip": {
-        "type": "integer", 
-        "required": False, 
-        "empty": False, 
-        "allowed": [0, 1, 2] # 0 for no shared crosshair or tooltip (default), 1 for shared crosshair, 2 for shared crosshair and shared tooltip
+        "type": "integer",
+        "required": False,
+        "empty": False,
+        "allowed": [
+            0,
+            1,
+            2,
+        ],  # 0 for no shared crosshair or tooltip (default), 1 for shared crosshair, 2 for shared crosshair and shared tooltip
     },
     "components": {
         "type": "dict",

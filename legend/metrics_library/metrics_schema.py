@@ -36,6 +36,9 @@ pgsql_rds_schema = {
             "schema": {
                 "db_instance_identifier": {"type": "string", "required": True},
                 "region": {"type": "string", "required": False},
+                "is_replica": {"type": "boolean", "required": False},
+                "is_aurora": {"type": "boolean", "required": False},
+                "is_disk_gp2": {"type": "boolean", "required": False},
             },
         },
     },
@@ -47,9 +50,7 @@ pgbouncer_schema = {
         "type": "list",
         "schema": {
             "type": "dict",
-            "schema": {
-                "job_name": {"type": "string", "required": True},
-            },
+            "schema": {"job_name": {"type": "string", "required": True},},
         },
     },
 }
@@ -60,9 +61,7 @@ platform_k8s_deployment_schema = {
         "type": "list",
         "schema": {
             "type": "dict",
-            "schema": {
-                "deployment_name": {"type": "string", "required": True},
-            },
+            "schema": {"deployment_name": {"type": "string", "required": True},},
         },
     },
 }
@@ -119,6 +118,9 @@ mysql_56_rds_schema = {
             "schema": {
                 "db_instance_identifier": {"type": "string", "required": True},
                 "region": {"type": "string", "required": False},
+                "is_replica": {"type": "boolean", "required": False},
+                "is_aurora": {"type": "boolean", "required": False},
+                "is_disk_gp2": {"type": "boolean", "required": False},
             },
         },
     },
@@ -144,9 +146,7 @@ springboot_schema = {
         "type": "list",
         "schema": {
             "type": "dict",
-            "schema": {
-                "job": {"type": "string", "required": True},
-            },
+            "schema": {"job": {"type": "string", "required": True},},
         },
     },
 }
@@ -190,9 +190,7 @@ haproxy_schema = {
         "type": "list",
         "schema": {
             "type": "dict",
-            "schema": {
-                "backend": {"type": "string", "required": True},
-            },
+            "schema": {"backend": {"type": "string", "required": True},},
         },
     },
 }
@@ -203,9 +201,7 @@ elb_schema = {
         "type": "list",
         "schema": {
             "type": "dict",
-            "schema": {
-                "load_balancer_name": {"type": "string", "required": True},
-            },
+            "schema": {"load_balancer_name": {"type": "string", "required": True},},
         },
     },
 }
@@ -231,9 +227,7 @@ django_schema = {
         "type": "list",
         "schema": {
             "type": "dict",
-            "schema": {
-                "job": {"type": "string", "required": True},
-            },
+            "schema": {"job": {"type": "string", "required": True},},
         },
     },
 }
@@ -244,9 +238,7 @@ flask_schema = {
         "type": "list",
         "schema": {
             "type": "dict",
-            "schema": {
-                "job": {"type": "string", "required": True},
-            },
+            "schema": {"job": {"type": "string", "required": True},},
         },
     },
 }
@@ -257,9 +249,7 @@ playframework_schema = {
         "type": "list",
         "schema": {
             "type": "dict",
-            "schema": {
-                "service": {"type": "string", "required": True},
-            },
+            "schema": {"service": {"type": "string", "required": True},},
         },
     },
 }
@@ -270,9 +260,7 @@ couchdb_schema = {
         "type": "list",
         "schema": {
             "type": "dict",
-            "schema": {
-                "job_name": {"type": "string", "required": True},
-            },
+            "schema": {"job_name": {"type": "string", "required": True},},
         },
     },
 }
@@ -283,9 +271,7 @@ consul_schema = {
         "type": "list",
         "schema": {
             "type": "dict",
-            "schema": {
-                "region": {"type": "string", "required": True},
-            },
+            "schema": {"region": {"type": "string", "required": True},},
         },
     },
 }
@@ -296,9 +282,7 @@ vault_schema = {
         "type": "list",
         "schema": {
             "type": "dict",
-            "schema": {
-                "environment": {"type": "string", "required": True},
-            },
+            "schema": {"environment": {"type": "string", "required": True},},
         },
     },
 }
@@ -323,9 +307,7 @@ celery_schema = {
         "type": "list",
         "schema": {
             "type": "dict",
-            "schema": {
-                "job_name": {"type": "string", "required": True},
-            },
+            "schema": {"job_name": {"type": "string", "required": True},},
         },
     },
 }
@@ -336,9 +318,7 @@ redis_schema = {
         "type": "list",
         "schema": {
             "type": "dict",
-            "schema": {
-                "job_name": {"type": "string", "required": True},
-            },
+            "schema": {"job_name": {"type": "string", "required": True},},
         },
     },
 }
@@ -363,9 +343,7 @@ platform_ec2_schema = {
         "type": "list",
         "schema": {
             "type": "dict",
-            "schema": {
-                "host": {"type": "string", "required": True},
-            },
+            "schema": {"host": {"type": "string", "required": True},},
         },
     },
 }
@@ -455,9 +433,7 @@ nodejs_schema = {
         "type": "list",
         "schema": {
             "type": "dict",
-            "schema": {
-                "job": {"type": "string", "required": True},
-            },
+            "schema": {"job": {"type": "string", "required": True},},
         },
     },
 }
@@ -468,9 +444,7 @@ go_schema = {
         "type": "list",
         "schema": {
             "type": "dict",
-            "schema": {
-                "job": {"type": "string", "required": True},
-            },
+            "schema": {"job": {"type": "string", "required": True},},
         },
     },
 }
@@ -486,17 +460,9 @@ loki_schema = {
                     "type": "dict",
                     "required": True,
                     "allow_unknown": True,
-                    "schema": {
-                        "namespace": {
-                            "type": "string",
-                            "required": True,
-                        }
-                    },
+                    "schema": {"namespace": {"type": "string", "required": True,}},
                 },
-                "filters": {
-                    "type": "list",
-                    "required": False,
-                },
+                "filters": {"type": "list", "required": False,},
             },
         },
     },
@@ -508,9 +474,7 @@ nginx_schema = {
         "type": "list",
         "schema": {
             "type": "dict",
-            "schema": {
-                "nginx_namespace": {"type": "string", "required": True},
-            },
+            "schema": {"nginx_namespace": {"type": "string", "required": True},},
         },
     },
 }

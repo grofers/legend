@@ -1,38 +1,36 @@
 #!/usr/bin/env python
 
+
 import json
 import os
 import subprocess
-
 from uuid import uuid4
 
 from grafana_api.grafana_api import GrafanaClientError
 from grafana_api.grafana_face import GrafanaFace
 
+from . import (
+    GRAFANA_DEFAULT_DATA_SOURCES,
+    GRAFONNET_REPO_NAME,
+    LEGEND_DEFAULT_CONFIG,
+    LEGEND_HOME,
+)
 from .helpers.utilities import (
     assemble_panels_dynamic,
     convert_to_alnum,
-    jinja2_to_render,
-    str_yaml_to_json,
-    get_alert_id,
-    parse_condition_query,
-    get_grafana_folder_id,
     create_grafana_folder,
-    pagerduty_alert_severity_map,
-    opsgenie_alert_severity_map,
+    get_alert_id,
+    get_grafana_folder_id,
+    jinja2_to_render,
     mkdir,
+    opsgenie_alert_severity_map,
+    pagerduty_alert_severity_map,
+    parse_condition_query,
+    str_yaml_to_json,
 )
-
 from .kubernetes_library.adapter import (
-    kubernetes_library_eval,
     kubernetes_library_component_exists,
-)
-
-from . import (
-    LEGEND_HOME,
-    GRAFONNET_REPO_NAME,
-    LEGEND_DEFAULT_CONFIG,
-    GRAFANA_DEFAULT_DATA_SOURCES,
+    kubernetes_library_eval,
 )
 
 make_abs_path = lambda d: os.path.join(os.path.dirname(os.path.abspath(__file__)), d)
@@ -40,19 +38,21 @@ make_abs_path = lambda d: os.path.join(os.path.dirname(os.path.abspath(__file__)
 global LEGEND_HOME
 global GRAFONNET_REPO_NAME
 
+
 def generate_jsonnet(input_spec, legend_config):
     grafana_api_key = legend_config["grafana_api_key"]
     grafana_url = "%s://%s" % (
         legend_config["grafana_protocol"],
         legend_config["grafana_host"],
     )
-
     component_description = {}
     alert_rule_tags = {}
     alert_ids = []
     if input_spec.get("alert_config"):
         alert_ids = get_alert_id(
-            input_spec["alert_config"]["notification_channels"], grafana_api_key, grafana_url
+            input_spec["alert_config"]["notification_channels"],
+            grafana_api_key,
+            grafana_url,
         )
 
         if input_spec["alert_config"].get("tags") is not None:
@@ -78,7 +78,10 @@ def generate_jsonnet(input_spec, legend_config):
         # Adding custom panels and adding custom alerts
         for template in templates:
 
-            data_source = values.get("data_source", GRAFANA_DEFAULT_DATA_SOURCES.get(template["data_source_type"].upper()))
+            data_source = values.get(
+                "data_source",
+                GRAFANA_DEFAULT_DATA_SOURCES.get(template["data_source_type"].upper()),
+            )
 
             if data_source is None:
                 raise Exception("data source cannot be empty")
@@ -109,6 +112,10 @@ def generate_jsonnet(input_spec, legend_config):
                 else:
                     template["panels"].append(panel)
 
+            template["panels"] = [
+                panel for panel in template.get("panels") if panel.get("targets")
+            ]  # skipping panels with 0 targets
+
             for panel in template["panels"]:
                 panel["title_var"] = convert_to_alnum(panel["title"])
                 for target in panel["targets"]:
@@ -135,11 +142,15 @@ def generate_jsonnet(input_spec, legend_config):
                                     if severity is not None:
                                         alert_rule_tags["og_priority"] = severity
                                 elif id["type"] == "pagerduty":
-                                    severity = pagerduty_alert_severity_map.get(priority)
+                                    severity = pagerduty_alert_severity_map.get(
+                                        priority
+                                    )
                                     if severity is not None:
                                         alert_rule_tags["Severity"] = severity
 
-                    panel["alert_config"]["alert_rule_tags"] = json.dumps(alert_rule_tags)
+                    panel["alert_config"]["alert_rule_tags"] = json.dumps(
+                        alert_rule_tags
+                    )
 
                     alertrender = jinja2_to_render(
                         make_abs_path("templates/alert"),
@@ -148,7 +159,9 @@ def generate_jsonnet(input_spec, legend_config):
                     )
 
                     if panel["alert_config"].get("condition_query"):
-                        panel["alert_config"]["conditions"] = parse_condition_query(panel["alert_config"]["condition_query"], panel["targets"])
+                        panel["alert_config"]["conditions"] = parse_condition_query(
+                            panel["alert_config"]["condition_query"], panel["targets"]
+                        )
 
                         for condition in panel["alert_config"]["conditions"]:
                             conditionrender = jinja2_to_render(
@@ -186,7 +199,9 @@ def generate_dashboard_from_jsonnet(jsonnet_file_path):
     return json.loads(output)
 
 
-def create_or_update_grafana_dashboard(dashboard_json, legend_config, dashboard_id=None):
+def create_or_update_grafana_dashboard(
+    dashboard_json, legend_config, dashboard_id=None
+):
 
     auth = legend_config["grafana_api_key"]
     host = legend_config["grafana_host"]
