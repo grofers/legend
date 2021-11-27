@@ -9,7 +9,4 @@ def login_handler(**kwargs):
     Kubernetes cluster using `kubectl proxy`.
     """
 
-    return kopf.ConnectionInfo(
-        server="http://localhost:8001",
-        insecure=True,
-    )
+    return kopf.ConnectionInfo(server="http://localhost:8001", insecure=True,)
