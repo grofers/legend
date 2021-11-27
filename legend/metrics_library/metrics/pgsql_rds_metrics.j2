@@ -15,7 +15,7 @@ panels:
       namespace: AWS/RDS
       statistic: Maximum
       alias: '{{ '{{DBInstanceIdentifier}}_{{metric}}_{{stat}}' }}'
-      ref_no: 1
+      ref_no: {{ loop.index }}
       {% endfor %}
     formatY1: percent
     alert_config:
@@ -25,7 +25,9 @@ panels:
         for_duration: 5m
         evaluate_every: 1m
       condition_query:
-        - OR,avg,1,now,5m,gt,75
+      {% for dimension in data %}
+        - OR,avg,{{ loop.index }},now,5m,gt,75
+      {% endfor %}
 
   - title: (U) Database Connection Count
     type: Graph
@@ -38,7 +40,7 @@ panels:
       namespace: AWS/RDS
       statistic: Maximum
       alias: '{{ '{{DBInstanceIdentifier}}_{{metric}}_{{stat}}' }}'
-      ref_no: 1
+      ref_no: {{ loop.index }}
       {% endfor %}
     alert_config:
       priority: P4
@@ -47,7 +49,9 @@ panels:
         for_duration: 5m
         evaluate_every: 1m
       condition_query:
-        - OR,avg,1,now,5m,gt,500
+      {% for dimension in data %}
+        - OR,avg,{{ loop.index }},now,5m,gt,500
+      {% endfor %}
 
   - title: (D) Read/Write latency
     type: Graph
@@ -96,13 +100,17 @@ panels:
     description: The percentage of Burst Balance remaining
     targets:
       {% for dimension in data %}
+        {% if dimension.get('is_disk_gp2', true) %}
+          {% if not dimension.get('is_aurora', false) %}
     - dimensions: {"DBInstanceIdentifier": {{ dimension.db_instance_identifier }}}
       region: {{ dimension.region or 'default' }}
       metric: BurstBalance
       namespace: AWS/RDS
       statistic: Average
       alias: '{{ '{{DBInstanceIdentifier}}_{{metric}}_{{stat}}' }}'
-      ref_no: 1
+      ref_no: {{ loop.index }}
+          {% endif %}
+        {% endif %}
       {% endfor %}
     formatY1: percent
     alert_config:
@@ -112,7 +120,9 @@ panels:
         for_duration: 5m
         evaluate_every: 1m
       condition_query:
-        - OR,avg,1,now,5m,lt,75
+      {% for dimension in data %}
+        - OR,avg,{{ loop.index }},now,5m,lt,75
+      {% endfor %}
 
   - title: (U) Freeable Memory
     type: Graph
@@ -133,13 +143,15 @@ panels:
     description: The amount of available storage space
     targets:
       {% for dimension in data %}
+        {% if not dimension.get('is_aurora', false) %}
       - dimensions: {"DBInstanceIdentifier": {{ dimension.db_instance_identifier }}}
         region: {{ dimension.region or 'default' }}
         metric: FreeStorageSpace
         namespace: AWS/RDS
         statistic: Maximum
         alias: '{{ '{{DBInstanceIdentifier}}_{{metric}}_{{stat}}' }}'
-        ref_no: 1
+        ref_no: {{ loop.index }}
+        {% endif %}
       {% endfor %}
     formatY1: bytes
     alert_config:
@@ -149,7 +161,9 @@ panels:
         for_duration: 5m
         evaluate_every: 1m
       condition_query:
-        - OR,min,1,now,5m,lt,50*1024*1024*1024
+      {% for dimension in data %}
+        - OR,min,{{ loop.index }},now,5m,lt,50*1024*1024*1024
+      {% endfor %}
 
   - title: (U) Network Throughput (Bytes/Second)
     type: Graph
@@ -235,12 +249,14 @@ panels:
     description: The max amount of time a Read Replica DB instance lags behind the source DB instance.
     targets:
       {% for dimension in data %}
+        {% if dimension.get('is_replica', true) %}
       - dimensions: {"DBInstanceIdentifier": {{ dimension.db_instance_identifier }}}
         region: {{ dimension.region or 'default' }}
         metric: ReplicaLag
         namespace: AWS/RDS
         statistic: Maximum
         alias: '{{ '{{DBInstanceIdentifier}}_{{metric}}_{{stat}}' }}'
+        {% endif %}
       {% endfor %}
 
   - title: (D) Slow Query Count
@@ -260,9 +276,11 @@ panels:
     description: Replication related errors from logs (Custom Metric)
     targets:
       {% for dimension in data %}
+        {% if dimension.get('is_replica', true) %}
       - dimensions: {}
         region: {{ dimension.region or 'default' }}
         metric: ReplicationErrorCount-{{ dimension.db_instance_identifier }}
         namespace: RDSCustomMetric
         statistic: Maximum
+        {% endif %}
       {% endfor %}

@@ -36,6 +36,9 @@ pgsql_rds_schema = {
             "schema": {
                 "db_instance_identifier": {"type": "string", "required": True},
                 "region": {"type": "string", "required": False},
+                "is_replica": {"type": "boolean", "required": False},
+                "is_aurora": {"type": "boolean", "required": False},
+                "is_disk_gp2": {"type": "boolean", "required": False},
             },
         },
     },
@@ -115,6 +118,9 @@ mysql_56_rds_schema = {
             "schema": {
                 "db_instance_identifier": {"type": "string", "required": True},
                 "region": {"type": "string", "required": False},
+                "is_replica": {"type": "boolean", "required": False},
+                "is_aurora": {"type": "boolean", "required": False},
+                "is_disk_gp2": {"type": "boolean", "required": False},
             },
         },
     },
