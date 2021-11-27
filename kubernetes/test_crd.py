@@ -27,21 +27,41 @@ with open(metric_file_crd, "w") as file:
 
 @pytest.fixture(autouse=True)
 def test_crd_exists():
-    subprocess.run(f"kubectl apply -f {crd_yaml}", check=True, timeout=10, capture_output=True, shell=True)
+    subprocess.run(
+        f"kubectl apply -f {crd_yaml}",
+        check=True,
+        timeout=10,
+        capture_output=True,
+        shell=True,
+    )
 
 
 def test_resource_lifecycle():
 
     # Run an operator and simulate some activity with the operated resource.
-    with KopfRunner(["run", "--verbose", "--standalone", handler_py], timeout=60) as runner:
+    with KopfRunner(
+        ["run", "--verbose", "--standalone", handler_py], timeout=60
+    ) as runner:
 
         for file in os.listdir(input_dir):
 
             input_yaml = os.path.join(input_dir, file)
-            subprocess.run(f"kubectl apply -f {input_yaml}", shell=True, check=True, timeout=10, capture_output=True)
+            subprocess.run(
+                f"kubectl apply -f {input_yaml}",
+                shell=True,
+                check=True,
+                timeout=10,
+                capture_output=True,
+            )
             time.sleep(40)  # give it some time to react
 
-            subprocess.run(f"kubectl delete -f {input_yaml}", shell=True, check=True, timeout=10, capture_output=True)
+            subprocess.run(
+                f"kubectl delete -f {input_yaml}",
+                shell=True,
+                check=True,
+                timeout=10,
+                capture_output=True,
+            )
             time.sleep(40)  # give it some time to react
 
     # Ensure that the operator did not die on start, or during the operation.
