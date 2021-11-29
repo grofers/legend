@@ -1,38 +1,36 @@
 #!/usr/bin/env python
 
+
 import json
 import os
 import subprocess
-
 from uuid import uuid4
 
 from grafana_api.grafana_api import GrafanaClientError
 from grafana_api.grafana_face import GrafanaFace
 
+from . import (
+    GRAFANA_DEFAULT_DATA_SOURCES,
+    GRAFONNET_REPO_NAME,
+    LEGEND_DEFAULT_CONFIG,
+    LEGEND_HOME,
+)
 from .helpers.utilities import (
     assemble_panels_dynamic,
     convert_to_alnum,
-    jinja2_to_render,
-    str_yaml_to_json,
-    get_alert_id,
-    parse_condition_query,
-    get_grafana_folder_id,
     create_grafana_folder,
-    pagerduty_alert_severity_map,
-    opsgenie_alert_severity_map,
+    get_alert_id,
+    get_grafana_folder_id,
+    jinja2_to_render,
     mkdir,
+    opsgenie_alert_severity_map,
+    pagerduty_alert_severity_map,
+    parse_condition_query,
+    str_yaml_to_json,
 )
-
 from .kubernetes_library.adapter import (
-    kubernetes_library_eval,
     kubernetes_library_component_exists,
-)
-
-from . import (
-    LEGEND_HOME,
-    GRAFONNET_REPO_NAME,
-    LEGEND_DEFAULT_CONFIG,
-    GRAFANA_DEFAULT_DATA_SOURCES,
+    kubernetes_library_eval,
 )
 
 make_abs_path = lambda d: os.path.join(os.path.dirname(os.path.abspath(__file__)), d)
@@ -47,7 +45,6 @@ def generate_jsonnet(input_spec, legend_config):
         legend_config["grafana_protocol"],
         legend_config["grafana_host"],
     )
-
     component_description = {}
     alert_rule_tags = {}
     alert_ids = []
@@ -114,6 +111,10 @@ def generate_jsonnet(input_spec, legend_config):
                             tpanel_map[panel["title"]][k] = panel[k]
                 else:
                     template["panels"].append(panel)
+
+            template["panels"] = [
+                panel for panel in template.get("panels") if panel.get("targets")
+            ]  # skipping panels with 0 targets
 
             for panel in template["panels"]:
                 panel["title_var"] = convert_to_alnum(panel["title"])
