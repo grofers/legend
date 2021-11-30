@@ -178,8 +178,7 @@ panels:
     description: The percentage of Burst Balance remaining
     targets:
       {% for dimension in data %}
-        {% if dimension.get('is_disk_gp2', true) %}
-          {% if not dimension.get('is_aurora', false) %}
+        {% if dimension.get('is_disk_gp2', true) and not dimension.get('is_aurora', false) and dimension.get('is_burst_balance_panel_required', true) %}
     - dimensions: {"DBInstanceIdentifier": {{ dimension.db_instance_identifier }}}
       region: {{ dimension.region or 'default' }}
       metric: BurstBalance
@@ -187,7 +186,6 @@ panels:
       statistic: Average
       alias: '{{ '{{DBInstanceIdentifier}}_{{metric}}_{{stat}}' }}'
       ref_no: {{ loop.index }}
-          {% endif %}
         {% endif %}
       {% endfor %}
     formatY1: percent
