@@ -390,27 +390,30 @@ s3_schema = {
 mysql_ec2_schema = {
     "data_source": {"type": "string", "required": False},
     "dimensions": {
-        "type": "dict",
+        "type": "list",
         "schema": {
-            "masters": {
-                "required": True,
-                "type": "list",
-                "schema": {
-                    "type": "dict",
+            "type": "dict",
+            "schema": {
+                "masters": {
+                    "required": True,
+                    "type": "list",
                     "schema": {
-                        "host": {"type": "string", "required": True},
-                        "db_name": {"type": "string", "required": True},
+                        "type": "dict",
+                        "schema": {
+                            "host": {"type": "string", "required": True},
+                            "db_name": {"type": "string", "required": True},
+                        },
                     },
                 },
-            },
-            "slaves": {
-                "required": False,
-                "type": "list",
-                "schema": {
-                    "type": "dict",
+                "slaves": {
+                    "required": False,
+                    "type": "list",
                     "schema": {
-                        "host": {"type": "string", "required": True},
-                        "db_name": {"type": "string", "required": True},
+                        "type": "dict",
+                        "schema": {
+                            "host": {"type": "string", "required": True},
+                            "db_name": {"type": "string", "required": True},
+                        },
                     },
                 },
             },
