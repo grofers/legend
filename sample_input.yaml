@@ -52,8 +52,8 @@ components:
   mysql_ec2:
     dimensions:
       - masters:
-        - host: sample-mysql-host-master
-          db_name: sample-db
+          - host: sample-mysql-host-master
+            db_name: sample-db
         slaves:
           - host: sample-mysql-host-slave
             db_name: sample-db
