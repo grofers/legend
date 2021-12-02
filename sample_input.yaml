@@ -51,12 +51,12 @@ components:
 # Databases
   mysql_ec2:
     dimensions:
-      masters:
+      - masters:
         - host: sample-mysql-host-master
           db_name: sample-db
-      slaves:
-        - host: sample-mysql-host-slave
-          db_name: sample-db
+        slaves:
+          - host: sample-mysql-host-slave
+            db_name: sample-db
   mysql_56_rds:
     dimensions:
       - db_instance_identifier: sample-rds-mysql56
