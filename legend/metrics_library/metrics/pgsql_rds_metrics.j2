@@ -254,7 +254,20 @@ panels:
         namespace: AWS/RDS
         statistic: Maximum
         alias: '{{ '{{DBInstanceIdentifier}}_{{metric}}_{{stat}}' }}'
+        ref_no: {{ loop.index }}
         {% endif %}
+      {% endfor %}
+    labelY1: seconds
+    formatY1: s
+    alert_config:
+      priority: P4
+      message: 'Replication Lag is High'
+      rule:
+        for_duration: 5m
+        evaluate_every: 1m
+      condition_query:
+      {% for dimension in data %}
+        - OR,min,{{ loop.index }},now,5m,gt,100
       {% endfor %}
 
   - title: (D) Slow Query Count
