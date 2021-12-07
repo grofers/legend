@@ -34,6 +34,7 @@ panels:
     description: Percentage of the memory available for the cluster that is in use. This is calculated using used_memory/maxmemory from Redis INFO.
     targets:
       {% for dimension in data %}
+        {% if not dimension.get('is_redis_version_below_three', false) %}
     - dimensions: {"CacheClusterId": {{ dimension.cache_cluster_identifier }}}
       region: {{ dimension.region or 'default' }}
       metric: DatabaseMemoryUsagePercentage
@@ -41,6 +42,7 @@ panels:
       statistic: Maximum
       alias: '{{ '{{CacheClusterId}}_{{metric}}_{{stat}}' }}'
       ref_no: {{ loop.index }}
+        {% endif %}
       {% endfor %}
     formatY1: percent
     alert_config:
@@ -106,6 +108,16 @@ panels:
       ref_no: {{ loop.index }}
       {% endfor %}
     formatY1: bytes
+    alert_config:
+      priority: P3
+      message: 'Freeable Memory is low'
+      rule:
+        for_duration: 5m
+        evaluate_every: 1m
+      condition_query:
+      {% for dimension in data %}
+        - OR,avg,{{ loop.index }},now,5m,lt,524288000
+      {% endfor %}
 
   - title: (S) Swap Usage
     type: Graph
