@@ -9,7 +9,7 @@ panels:
     type: Graph
     description: Number of database connections
     targets:
-      {% for dimension in data.db %}
+      {% for dimension in data %}
         {% for master in dimension.masters %}
       - metric: max(max_over_time(mysql_global_status_threads_connected{instance_name=~"{{ master.host }}"}[5m]) or mysql_global_status_threads_connected{instance_name=~"{{ master.host }}"} ) by (instance_name)
         legend: '{{ 'CONNECTIONS_{{instance_name}}' }}'
@@ -34,7 +34,7 @@ panels:
     description: Percentage of DB connection utilization
     formatY1: percent
     targets:
-      {% for dimension in data.db %}
+      {% for dimension in data %}
         {% for master in dimension.masters %}
       - metric: (max((max_over_time(mysql_global_status_threads_connected{instance_name=~"{{ master.host }}"}[5m]) or mysql_global_status_threads_connected{instance_name=~"{{ master.host }}"})*100 / ignoring(job) mysql_global_variables_max_connections{instance_name=~"{{ master.host }}"} ) by (instance_name))
         legend: '{{ '{{instance_name}}' }}'
@@ -61,7 +61,7 @@ panels:
     description: Percentage of autoincrement counter is consumed by each table in schema
     formatY1: percent
     targets:
-      {% for dimension in data.db %}
+      {% for dimension in data %}
         {% for master in dimension.masters %}
       - metric: mysql_info_schema_auto_increment_column{instance_name=~"{{ master.host }}", schema=~"{{ master.db_name }}"}*100/mysql_info_schema_auto_increment_column_max{instance_name=~"{{ master.host }}", schema=~"{{ master.db_name }}"}
         legend: '{{ '{{instance_name}}_{{schema}}_{{table}}' }}'
@@ -87,7 +87,7 @@ panels:
     type: Graph
     description: No. of Slow Queries
     targets:
-      {% for dimension in data.db %}
+      {% for dimension in data %}
         {% for master in dimension.masters %}
       - metric: rate(mysql_global_status_slow_queries{instance_name=~"{{ master.host }}"}[5m])
         legend: '{{ '{{instance_name}}' }}'
@@ -103,7 +103,7 @@ panels:
     description: Slow Queries (%)
     formatY1: percent
     targets:
-      {% for dimension in data.db %}
+      {% for dimension in data %}
         {% for master in dimension.masters %}
       - metric: rate(mysql_global_status_slow_queries{instance_name=~"{{ master.host }}"}[5m])*100 / rate(mysql_global_status_queries{instance_name=~"{{ master.host }}"}[5m])
         legend: '{{ '{{instance_name}}' }}'
@@ -129,7 +129,7 @@ panels:
     type: Graph
     description: No. of deadlocks happend
     targets:
-      {% for dimension in data.db %}
+      {% for dimension in data %}
         {% for master in dimension.masters %}
       - metric: (rate(mysql_global_status_innodb_deadlocks{instance_name=~"{{ master.host }}"}[5m]) or rate(mysql_info_schema_innodb_metrics_lock_lock_deadlocks_total{instance_name=~"{{ master.host }}"}[5m]))
         legend: '{{ '{{instance_name}}' }}'
@@ -155,7 +155,7 @@ panels:
     type: Graph
     description: Rate of queries executed
     targets:
-      {% for dimension in data.db %}
+      {% for dimension in data %}
         {% for master in dimension.masters %}
       - metric: rate(mysql_global_status_queries{instance_name=~"{{ master.host }}"}[5m])
         legend: '{{ '{{instance_name}}' }}'
@@ -170,7 +170,7 @@ panels:
     type: Graph
     description: Rate of MySQL Temporary Object
     targets:
-      {% for dimension in data.db %}
+      {% for dimension in data %}
         {% for master in dimension.masters %}
       - metric: rate(mysql_global_status_created_tmp_tables{instance_name=~"{{ master.host }}"}[5m])
         legend: '{{ 'Created_Tmp_Tables{{instance_name}}' }}'
@@ -193,7 +193,7 @@ panels:
     type: Graph
     description: "MySQL Select Range - Ref: https://www.percona.com/doc/percona-monitoring-and-management/dashboard.mysql-overview.html#dashboard-mysql-overview-select-types"
     targets:
-      {% for dimension in data.db %}
+      {% for dimension in data %}
         {% for master in dimension.masters %}
       - metric: rate(mysql_global_status_select_full_join{instance_name=~"{{ master.host }}"}[5m])
         legend: '{{ 'Select_Full_Join_{{instance_name}}' }}'
@@ -225,7 +225,7 @@ panels:
     description: MySQL Replication in Seconds
     formatY1: s
     targets:
-      {% for dimension in data.db %}
+      {% for dimension in data %}
         {% for slave in dimension.slaves %}
       - metric: mysql_slave_status_seconds_behind_master{instance_name=~"{{ slave.host }}"}
         legend: '{{ '{{instance_name}}_{{channel_name}}' }}'
@@ -245,7 +245,7 @@ panels:
     type: Graph
     description: MySQL Up
     targets:
-      {% for dimension in data.db %}
+      {% for dimension in data %}
         {% for master in dimension.masters %}
       - metric: up{instance_name=~"{{ master.host }}"}
         legend:  '{{ '{{instance_name}}_{{channel_name}}' }}'
@@ -271,7 +271,7 @@ panels:
     type: Graph
     description: Displays whether the IO Thread is in the running state or not. Applies only to a Slave host. The IO Thread connects to the Master host and reads binary log events, and then copies them locally to a file called the relay log.
     targets:
-      {% for dimension in data.db %}
+      {% for dimension in data %}
         {% for slave in dimension.slaves %}
       - metric: mysql_slave_status_slave_io_running{instance_name=~"{{ slave.host }}"}
         legend: '{{ '{{instance_name}}_{{channel_name}}' }}'
@@ -291,7 +291,7 @@ panels:
     type: Graph
     description: Displays whether the SQL Thread is in the running state or not. Applies only to a Slave host. The SQL Thread reads the events from the local relay log file and applies them to the Slave host.  Depending on the format of the binary log it can read query statements (STATEMENT format) and re-executes them, or by reading row changes (ROW format) and applying only the changes.
     targets:
-      {% for dimension in data.db %}
+      {% for dimension in data %}
         {% for slave in dimension.slaves %}
       - metric: mysql_slave_status_slave_sql_running{instance_name=~"{{ slave.host }}"}
         legend: '{{ '{{instance_name}}_{{channel_name}}' }}'
@@ -306,6 +306,3 @@ panels:
           evaluate_every: 60s
         condition_query:
         - OR,last,1,now,1m,lt,1
----
-{% set data = data.ec2 %}
-{% include "platform_ec2_metrics.j2" with context %}

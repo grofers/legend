@@ -42,7 +42,10 @@ pgsql_rds_schema = {
                 "is_replica": {"type": "boolean", "required": False},
                 "is_aurora": {"type": "boolean", "required": False},
                 "is_disk_gp2": {"type": "boolean", "required": False},
-                "is_burst_balance_panel_required": {"type": "boolean", "required": False}
+                "is_burst_balance_panel_required": {
+                    "type": "boolean",
+                    "required": False,
+                },
             },
         },
     },
@@ -125,7 +128,10 @@ mysql_56_rds_schema = {
                 "is_replica": {"type": "boolean", "required": False},
                 "is_aurora": {"type": "boolean", "required": False},
                 "is_disk_gp2": {"type": "boolean", "required": False},
-                "is_burst_balance_panel_required": {"type": "boolean", "required": False}
+                "is_burst_balance_panel_required": {
+                    "type": "boolean",
+                    "required": False,
+                },
             },
         },
     },
@@ -388,43 +394,29 @@ s3_schema = {
 mysql_ec2_schema = {
     "data_source": {"type": "string", "required": False},
     "dimensions": {
-        "type": "dict",
+        "type": "list",
         "schema": {
-            "ec2": {
-                "required": True,
-                "type": "list",
-                "schema": {
-                    "type": "dict",
-                    "schema": {"host": {"type": "string", "required": True}},
-                },
-            },
-            "db": {
-                "required": True,
-                "type": "list",
-                "schema": {
-                    "type": "dict",
+            "type": "dict",
+            "schema": {
+                "masters": {
+                    "required": True,
+                    "type": "list",
                     "schema": {
-                        "masters": {
-                            "required": False,
-                            "type": "list",
-                            "schema": {
-                                "type": "dict",
-                                "schema": {
-                                    "host": {"type": "string", "required": True},
-                                    "db_name": {"type": "string", "required": True},
-                                },
-                            },
+                        "type": "dict",
+                        "schema": {
+                            "host": {"type": "string", "required": True},
+                            "db_name": {"type": "string", "required": True},
                         },
-                        "slaves": {
-                            "required": False,
-                            "type": "list",
-                            "schema": {
-                                "type": "dict",
-                                "schema": {
-                                    "host": {"type": "string", "required": True},
-                                    "db_name": {"type": "string", "required": True},
-                                },
-                            },
+                    },
+                },
+                "slaves": {
+                    "required": False,
+                    "type": "list",
+                    "schema": {
+                        "type": "dict",
+                        "schema": {
+                            "host": {"type": "string", "required": True},
+                            "db_name": {"type": "string", "required": True},
                         },
                     },
                 },
