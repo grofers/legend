@@ -108,8 +108,6 @@ panels:
       ref_no: {{ loop.index }}
       {% endfor %}
     formatY1: bytes
-    {% for dimension in data %}
-      {% if dimension.get('is_redis_version_below_three', false) %}
     alert_config:
       priority: P3
       message: 'Freeable Memory is low'
@@ -120,8 +118,6 @@ panels:
       {% for dimension in data %}
         - OR,avg,{{ loop.index }},now,5m,lt,524288000
       {% endfor %}
-      {% endif %}
-    {% endfor %}
 
   - title: (S) Swap Usage
     type: Graph
