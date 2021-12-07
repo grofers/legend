@@ -1,3 +1,6 @@
+from typing_extensions import Required
+
+
 airflow_schema = {
     "data_source": {"type": "string", "required": False},
     "dimensions": {
@@ -340,6 +343,7 @@ redis_elasticache_schema = {
             "schema": {
                 "cache_cluster_identifier": {"type": "string", "required": True},
                 "region": {"type": "string", "required": False},
+                "is_redis_version_below_three": {"type": "boolean", "required": False} 
             },
         },
     },
