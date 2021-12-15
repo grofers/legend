@@ -40,6 +40,7 @@ panels:
         metric: SurgeQueueLength
         namespace: AWS/ELB
         statistic: Maximum
+        expression: "FILL(SEARCH('{AWS/ELB,LoadBalancerName} MetricName=SurgeQueueLength LoadBalancerName=({{ dimension.load_balancer_name }})', 'Sum', 60), 0)"
         alias: '{{ '{{LoadBalancerName}}_{{metric}}_{{stat}}' }}'
         ref_no: 1
       {% endfor %}
