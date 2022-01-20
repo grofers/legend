@@ -1,0 +1,158 @@
+component: platform_k8s_statefulset
+data_source_type: Prometheus
+metrics_source: https://github.com/kubernetes/kube-state-metrics
+reference: https://blog.freshtracks.io/a-deep-dive-into-kubernetes-metrics-part-3-container-resource-metrics-361c5ee46e66
+description: Kubernetes Statefulset
+panels:
+  - title: (U) CPU Utilisation
+    type: Graph
+    description: current cpu utilisation per container
+    targets:
+      {% for dimension in data %}
+      - metric: round(((sum(rate(container_cpu_usage_seconds_total{container!~"POD", pod=~"^{{ dimension.statefulset_name }}.*"}[5m])) by (container) / sum(kube_pod_container_resource_limits{pod=~"^{{ dimension.statefulset_name }}.*", resource="cpu", unit="core"}) by (container)) * 100), 0.1)
+        legend: '{{ '{{container}}' }}'
+        ref_no: 1
+      {% endfor %}
+    formatY1: percent
+    alert_config:
+      priority: P3
+      message: High CPU Utilisation
+      rule:
+        for_duration: 5m
+        evaluate_every: 1m
+      condition_query:
+        - OR,avg,1,now,5m,gt,80
+
+  - title: (S) CPU Saturation
+    type: Graph
+    description: Amount of time the container was throttled
+    targets:
+      {% for dimension in data %}
+      - metric: sum(rate(container_cpu_cfs_throttled_seconds_total{container!~"POD", pod=~"^{{ dimension.statefulset_name }}.*"}[5m])) by (container)
+        legend: '{{ '{{container}}' }}'
+      {% endfor %}
+    formatY1: s
+
+  - title: (U) Memory Utilisation
+    type: Graph
+    description: Current memory usage per container
+    targets:
+      {% for dimension in data %}
+      - metric: round(((sum(container_memory_working_set_bytes{container!~"POD", pod=~"^{{ dimension.statefulset_name }}.*"}) by (container) / sum(kube_pod_container_resource_limits{pod=~"^{{ dimension.statefulset_name }}.*", resource="memory", unit="byte"}) by (container)) * 100), 0.1)
+        legend: '{{ '{{container}}' }}'
+        ref_no: 1
+      {% endfor %}
+    formatY1: percent
+    alert_config:
+      priority: P3
+      message: High Memory Utilisation
+      rule:
+        for_duration: 5m
+        evaluate_every: 1m
+      condition_query:
+        - OR,avg,1,now,5m,gt,80
+
+  - title: (S) Memory Saturation
+    type: Graph
+    description: Amount of available memory from the limit
+    targets:
+      {% for dimension in data %}
+      - metric: (sum(container_memory_working_set_bytes{pod=~"^{{ dimension.statefulset_name }}.*"}) by (container) / sum(kube_pod_container_resource_limits{pod=~"^{{ dimension.statefulset_name }}.*", resource="memory", unit="byte"}) by (container))
+        legend: '{{ '{{container}}' }}'
+      {% endfor %}
+    formatY1: bytes
+
+  - title: (U) Disk Utilisation
+    type: Graph
+    description: bytes read/written
+    targets:
+      {% for dimension in data %}
+      - metric: sum(rate(container_fs_writes_bytes_total{pod=~"^{{ dimension.statefulset_name }}.*"}[5m])) by (container,device)
+        legend: '{{ '{{container}} {{device}} Writes' }}'
+      - metric: sum(rate(container_fs_reads_bytes_total{pod=~"^{{ dimension.statefulset_name }}.*"}[5m])) by (container,device)
+        legend: '{{ '{{container}} {{device}} Reads' }}'
+      {% endfor %}
+    formatY1: bytes
+
+  - title: (U) Network Utilisation
+    type: Graph
+    description: bytes received/transmitted
+    targets:
+      {% for dimension in data %}
+      - metric: sum(rate(container_network_receive_bytes_total{pod=~"^{{ dimension.statefulset_name }}.*"}[5m])) by (pod, interface)
+        legend: '{{ '{{pod}} rx' }}'
+      - metric: sum(rate(container_network_transmit_bytes_total{pod=~"^{{ dimension.statefulset_name }}.*"}[5m])) by (pod, interface)
+        legend: '{{ '{{pod}} tx' }}'
+      {% endfor %}
+
+  - title: (E) Network Errors
+    type: Graph
+    description: Number of network errors
+    targets:
+      {% for dimension in data %}
+      - metric: sum(rate(container_network_receive_errors_total{pod=~"^{{ dimension.statefulset_name }}.*"}[5m])) by (pod)
+        legend: '{{ '{{pod}} rx' }}'
+      - metric: sum(rate(container_network_transmit_errors_total{pod=~"^{{ dimension.statefulset_name }}.*"}[5m])) by (pod)
+        legend: '{{ '{{pod}} tx' }}'
+      {% endfor %}
+
+  - title: (E) Unavailable Replica Percentage
+    type: Graph
+    description: Percentage of replicas not available in the statefulset
+    targets:
+      {% for dimension in data %}
+      - metric: round((((kube_statefulset_replicas{statefulset=~"^{{ dimension.statefulset_name }}.*"}-kube_statefulset_status_replicas_ready{statefulset=~"^{{ dimension.statefulset_name }}.*"})/kube_statefulset_replicas{statefulset=~"^{{ dimension.statefulset_name }}.*"}) * 100), 1)
+        legend: '{{ '{{statefulset}}' }}'
+        ref_no: 1
+      {% endfor %}
+    formatY1: percent
+    alert_config:
+      priority: P2
+      message: High Unavailable Replica Percentage
+      rule:
+        for_duration: 5m
+        evaluate_every: 1m
+      condition_query:
+        - OR,avg,1,now,5m,gt,60
+
+  - title: (E) Running replicas
+    type: Graph
+    description: Running replicas
+    targets:
+      {% for dimension in data %}
+      - metric: kube_statefulset_status_replicas_ready{statefulset=~"^{{ dimension.statefulset_name }}.*"}
+        legend: '{{ '{{statefulset}}' }}'
+        ref_no: 1
+      {% endfor %}
+
+  - title: (U) CPU Utilisation(Request)
+    type: Graph
+    description: current cpu utilisation per container from the request
+    targets:
+      {% for dimension in data %}
+      - metric: round(((sum(rate(container_cpu_usage_seconds_total{container!~"POD", pod=~"^{{ dimension.statefulset_name }}.*"}[5m])) by (container) / sum(kube_pod_container_resource_requests{pod=~"^{{ dimension.statefulset_name }}.*", resource="cpu", unit="core"}) by (container)) * 100), 0.1)
+        legend: '{{ '{{container}}' }}'
+        ref_no: 1
+      {% endfor %}
+    formatY1: percent
+
+  - title: (S) Memory Saturation(Request)
+    type: Graph
+    description: Amount of available memory from the request
+    targets:
+      {% for dimension in data %}
+      - metric: (sum(container_memory_working_set_bytes{pod=~"^{{ dimension.statefulset_name }}.*"}) by (container) / sum(kube_pod_container_resource_requests{pod=~"^{{ dimension.statefulset_name }}.*", resource="memory", unit="byte"}) by (container))
+        legend: '{{ '{{container}}' }}'
+      {% endfor %}
+    formatY1: bytes
+
+  - title: (U) Memory Utilisation(Request)
+    type: Graph
+    description: Current memory usage per container
+    targets:
+      {% for dimension in data %}
+      - metric: round(((sum(container_memory_working_set_bytes{container!~"POD", pod=~"^{{ dimension.statefulset_name }}.*"}) by (container) / sum(kube_pod_container_resource_requests{pod=~"^{{ dimension.statefulset_name }}.*", resource="memory", unit="byte"}) by (container)) * 100), 0.1)
+        legend: '{{ '{{container}}' }}'
+        ref_no: 1
+      {% endfor %}
+    formatY1: percent

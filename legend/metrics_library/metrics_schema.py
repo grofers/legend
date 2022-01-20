@@ -73,6 +73,17 @@ platform_k8s_deployment_schema = {
     },
 }
 
+platform_k8s_statefulset_schema = {
+    "data_source": {"type": "string", "required": False},
+    "dimensions": {
+        "type": "list",
+        "schema": {
+            "type": "dict",
+            "schema": {"statefulset_name": {"type": "string", "required": True},},
+        },
+    },
+}
+
 platform_k8s_cronjob_schema = {
     "data_source": {"type": "string", "required": False},
     "dimensions": {
