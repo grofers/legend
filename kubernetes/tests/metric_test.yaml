@@ -16,8 +16,7 @@ spec:
     environment: Prod
     description: Logging tool for everything deployed on kubernetes
     references:
-      deployment: -|
-        https://github.com/grofers/legend/tree/master/helm-chart/legend/Readme.md
+      deployment: https://github.com/grofers/legend/tree/master/helm-chart/legend/Readme.md
       documentation: https://github.com/grofers/legend/tree/master/docs
       metrics_definition: https://github.com/grofers/legend
     tags:
