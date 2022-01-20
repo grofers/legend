@@ -67,7 +67,7 @@ def create_or_update_handler(spec, name, **kwargs):
 
 
 @kopf.on.create("grofers.io", "v1beta1", "grafana-dashboards")
-def create_handler(spec, name, **kwargs):
+def handler(spec, name, **kwargs):
     logger.info("Creating new Grafana dashboard: %s", name)
     kopf.info(
         spec, reason="CreatingDashboard", message="Creating new grafana-dashboard."
@@ -101,19 +101,20 @@ def create_handler(spec, name, **kwargs):
 
 @kopf.on.resume("grofers.io", "v1beta1", "grafana-dashboards")
 @kopf.on.update("grofers.io", "v1beta1", "grafana-dashboards")
-def update_handler(spec, name, **kwargs):
+def handler(spec, name, **kwargs):
     logger.info("Updating existing Grafana dashboard object: %s", name)
     kopf.info(spec, reason="UpdatingDashboard", message="Updating Grafana dashboard.")
     logger.debug("Got the following keyword args for udpating the object: %s", kwargs)
 
     try:
-        create_or_update_handler(spec, name, **kwargs)
+        resp = create_or_update_handler(spec, name, **kwargs)
         kopf.info(
             spec,
             reason="UpdatedDashboard",
             message="Finished updating Grafana dashboard: %s." % name,
         )
         logger.info("Finished updating Grafana dashboard: %s", name)
+        return resp
     except Exception as e:
         logger.error(
             (
@@ -140,8 +141,8 @@ def delete_handler(spec, name, body, **kwargs):
     # was successful earlier
     if "status" in body:
         status = body["status"]
-        if status.get("create_handler") or status.get("update_handler"):
-            uid = body["status"]["create_handler"]["uid"]
+        if status.get("handler"):
+            uid = body["status"]["handler"]["uid"]
 
             try:
                 legend_config = load_legend_config()
