@@ -16,12 +16,13 @@ spec:
     environment: Prod
     description: Logging tool for everything deployed on kubernetes
     references:
-      deployment: https://github.com/grofers/legend/tree/master/helm-chart/legend/Readme.md
+      deployment: -|
+        https://github.com/grofers/legend/tree/master/helm-chart/legend/Readme.md
       documentation: https://github.com/grofers/legend/tree/master/docs
       metrics_definition: https://github.com/grofers/legend
     tags:
-    - prod
-    - infra
+      - prod
+      - infra
     components:
 
     # Application frameworks
@@ -52,8 +53,8 @@ spec:
             - host: sample-ec2-host
           db:
             - masters:
-              - host: sample-mysql-host-master
-                db_name: sample-db
+                - host: sample-mysql-host-master
+                  db_name: sample-db
               slaves:
                 - host: sample-mysql-host-slave
                   db_name: sample-db
@@ -94,7 +95,7 @@ spec:
           - deployment_name: sample-deployment-name
       platform_k8s_statefulset:
         dimensions:
-          - statefulset_name: sample-statefulset-name           
+          - statefulset_name: sample-statefulset-name
       platform_k8s_ingress:
         dimensions:
           - namespace: sample-namespace
@@ -135,7 +136,7 @@ spec:
           - job: sample-starlette-service
             path: sample-starlette-path
 
-    # Applications 
+    # Applications
       consul:
         dimensions:
           - region: sample-aws-region
