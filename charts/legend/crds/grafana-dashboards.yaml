@@ -31,10 +31,10 @@ spec:
       - name: Dashboard URL
         type: string
         priority: 0
-        jsonPath: .status.create_handler.grafana_url
+        jsonPath: .status.handler.grafana_url
         description: URL for the Grafana dashboard.
       - name: Status
         type: string
         priority: 0
-        jsonPath: .status.create_handler.status
+        jsonPath: .status.handler.status
         description: Status of the Grafana dashboard.
