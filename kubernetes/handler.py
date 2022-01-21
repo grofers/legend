@@ -71,29 +71,34 @@ def create_or_update_handler(spec, name, **kwargs):
 def handler(spec, name, **kwargs):
     logger.debug("Event: %s",kwargs['event'])
     action=kwargs["event"]
-    if action == 'create':
-        logger.info("Creating new Grafana dashboard: %s", name)
-        kopf.info(
-            spec, reason="CreatingDashboard", message="Creating new grafana-dashboard."
-        )
-        logger.debug("Got the following keyword args for creating the object: %s", kwargs)
-    else:
-        logger.info("Updating existing Grafana dashboard object: %s", name)
-        kopf.info(spec, reason="UpdatingDashboard", message="Updating Grafana dashboard.")
-        logger.debug("Got the following keyword args for updating the object: %s", kwargs)
-    
     try:
-        resp = create_or_update_handler(spec, name, **kwargs)
         if action == 'create':
+            logger.info("Creating new Grafana dashboard: %s", name)
+            kopf.info(
+                spec, reason="CreatingDashboard", message="Creating new grafana-dashboard."
+            )
+            logger.debug("Got the following keyword args for creating the object: %s", kwargs)
+
+            resp = create_or_update_handler(spec, name, **kwargs)
+
             kopf.info(
                 spec,reason="CreatedDashboard",message=("Finished creating dashboard " "at %s." % resp["grafana_url"])
             )
             logger.info("Finished creating Grafana dashboard: %s", name)            
         else:
+            logger.info("Updating existing Grafana dashboard object: %s", name)
+            kopf.info(
+                spec, reason="UpdatingDashboard", message="Updating Grafana dashboard."
+            )
+            logger.debug("Got the following keyword args for updating the object: %s", kwargs) 
+
+            resp = create_or_update_handler(spec, name, **kwargs)
+
             kopf.info(
                 spec,reason="UpdatedDashboard",message="Finished updating Grafana dashboard: %s." % name
             )
             logger.info("Finished updating Grafana dashboard: %s", name)
+            
         return resp
         
     except Exception as e:
