@@ -65,68 +65,50 @@ def create_or_update_handler(spec, name, **kwargs):
         "grafana_url": grafana_url,
     }
 
-
 @kopf.on.create("grofers.io", "v1beta1", "grafana-dashboards")
-def handler(spec, name, **kwargs):
-    logger.info("Creating new Grafana dashboard: %s", name)
-    kopf.info(
-        spec, reason="CreatingDashboard", message="Creating new grafana-dashboard."
-    )
-    logger.debug("Got the following keyword args for creating the object: %s", kwargs)
-
-    try:
-        resp = create_or_update_handler(spec, name, **kwargs)
-        kopf.info(
-            spec,
-            reason="CreatedDashboard",
-            message=("Finished creating dashboard " "at %s." % resp["grafana_url"]),
-        )
-        logger.info("Finished creating Grafana dashboard: %s", name)
-        return resp
-    except Exception as e:
-        logger.error(
-            (
-                "Failed to create Grafana dashboard due to the "
-                "following exception: %s"
-            ),
-            e,
-        )
-        kopf.exception(
-            spec,
-            reason="APIError",
-            message=("Failed to create dashboard due to API " "error: %s" % e),
-        )
-        raise kopf.PermanentError("Failed creating the dashboard")
-
-
 @kopf.on.resume("grofers.io", "v1beta1", "grafana-dashboards")
 @kopf.on.update("grofers.io", "v1beta1", "grafana-dashboards")
 def handler(spec, name, **kwargs):
-    logger.info("Updating existing Grafana dashboard object: %s", name)
-    kopf.info(spec, reason="UpdatingDashboard", message="Updating Grafana dashboard.")
-    logger.debug("Got the following keyword args for udpating the object: %s", kwargs)
-
+    logger.debug("Event: %s",kwargs['event'])
+    action=kwargs["event"]
+    if action == 'create':
+        logger.info("Creating new Grafana dashboard: %s", name)
+        kopf.info(
+            spec, reason="CreatingDashboard", message="Creating new grafana-dashboard."
+        )
+        logger.debug("Got the following keyword args for creating the object: %s", kwargs)
+    else:
+        logger.info("Updating existing Grafana dashboard object: %s", name)
+        kopf.info(spec, reason="UpdatingDashboard", message="Updating Grafana dashboard.")
+        logger.debug("Got the following keyword args for updating the object: %s", kwargs)
+    
     try:
         resp = create_or_update_handler(spec, name, **kwargs)
-        kopf.info(
-            spec,
-            reason="UpdatedDashboard",
-            message="Finished updating Grafana dashboard: %s." % name,
-        )
-        logger.info("Finished updating Grafana dashboard: %s", name)
+        if action == 'create':
+            kopf.info(
+                spec,reason="CreatedDashboard",message=("Finished creating dashboard " "at %s." % resp["grafana_url"])
+            )
+            logger.info("Finished creating Grafana dashboard: %s", name)            
+        else:
+            kopf.info(
+                spec,reason="UpdatedDashboard",message="Finished updating Grafana dashboard: %s." % name
+            )
+            logger.info("Finished updating Grafana dashboard: %s", name)
         return resp
+        
     except Exception as e:
         logger.error(
             (
-                "Failed to update Grafana dashboard due to the "
+                "Failed to %s Grafana dashboard due to the "
                 "following exception: %s"
             ),
+            action,
             e,
         )
         kopf.exception(
             spec,
             reason="APIError",
-            message=("Failed to update dashboard due to API " "error: %s" % e),
+            message=("Failed to %s dashboard due to API " "error: %s",action, e),
         )
         raise kopf.PermanentError("Failed creating the dashboard")
 
