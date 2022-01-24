@@ -99,6 +99,9 @@ components:
   platform_k8s_deployment:
     dimensions:
       - deployment_name: sample-deployment-name
+  platform_k8s_statefulset:
+    dimensions:
+      - statefulset_name: sample-statefulset-name
   platform_k8s_ingress:
     dimensions:
       - namespace: sample-namespace
