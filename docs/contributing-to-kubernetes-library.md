@@ -10,7 +10,7 @@ But if your use-case requires certain kubernetes objects to be created before le
 
 ## Implementation
 
-Legend relys heavily on templating and name-schema. So to add a component to kubernetes library in parity to the componet which is added in metric library you'll just need to create a python file with same name on path `legend/kubernetes_library` and implement `run` function with your business logic.
+Legend relys heavily on templating and name-schema. So to add a component to kubernetes library in parity to the component which is added in metric library you'll just need to create a python file with same name on path `legend/kubernetes_library` and implement `run` function with your business logic.
 
 Example:
 * You have added a new metric component to metric library: `kryptonite`
