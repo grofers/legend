@@ -1,23 +1,23 @@
 # Writing input file for legend
 
-For legend, every input file  correlates to _one_ Grafana dashboard. Every dashboard represts one
+For legend, every input file correlates to _one_ Grafana dashboard. Every dashboard represents one
 [service](#service) which is built up of multiple [components](#components).
 
 The input file must be written in [yaml](#yaml) format
 
 ## Service
 
-The construct of service is similar to the application for which the dashboard is being built for.
+The construct of service is similar to the application for which the dashboard is being built.
 
 ## Components
 
-These are discrete components which the application is using to provide the service. Simply put - this can be all the tech stack of the application's architecture. Examples of components - SQS, ALB, Consul, EC2, etc. 
+These are discrete components that the application is using to provide the service. Simply put - this can be all the tech stack of the application's architecture. Examples of components - SQS, ALB, Consul, EC2, etc. 
 
 ## Metric library
 
-A core feature of Legend is that it creates dashboards with pre filled metrics. All those metrics' filters and config are stored in [metric library](../legend/metrics_library/metrics). Every file in this folder represents the default metrics which are plotted for that component. The default alerting configuration is also defined in the same file.
+A core feature of Legend is that it creates dashboards with pre-filled metrics. All those metrics' filters and config are stored in [metric library](../legend/metrics_library/metrics). Every file in this folder represents the default metrics that are plotted for that component. The default alerting configuration is also defined in the same file.
 
-The metrics here have been coallated using standard industry practices, you can find some of the
+The metrics here have been collated using standard industry practices, you can find some of the
 references here:
 
 * https://landing.google.com/sre/sre-book/chapters/monitoring-distributed-systems/
@@ -32,20 +32,20 @@ metric library, [contributing-to-metric-library](../docs/contributing-to-metric-
 
 ## Sample input
 
-All descriptional fields of this spec are compulsory. For fileds within components you can refer to the [schema](../legend/metrics_library/metrics_schema.py) to find out which ones are compulsory and optional
+All descriptional fields of this spec are compulsory. For files within components, you can refer to the [schema](../legend/metrics_library/metrics_schema.py) to find out which ones are compulsory and optional
 
 ```yaml
 ---
-title: # Title of the dashboard. Should ususally be the service name. While creating the title in Grafana, this is appended with the environment filed mentioned below
-service: # Name of the service for which the dashboard is being generated. For all the alerts in this dashboard, a tag og_servce:<service> will be created which is further used for associating alerts from this dashabord to a particular service in opsgenie 
+title: # Title of the dashboard. Should usually be the service name. While creating the title in Grafana, this is appended with the environment file mentioned below
+service: # Name of the service for which the dashboard is being generated. For all the alerts in this dashboard, a tag og_servce:<service> will be created which is further used for associating alerts from this dashboard to a particular service in opsgenie 
 grafana_folder: # The grafana folder in which the dashboard has to be created. If the folder is not present in Grafana, Legend creates it
-alert_config: # Configuration associated with the alerts which are going to be setup for the respective panels.
+alert_config: # Configuration associated with the alerts which are going to be set up for the respective panels.
   notification_channels: [] # List of alert channels for notifications. These have to be present in Grafana from before. For example:  "service-opsgenie", "pagerduty"
-  tags: # Alert will be tagged with the following tags. For example :- Priority: P2
+  tags: # Alert will be tagged with the following tags. For example:- Priority: P2
     key1: value1 
     key2: value2
 environment: # The environment for which the dashboard is being generated for
-description: # Description on what is the pupose of the service/application
+description: # Description on what is the purpose of the service/application
 references:
   deployment: # Reference link to tell how the service is deployed
   documentation: # Reference link to the service's documentation
@@ -61,7 +61,7 @@ components: # The components which the service consists of along with the identi
 ## Add custom metrics and alert configurations
 
 To suit your use case you can edit the default alerts and metrics for each component. Or create new
-panels with custom metrics. You need to add the sepc in the input file under the component for which the config has to be changed. If the panel title is new a new panel is created, if not the existing panel will be altered.
+panels with custom metrics. You need to add the spec in the input file under the component for which the config has to be changed. If the panel title is new a new panel is created, if not the existing panel will be altered.
 
 The custom panels/metrics should follow the same format/syntax from the original component file in `metrics_library/metrics`. Please refer to [contributing-to-metric-library](../docs/contributing-to-metric-library.md) to understand this spec
 
