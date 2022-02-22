@@ -32,7 +32,7 @@ host: grafana-stage.grofer.io
 
 ### Deploying via CRD
 
-Set the appropraite context
+Set the appropriate context
 `kubectl apply -f <>`
 
 ### Minikube Setup
@@ -86,8 +86,8 @@ Prerequisite
  * Docker
 ```
 
-Following script will spawn a new kubernetes cluster using kind and will install relevent dependencies on kubernetes cluster.
-Script will automatically clean relevent kind cluster. 
+The following script will spawn a new Kubernetes cluster using kind and will install relevant dependencies on the Kubernetes cluster.
+The script will automatically clean the relevant kind cluster. 
 
 ```shell
 chmod +x isolated_legend_e2e_test.sh
