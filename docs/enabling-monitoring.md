@@ -1,7 +1,7 @@
 
 # Client Libraries & Integration Guides
 
-> This guide is only about enabling the metrics in the respective components, but doesn't not guide on enabling scrapping of the merics where applicable (ex: prometheus). Internally we user promethues operator and service monitor concept - [https://github.com/prometheus-operator/prometheus-operator/blob/master/Documentation/user-guides/getting-started.md](https://github.com/prometheus-operator/prometheus-operator/blob/master/Documentation/user-guides/getting-started.md )
+> This guide is only about enabling the metrics in the respective components but doesn't guide on enabling scrapping of the metrics where applicable (ex: Prometheus). Internally we use Prometheus operator and service monitor concept - [https://github.com/prometheus-operator/prometheus-operator/blob/master/Documentation/user-guides/getting-started.md](https://github.com/prometheus-operator/prometheus-operator/blob/master/Documentation/user-guides/getting-started.md )
 
 ## Table of contents
 
@@ -17,28 +17,28 @@
 * [Nginx](#Nginx)
 ## Django
 
-### Configure prometheus metrics exporter
+### Configure Prometheus metrics exporter
 
-You can set up  [django-prometheus](https://github.com/korfuri/django-prometheus)  exporter for your service by referring to the README here:  [https://github.com/grofers/django-prometheus/tree/v1.0.16](https://github.com/grofers/django-prometheus/tree/v1.0.16). This is specific becuase of the frozen django version. If your service supports you can probably user the upstream exporter itself
+You can set up  [django-prometheus](https://github.com/korfuri/django-prometheus)  exporter for your service by referring to the README here:  [https://github.com/grofers/django-prometheus/tree/v1.0.16](https://github.com/grofers/django-prometheus/tree/v1.0.16). This is specific because of the frozen Django version. If your service supports you can probably use the upstream exporter itself
 
-### Enable metrics django framweok
+### Enable metrics django framework
 
 Please follow  [django-prometheus](https://pypi.org/project/django-prometheus/)
 
 ### Enable Nginx Monitoring
 
-Prometheus will try to fetch `/metrics` and scrape all the open HTTP ports of instances tagged in the manifest causing that the Prometheus scraper throws 404 when trying to scrape HTTP servers that don’t expose metrics. This happens because all the endpoints mentioned urls.py are restricted to avoid being public. We can enable /metrics in nginx config such that prometheus is able to scrape this.
+Prometheus will try to fetch `/metrics` and scrape all the open HTTP ports of instances tagged in the manifest causing the Prometheus scraper throws 404 when trying to scrape HTTP servers that don’t expose metrics. This happens because all the endpoints mentioned urls.py are restricted to avoid being public. We can enable /metrics in nginx config such that Prometheus can scrape this.
 Reference -
  [https://www.linode.com/docs/web-servers/nginx/how-to-configure-nginx/#location-blocks](https://www.linode.com/docs/web-servers/nginx/how-to-configure-nginx/#location-blocks)  
 
 ## Celery
 
-[celery-prometheus-exporter](https://github.com/zerok/celery-prometheus-exporter)  is an exporter for Celery related metrics in order to get picked up by Prometheus.
-You can set up celery-prometheus-exporter for your service by referring the below link  [https://github.com/zerok/celery-prometheus-exporter](https://github.com/zerok/celery-prometheus-exporter)  
+[celery-prometheus-exporter](https://github.com/zerok/celery-prometheus-exporter)  is an exporter for Celery related metrics to get picked up by Prometheus.
+You can set up celery-prometheus-exporter for your service by referring to the below link  [https://github.com/zerok/celery-prometheus-exporter](https://github.com/zerok/celery-prometheus-exporter)  
 
 ### Example
 
-This is a sample deployment following the documenatation to setup metrics over the celery queue using redis
+This is a sample deployment following the documentation to set up metrics over the celery queue using redis
 
 ```yaml
 ---
@@ -74,7 +74,7 @@ spec:
 
 ## MySql EC2
 
-To consume the metrics from MySQL we should setup PMM server on each MySQL instance. Once the servers are exposing metrics, we should enable scarping to insert into prometheus. One way to do it is create a static kubernetes `endpoint` pointing to the instance and further creating a `service` pointing to this `endpoint` and having a `service monitor` scarpping
+To consume the metrics from MySQL we should set up PMM server on each MySQL instance. Once the servers are exposing metrics, we should enable scarping to insert into Prometheus. One way to do it is to create a static kubernetes `endpoint` pointing to the instance and further creating a `service` pointing to this `endpoint` and having a `service monitor` scrapping
 
 ```yaml
 ---
@@ -217,7 +217,7 @@ sudo rabbitmqctl status
 *`3.6.x` and `3.7.x`
 Exporter - [https://github.com/deadtrickster/prometheus_rabbitmq_exporter](https://github.com/deadtrickster/prometheus_rabbitmq_exporter) to expose metrics to prometheus.
 
-Depending on the version of RabbitMQ you need to download relevant release , which you will have to enable on your machine where your RabbitMQ is running.
+Depending on the version of RabbitMQ you need to download relevant release, which you will have to enable on your machine where your RabbitMQ is running.
 
 Go to the section Install the rabbitmq prometheus exporter in this link. [http://www.hontecillas.com/setup_prometheus_and_grafana.html](http://www.hontecillas.com/setup_prometheus_and_grafana.html). Download the relevant release in the path where other rabbitmq plugins are installed , mostly it will be `/usr/lib/rabbitmq/lib/rabbitmq-server-[version]/plugins` or `/usr/lib/rabbitmq/plugins`
 
@@ -262,9 +262,9 @@ spec:
       targetPort: 80
 ```
 
-To get queue based metrics, enable per object metric collection using the prometheus.return_per_object_metrics = true, in the rabbitmq.conf. More info here at  [Per Object Metrics](https://www.rabbitmq.com/prometheus.html#metric-aggregation) (This has a performance impact, so please read the docs for that).
+To get queue-based metrics, enable per object metric collection using the prometheus.return_per_object_metrics = true, in the rabbitmq.conf. More info here at  [Per Object Metrics](https://www.rabbitmq.com/prometheus.html#metric-aggregation) (This has a performance impact, so please read the docs for that).
 
-_Note:_ If using legend to configure RabbitMQ monitoring, remember to enable prometheus return_per_object_metrics, else most graphs won’t show any data
+_Note:_ If using the legend to configure RabbitMQ monitoring, remember to enable prometheus return_per_object_metrics, else most graphs won’t show any data
 
 # Couchdb
 
@@ -296,7 +296,7 @@ Please setup PgBouncer exporter from [here](https://github.com/spreaker/promethe
 
 # NGINX
 
-* Please setup the Prometheus-NginxLog-Exporter from [here](https://github.com/martin-helmich/prometheus-nginxlog-exporter).
-* Please setup namespacing over your NGINX (don't mistake this for kubernetes namespace. They are not at all related ). Refer to [this](https://github.com/martin-helmich/prometheus-nginxlog-exporter#namespace-as-labels) for more details around nginx namespacing. 
+* Please set up the Prometheus-NginxLog-Exporter from [here](https://github.com/martin-helmich/prometheus-nginxlog-exporter).
+* Please setup namespacing over your NGINX (don't mistake this for Kubernetes namespace. They are not at all related ). Refer to [this](https://github.com/martin-helmich/prometheus-nginxlog-exporter#namespace-as-labels) for more details around nginx namespacing. 
   * Do not use any other special characters apart from "underscores" (_) while naming any namespace as the namespace names are used directly as placeholders in the names of the metrics created by the above exporter (for example `<namespace>_http_response_count_total`) and prometheus would expect all the metric names to NOT contain any special character apart from underscores (\_).
-* Finally, setup a Prometheus server to periodically scrape the `/metrics` endpoint exposed by the above prometheus-nginxlog-exporter thereby, exposing the required NGINX metrics. 
+* Finally, set up a Prometheus server to periodically scrape the `/metrics` endpoint exposed by the above prometheus-nginxlog-exporter thereby, exposing the required NGINX metrics. 
