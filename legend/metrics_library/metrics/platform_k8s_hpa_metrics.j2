@@ -9,7 +9,7 @@ panels:
     description: Check if Total Number of Pods less than Min Pods
     targets:
       {% for dimension in data %}
-      - metric: kube_deployment_status_replicas_available{deployment=~""^{{ dimension.deployment_name }}.*"} / on (service) group_left(horizontalpodautoscaler) kube_horizontalpodautoscaler_spec_min_replicas{horizontalpodautoscaler="{{ dimension.hpa_name }}"}
+      - metric: kube_deployment_status_replicas_available{deployment=~"^{{ dimension.deployment_name }}.*"} / on (service) group_left(horizontalpodautoscaler) kube_horizontalpodautoscaler_spec_min_replicas{horizontalpodautoscaler="{{ dimension.hpa_name }}"}
         legend: '{{ ' {{deployment}} ' }}'
         ref_no: 1
       {% endfor %}
@@ -27,7 +27,7 @@ panels:
     description: Check if Total Number of Pods equal to Max Pods for long
     targets:
       {% for dimension in data %}
-      - metric: kube_deployment_status_replicas_available{deployment=~""^{{ dimension.deployment_name }}.*"} / on (service) group_left(horizontalpodautoscaler) kube_horizontalpodautoscaler_spec_max_replicas{horizontalpodautoscaler="{{ dimension.hpa_name }}"}
+      - metric: kube_deployment_status_replicas_available{deployment=~"^{{ dimension.deployment_name }}.*"} / on (service) group_left(horizontalpodautoscaler) kube_horizontalpodautoscaler_spec_max_replicas{horizontalpodautoscaler="{{ dimension.hpa_name }}"}
         legend: '{{ ' {{deployment}} ' }}'
         ref_no: 1
       {% endfor %}
