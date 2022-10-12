@@ -1,7 +1,7 @@
-FROM bitnami/jsonnet AS jsonnet
+FROM public.ecr.aws/zomato/bitnami/jsonnet AS jsonnet
 RUN echo "`which jsonnet`"
 
-FROM python:3.7
+FROM public.ecr.aws/zomato/python:3.7
 
 ENV LEGEND_HOME="/src"
 ENV GRAFONNET_REPO_URL="https://github.com/grafana/grafonnet-lib"
@@ -12,7 +12,7 @@ ENV GRAFONNET_REPO_RELEASE_TAG="3082bfca110166cd69533fa3c0875fdb1b68c329"
 
 WORKDIR /src
 
-COPY --from=jsonnet /opt/bitnami/jsonnet/bin/jsonnet /usr/local/bin/jsonnet
+COPY --from=jsonnet /opt/public.ecr.aws/zomato/bitnami/jsonnet/bin/jsonnet /usr/local/bin/jsonnet
 
 COPY requirements.txt .
 
