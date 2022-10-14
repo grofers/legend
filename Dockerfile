@@ -1,4 +1,4 @@
-FROM public.ecr.aws/zomato/bitnami/jsonnet AS jsonnet
+FROM public.ecr.aws/zomato/bitnami/jsonnet:0.18.0 AS jsonnet
 RUN echo "`which jsonnet`"
 
 FROM public.ecr.aws/zomato/python:3.7
