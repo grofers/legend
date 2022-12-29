@@ -10,7 +10,7 @@ on:
 jobs:
 
   test-e2e:
-    runs-on: ubuntu-latest
+    runs-on: self-hosted
 
     services:
       grafana:
