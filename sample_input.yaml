@@ -38,6 +38,10 @@ components:
   django:
     dimensions:
       - job: sample-django-service
+  fastapi:
+    dimensions:
+      - job: sample-fastapi-service
+        path: sample-fastapi-path
   flask:
     dimensions:
       - job: sample-flask-service
