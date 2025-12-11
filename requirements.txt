@@ -11,5 +11,5 @@ yamllint==1.25.0
 jsonnet==0.17.0
 cerberus==1.3.2
 sentry-sdk==0.19.5
-black==19.10b0
+black==24.3.0
 MarkupSafe==2.0.1
